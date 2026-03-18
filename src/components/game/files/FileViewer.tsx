@@ -13,7 +13,7 @@ export default function FileViewer({
 }: FileViewerProps) {
   if (type === "text") {
     return (
-      <div className="h-full overflow-auto rounded-lg bg-neutral-950 p-4 text-sm text-green-300">
+      <div className="h-full w-full overflow-auto rounded-lg bg-neutral-950 p-4 text-sm text-green-300">
         <pre className="whitespace-pre-wrap font-mono">{content}</pre>
       </div>
     );

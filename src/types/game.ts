@@ -11,6 +11,11 @@ export type DesktopItem = {
   children?: DesktopItem[];
 };
 
+export type WindowPosition = {
+  x: number;
+  y: number;
+};
+
 export type WindowInstance = {
   id: string;
   title: string;
@@ -19,6 +24,7 @@ export type WindowInstance = {
   imageUrl?: string;
   children?: DesktopItem[];
   zIndex: number;
+  position: WindowPosition;
 };
 
 export type Briefing = {

@@ -49,6 +49,7 @@ export default function Desktop({ items, briefing }: DesktopProps) {
           id={window.id}
           title={window.title}
           zIndex={window.zIndex}
+          position={window.position}
         >
           {window.type === "terminal" ? (
             <TerminalWindow />

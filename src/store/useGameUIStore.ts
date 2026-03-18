@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type { Difficulty, WindowInstance } from "@/types/game";
+import type { Difficulty, WindowInstance, WindowPosition } from "@/types/game";
 
 type GameUIState = {
   briefingOpen: boolean;
@@ -12,10 +12,18 @@ type GameUIState = {
   closeBriefing: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
 
-  openWindow: (window: Omit<WindowInstance, "zIndex">) => void;
+  openWindow: (
+    window: Omit<WindowInstance, "zIndex" | "position"> & {
+      position?: WindowPosition;
+    },
+  ) => void;
   closeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
+  setWindowPosition: (id: string, position: WindowPosition) => void;
 };
+
+const BASE_WINDOW_POSITION: WindowPosition = { x: 120, y: 120 };
+const WINDOW_OFFSET = 28;
 
 export const useGameUIStore = create<GameUIState>((set, get) => ({
   briefingOpen: true,
@@ -42,8 +50,17 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
       return;
     }
 
+    const defaultPosition =
+      window.position ?? {
+        x: BASE_WINDOW_POSITION.x + WINDOW_OFFSET * openWindows.length,
+        y: BASE_WINDOW_POSITION.y + WINDOW_OFFSET * openWindows.length,
+      };
+
     set({
-      openWindows: [...openWindows, { ...window, zIndex: zCounter + 1 }],
+      openWindows: [
+        ...openWindows,
+        { ...window, zIndex: zCounter + 1, position: defaultPosition },
+      ],
       zCounter: zCounter + 1,
     });
   },
@@ -63,4 +80,11 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
       zCounter: zCounter + 1,
     });
   },
+
+  setWindowPosition: (id, position) =>
+    set((state) => ({
+      openWindows: state.openWindows.map((w) =>
+        w.id === id ? { ...w, position } : w,
+      ),
+    })),
 }));
