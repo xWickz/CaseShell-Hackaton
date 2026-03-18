@@ -22,6 +22,9 @@ export default function DesktopIcon({
   const addTerminalLines = useGameSessionStore(
     (state) => state.addTerminalLines,
   );
+  const currentDifficulty = useGameSessionStore(
+    (state) => state.currentDifficulty,
+  );
 
   const handleOpen = () => {
     if (item.name === "network.txt") {
@@ -53,6 +56,39 @@ export default function DesktopIcon({
           id: crypto.randomUUID(),
           type: "hint",
           text: "Nueva pista descubierta: identificaste un proceso sospechoso en ejecución.",
+        },
+      ]);
+    }
+
+    if (item.name === "resolver.conf" && currentDifficulty !== "easy") {
+      discoverKnowledge("knowsDnsFix");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "Reporte DNS analizado: puedes normalizar los reenviadores con 'fix dns'.",
+        },
+      ]);
+    }
+
+    if (item.name === "system.log" && currentDifficulty !== "easy") {
+      discoverKnowledge("knowsServiceRestart");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "Los logs indican que debes ejecutar 'restart services' tras estabilizar la red.",
+        },
+      ]);
+    }
+
+    if (item.name === "switch.conf" && currentDifficulty === "hard") {
+      discoverKnowledge("knowsSwitchFix");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "Configuración de switch encontrada: habilita el puerto crítico con 'enable port'.",
         },
       ]);
     }

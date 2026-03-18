@@ -3,6 +3,33 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
+import type { Difficulty } from "@/types/game";
+import type { CaseProgress } from "@/types/game-engine";
+
+const CASE_IDS: Record<Difficulty, string> = {
+  easy: "EASY-001",
+  medium: "MED-002",
+  hard: "HARD-003",
+};
+
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
+};
+
+const CHECKLIST_CONFIG: Array<{
+  key: keyof CaseProgress;
+  label: string;
+  difficulties: Difficulty[];
+}> = [
+  { key: "wifiFixed", label: "WiFi restaurado", difficulties: ["easy", "medium", "hard"] },
+  { key: "firewallFixed", label: "Firewall corregido", difficulties: ["easy", "medium", "hard"] },
+  { key: "malwareKilled", label: "Malware eliminado", difficulties: ["easy", "medium", "hard"] },
+  { key: "dnsFixed", label: "DNS normalizado", difficulties: ["medium", "hard"] },
+  { key: "servicesRestarted", label: "Servicios reiniciados", difficulties: ["medium", "hard"] },
+  { key: "switchPortEnabled", label: "Puerto crítico habilitado", difficulties: ["hard"] },
+];
 
 function formatTime(seconds: number) {
   const mins = Math.floor(seconds / 60);
@@ -19,11 +46,26 @@ export default function VictoryModal() {
   const resetSession = useGameSessionStore((state) => state.resetSession);
 
   const caseState = useGameSessionStore((state) => state.caseState);
+  const currentDifficulty = useGameSessionStore(
+    (state) => state.currentDifficulty,
+  );
 
   const elapsedSeconds = useMemo(() => {
     if (!startTime || !endTime) return 0;
     return Math.max(0, Math.floor((endTime - startTime) / 1000));
   }, [startTime, endTime]);
+
+  const caseId = CASE_IDS[currentDifficulty];
+  const difficultyLabel = DIFFICULTY_LABELS[currentDifficulty];
+
+  const checklist = useMemo(() => {
+    return CHECKLIST_CONFIG.filter((item) =>
+      item.difficulties.includes(currentDifficulty),
+    ).map((item) => ({
+      label: item.label,
+      done: Boolean(caseState.progress[item.key]),
+    }));
+  }, [currentDifficulty, caseState.progress]);
 
   if (!isVictoryOpen) return null;
 
@@ -43,8 +85,8 @@ export default function VictoryModal() {
 
         <p className="mt-3 text-slate-300">
           Has restaurado los servicios del caso{" "}
-          <span className="font-semibold text-emerald-400">EASY-001</span> y
-          estabilizado la infraestructura.
+          <span className="font-semibold text-emerald-400">{caseId}</span> en
+          dificultad <span className="font-semibold">{difficultyLabel}</span>.
         </p>
 
         {/* Stats */}
@@ -62,7 +104,7 @@ export default function VictoryModal() {
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               Dificultad
             </p>
-            <p className="mt-2 text-2xl font-bold text-emerald-400">Easy</p>
+            <p className="mt-2 text-2xl font-bold text-emerald-400">{difficultyLabel}</p>
           </div>
         </div>
 
@@ -73,44 +115,17 @@ export default function VictoryModal() {
           </p>
 
           <div className="mt-4 space-y-3">
-            <div className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3">
-              <span className="text-slate-300">WiFi restaurado</span>
-              <span
-                className={
-                  caseState.progress.wifiFixed
-                    ? "text-emerald-400"
-                    : "text-slate-500"
-                }
+            {checklist.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3"
               >
-                {caseState.progress.wifiFixed ? "✓" : "—"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3">
-              <span className="text-slate-300">Firewall corregido</span>
-              <span
-                className={
-                  caseState.progress.firewallFixed
-                    ? "text-emerald-400"
-                    : "text-slate-500"
-                }
-              >
-                {caseState.progress.firewallFixed ? "✓" : "—"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3">
-              <span className="text-slate-300">Malware eliminado</span>
-              <span
-                className={
-                  caseState.progress.malwareKilled
-                    ? "text-emerald-400"
-                    : "text-slate-500"
-                }
-              >
-                {caseState.progress.malwareKilled ? "✓" : "—"}
-              </span>
-            </div>
+                <span className="text-slate-300">{item.label}</span>
+                <span className={item.done ? "text-emerald-400" : "text-slate-500"}>
+                  {item.done ? "✓" : "—"}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 

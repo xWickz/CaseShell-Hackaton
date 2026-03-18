@@ -1,6 +1,6 @@
 import type {
   CommandExecutionResult,
-  EasyCaseState,
+  CaseState,
   TerminalLine,
   TerminalLineType,
 } from "@/types/game-engine";
@@ -15,7 +15,7 @@ function line(text: string, type: TerminalLineType = "system"): TerminalLine {
 
 export function executeEasyCommand(
   rawInput: string,
-  state: EasyCaseState,
+  state: CaseState,
 ): CommandExecutionResult {
   const input = rawInput.trim().toLowerCase();
 

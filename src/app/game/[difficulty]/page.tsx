@@ -26,5 +26,5 @@ export default async function GameDifficultyPage({
   const items = mockDesktopItemsByDifficulty[difficultyKey];
   const briefing = briefingsByDifficulty[difficultyKey];
 
-  return <Desktop items={items} briefing={briefing} />;
+  return <Desktop items={items} briefing={briefing} difficulty={difficultyKey} />;
 }

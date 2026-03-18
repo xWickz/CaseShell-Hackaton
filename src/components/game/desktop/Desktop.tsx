@@ -9,16 +9,33 @@ import WindowFrame from "@/components/game/desktop/WindowFrame";
 import FileViewer from "@/components/game/files/FileViewer";
 import FolderViewer from "@/components/game/files/FolderViewer";
 import { useGameUIStore } from "@/store/useGameUIStore";
-import type { DesktopItem, Briefing } from "@/types/game";
+import { useGameSessionStore } from "@/store/useGameSessionStore";
+import type { DesktopItem, Briefing, Difficulty } from "@/types/game";
 import VictoryModal from "@/components/game/modals/VictoryModal";
 type DesktopProps = {
   items: DesktopItem[];
   briefing: Briefing;
+  difficulty: Difficulty;
 };
 
-export default function Desktop({ items, briefing }: DesktopProps) {
+export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const openWindows = useGameUIStore((state) => state.openWindows);
   const openWindow = useGameUIStore((state) => state.openWindow);
+  const setDifficulty = useGameUIStore((state) => state.setDifficulty);
+
+  const initializeSession = useGameSessionStore(
+    (state) => state.initializeSession,
+  );
+  const currentDifficulty = useGameSessionStore(
+    (state) => state.currentDifficulty,
+  );
+
+  useEffect(() => {
+    setDifficulty(difficulty);
+    if (currentDifficulty !== difficulty) {
+      initializeSession(difficulty);
+    }
+  }, [difficulty, currentDifficulty, setDifficulty, initializeSession]);
 
   useEffect(() => {
     openWindow({

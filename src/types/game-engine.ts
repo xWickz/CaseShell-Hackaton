@@ -11,27 +11,33 @@ export type TerminalLine = {
   text: string;
 };
 
-export type EasyCaseKnowledge = {
+export type CaseKnowledge = {
   knowsWifiFix?: boolean;
   knowsFirewallFix?: boolean;
   knowsMalwareFix?: boolean;
+  knowsDnsFix?: boolean;
+  knowsServiceRestart?: boolean;
+  knowsSwitchFix?: boolean;
 };
 
-export type EasyCaseProgress = {
+export type CaseProgress = {
   wifiFixed?: boolean;
   firewallFixed?: boolean;
   malwareKilled?: boolean;
+  dnsFixed?: boolean;
+  servicesRestarted?: boolean;
+  switchPortEnabled?: boolean;
   completed?: boolean;
 };
 
-export type EasyCaseState = {
-  knowledge: EasyCaseKnowledge;
-  progress: EasyCaseProgress;
+export type CaseState = {
+  knowledge: CaseKnowledge;
+  progress: CaseProgress;
 };
 
 export type CommandExecutionResult = {
   lines: TerminalLine[];
-  nextState?: DeepPartial<EasyCaseState>;
+  nextState?: DeepPartial<CaseState>;
   completed?: boolean;
 };
 

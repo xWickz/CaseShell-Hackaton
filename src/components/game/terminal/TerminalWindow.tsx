@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
-import { executeEasyCommand } from "@/lib/game/easy-case-engine";
+import { executeCaseCommand } from "@/lib/game/case-engine";
 
 export default function TerminalWindow() {
   const terminalHistory = useGameSessionStore((state) => state.terminalHistory);
   const currentInput = useGameSessionStore((state) => state.currentInput);
   const caseState = useGameSessionStore((state) => state.caseState);
+  const currentDifficulty = useGameSessionStore(
+    (state) => state.currentDifficulty,
+  );
 
   const setCurrentInput = useGameSessionStore((state) => state.setCurrentInput);
   const addTerminalLines = useGameSessionStore(
@@ -58,7 +61,7 @@ export default function TerminalWindow() {
       return;
     }
 
-    const result = executeEasyCommand(rawInput, caseState);
+    const result = executeCaseCommand(currentDifficulty, rawInput, caseState);
 
     if (result.lines.length > 0) {
       addTerminalLines(result.lines);
