@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { difficulties } from "@/data/mock/difficulties";
 import Navbar from "@/components/game/ui/navbar";
-import { Difficulty } from "@/types/game";
+import Footer from "@/components/game/ui/footer";
 
 export default function GameSelectPage() {
   // Mapeo de estilos para que Tailwind los detecte siempre
@@ -81,6 +81,9 @@ export default function GameSelectPage() {
           </div>
         </div>
       </main>
+
+      {/* FOOTER */}
+      <Footer />
     </>
   );
 }

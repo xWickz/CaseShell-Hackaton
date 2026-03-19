@@ -21,6 +21,13 @@ export default function Navbar() {
         >
           Jugar
         </Link>
+        <Link
+          href="/ranking"
+          role="button"
+          className="text-sm text-white transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded-lg px-3 py-1"
+        >
+          Clasificación
+        </Link>
       </div>
     </nav>
   );

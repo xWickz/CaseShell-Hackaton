@@ -30,7 +30,7 @@ export default function GlowButton({ href, children }: GlowButtonProps) {
           />
           <path
             d="M1 1l4 4-4 4"
-            className="transition group-hover:translate-x-[3px]"
+            className="transition group-hover:translate-x-0.75"
           />
         </svg>
       </Link>

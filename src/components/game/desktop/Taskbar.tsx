@@ -1,27 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Palette, Power, RotateCcw, ChevronUp } from "lucide-react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import { useGameUIStore } from "@/store/useGameUIStore";
-import { getChecklistProgress } from "@/data/game/checklist";
 
 export default function Taskbar() {
   const [now, setNow] = useState(() => new Date());
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   const startMenuRef = useRef<HTMLDivElement>(null);
 
-  const caseState = useGameSessionStore((state) => state.caseState);
-  const currentDifficulty = useGameSessionStore(
-    (state) => state.currentDifficulty,
-  );
   const commandStats = useGameSessionStore((state) => state.commandStats);
   const startTime = useGameSessionStore((state) => state.startTime);
   const resetSession = useGameSessionStore((state) => state.resetSession);
-  const clearTerminalHistory = useGameSessionStore(
-    (state) => state.clearTerminalHistory,
-  );
 
   const cycleWallpaperTheme = useGameUIStore(
     (state) => state.cycleWallpaperTheme,
@@ -67,10 +58,6 @@ export default function Taskbar() {
     return { timeLabel, dateLabel, elapsedSeconds };
   }, [now, startTime]);
 
-  const progressStats = useMemo(() => {
-    return getChecklistProgress(currentDifficulty, caseState.progress);
-  }, [caseState.progress, currentDifficulty]);
-
   const accuracyPercent = useMemo(() => {
     if (commandStats.total === 0) return null;
     return Math.round((commandStats.success / commandStats.total) * 100);
@@ -84,7 +71,7 @@ export default function Taskbar() {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-[999] flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
+    <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
       <div className="flex items-center gap-2 relative" ref={startMenuRef}>
         {/* Start Menu Button */}
         <button
