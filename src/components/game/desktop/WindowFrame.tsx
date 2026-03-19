@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { X } from "lucide-react";
 import { useGameUIStore } from "@/store/useGameUIStore";
 import type { PointerEvent, ReactNode } from "react";
@@ -23,12 +23,11 @@ export default function WindowFrame({
 }: WindowFrameProps) {
   const closeWindow = useGameUIStore((state) => state.closeWindow);
   const focusWindow = useGameUIStore((state) => state.focusWindow);
-  const setWindowPosition = useGameUIStore(
-    (state) => state.setWindowPosition,
-  );
+  const setWindowPosition = useGameUIStore((state) => state.setWindowPosition);
 
   const frameRef = useRef<HTMLDivElement | null>(null);
   const dragOffsetRef = useRef<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const clamp = (value: number, min: number, max: number) => {
     if (Number.isNaN(value)) return min;
@@ -52,6 +51,7 @@ export default function WindowFrame({
       x: event.clientX - rect.left,
       y: event.clientY - rect.top,
     };
+    setIsDragging(true);
 
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -82,17 +82,23 @@ export default function WindowFrame({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     dragOffsetRef.current = null;
+    setIsDragging(false);
   };
 
   return (
     <div
       ref={frameRef}
       onMouseDown={() => focusWindow(id)}
-      className="absolute flex h-[420px] w-[90%] max-w-3xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/70 shadow-2xl backdrop-blur-xl"
-      style={{ zIndex, left: position.x, top: position.y }}
+      className="absolute flex h-105 w-[90%] max-w-3xl flex-col overflow-hidden rounded-2xl border border-white/20 bg-slate-900/60 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-200 ease-out"
+      style={{
+        zIndex,
+        left: position.x,
+        top: position.y,
+        transitionProperty: isDragging ? "none" : "box-shadow, border-color",
+      }}
     >
       <div
-        className="flex shrink-0 items-center justify-between rounded-t-2xl border-b border-white/10 bg-white/5 px-4 py-3 cursor-move select-none"
+        className="flex shrink-0 items-center justify-between border-b border-white/10 bg-white/10 px-4 py-3 cursor-move select-none backdrop-blur-md"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={endDrag}

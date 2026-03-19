@@ -15,7 +15,9 @@ export default function Taskbar() {
   );
   const commandStats = useGameSessionStore((state) => state.commandStats);
   const startTime = useGameSessionStore((state) => state.startTime);
-  const cycleWallpaperTheme = useGameUIStore((state) => state.cycleWallpaperTheme);
+  const cycleWallpaperTheme = useGameUIStore(
+    (state) => state.cycleWallpaperTheme,
+  );
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -58,12 +60,12 @@ export default function Taskbar() {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-[999] flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white backdrop-blur-xl">
+    <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
       <div className="flex items-center gap-2">
         <Link
           href="/"
           aria-label="Ir al escritorio principal"
-          className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           <House className="h-5 w-5" />
         </Link>
@@ -72,7 +74,7 @@ export default function Taskbar() {
           type="button"
           onClick={cycleWallpaperTheme}
           aria-label="Cambiar fondo del escritorio"
-          className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           <Palette className="h-5 w-5" />
         </button>
@@ -83,12 +85,19 @@ export default function Taskbar() {
           CaseShell OS
         </span>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Badge label="Incidentes" value={`${progressStats.completed}/${progressStats.total}`} />
+          <Badge
+            label="Incidentes"
+            value={`${progressStats.completed}/${progressStats.total}`}
+          />
           <Badge label="Tiempo" value={formatElapsed()} />
           <Badge
             label="Precisión"
             value={accuracyPercent === null ? "—" : `${accuracyPercent}%`}
-            tone={accuracyPercent !== null && accuracyPercent < 50 ? "warning" : "default"}
+            tone={
+              accuracyPercent !== null && accuracyPercent < 50
+                ? "warning"
+                : "default"
+            }
           />
         </div>
       </div>
@@ -116,7 +125,9 @@ function Badge({ label, value, tone = "default" }: BadgeProps) {
       : "border-white/15 bg-white/5 text-white";
 
   return (
-    <div className={`rounded-xl border px-3 py-1 text-[0.65rem] ${toneClasses}`}>
+    <div
+      className={`rounded-xl border px-3 py-1 text-[0.65rem] ${toneClasses}`}
+    >
       <span className="uppercase tracking-wider text-white/60">{label}</span>
       <span className="ml-2 font-semibold text-white">{value}</span>
     </div>

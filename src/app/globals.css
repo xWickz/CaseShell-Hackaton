@@ -24,3 +24,56 @@ body {
   color: var(--foreground);
   font-family: "Segoe UI", "Segoe UI Variable", system-ui, sans-serif;
 }
+
+/* --- CRT Effect --- */
+.crt-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.crt-overlay::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px; /* scanline size */
+  pointer-events: none;
+}
+
+.crt-overlay::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.05); /* very light dim */
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.7); /* vignette */
+  pointer-events: none;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.95; }
+  5% { opacity: 0.85; }
+  10% { opacity: 0.95; }
+  15% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+.crt-flicker {
+  animation: flicker 0.15s infinite;
+}

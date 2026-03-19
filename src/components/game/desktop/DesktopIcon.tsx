@@ -1,20 +1,31 @@
 "use client";
 
+import { useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
 import { FileText, Folder, ImageIcon, TerminalSquare } from "lucide-react";
 import { useGameUIStore } from "@/store/useGameUIStore";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { DesktopItem } from "@/types/game";
+import type { PanInfo } from "framer-motion";
 
 type DesktopIconProps = {
   item: DesktopItem;
   insideWindow?: boolean;
+  defaultIndex?: number;
+  allItems?: DesktopItem[];
 };
+
+const GRID_SIZE = 96;
 
 export default function DesktopIcon({
   item,
   insideWindow = false,
+  defaultIndex = 0,
+  allItems = [],
 }: DesktopIconProps) {
   const openWindow = useGameUIStore((state) => state.openWindow);
+  const iconPositions = useGameUIStore((state) => state.iconPositions);
+  const setIconPosition = useGameUIStore((state) => state.setIconPosition);
 
   const discoverKnowledge = useGameSessionStore(
     (state) => state.discoverKnowledge,
@@ -230,17 +241,125 @@ export default function DesktopIcon({
     }
   };
 
+  // Calculate default grid position (top-to-bottom, then left-to-right columns)
+  // Assuming a max height roughly matching 1080p for default layout
+  const MAX_ROWS = 8;
+  const PADDING = 16;
+  const TASKBAR_HEIGHT = 80;
+
+  const getDefaultPositionForIndex = (index: number) => {
+    const col = Math.floor(index / MAX_ROWS);
+    const row = index % MAX_ROWS;
+    return {
+      x: col * GRID_SIZE + PADDING,
+      y: row * GRID_SIZE + PADDING,
+    };
+  };
+
+  const currentPos =
+    iconPositions[item.id] ?? getDefaultPositionForIndex(defaultIndex);
+
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start(currentPos);
+  }, [currentPos, controls]);
+
+  if (insideWindow) {
+    return (
+      <button
+        onDoubleClick={handleOpen}
+        className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        aria-label={`Abrir ${item.name}`}
+        title={item.name}
+      >
+        {renderIcon()}
+        <span className="max-w-25 text-center text-xs font-medium">
+          {item.name}
+        </span>
+      </button>
+    );
+  }
+
+  const handleDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
+    const rawX = currentPos.x + info.offset.x;
+    const rawY = currentPos.y + info.offset.y;
+
+    // Snap to closest grid cell
+    let snappedX =
+      Math.round((rawX - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
+    let snappedY =
+      Math.round((rawY - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
+
+    // Window physical bounds
+    const maxX =
+      typeof window !== "undefined"
+        ? window.innerWidth - GRID_SIZE - PADDING
+        : 1920;
+    const maxY =
+      typeof window !== "undefined"
+        ? window.innerHeight - TASKBAR_HEIGHT - GRID_SIZE
+        : 1080;
+
+    // Prevent going out of negative bounds
+    if (snappedX < PADDING) snappedX = PADDING;
+    if (snappedY < PADDING) snappedY = PADDING;
+
+    // Prevent going under taskbar or out of right screen edge
+    if (snappedX > maxX)
+      snappedX = Math.floor((maxX - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
+    if (snappedY > maxY)
+      snappedY = Math.floor((maxY - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
+
+    const occupies = (x: number, y: number) => {
+      const storePositions = useGameUIStore.getState().iconPositions;
+
+      // Check against all items (both moved and unmoved)
+      return allItems.some((otherItem, index) => {
+        if (otherItem.id === item.id) return false;
+
+        // If other item has a saved position, use it. Otherwise, use its default calculated spot.
+        const otherPos =
+          storePositions[otherItem.id] ?? getDefaultPositionForIndex(index);
+
+        // Distance check (allow small margin of floating point error)
+        return Math.abs(otherPos.x - x) < 10 && Math.abs(otherPos.y - y) < 10;
+      });
+    };
+
+    // If occupied, safely revert to original pos visually instantly
+    if (occupies(snappedX, snappedY)) {
+      controls.start({
+        x: currentPos.x,
+        y: currentPos.y,
+        transition: { type: "spring", stiffness: 400, damping: 25 },
+      });
+    } else {
+      setIconPosition(item.id, { x: snappedX, y: snappedY });
+    }
+  };
+
   return (
-    <button
+    <motion.button
+      drag
+      dragMomentum={false}
+      onDragEnd={handleDragEnd}
       onDoubleClick={handleOpen}
-      className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+      initial={currentPos}
+      animate={controls}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      style={{ position: "absolute" }}
+      className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
       aria-label={`Abrir ${item.name}`}
       title={item.name}
     >
       {renderIcon()}
-      <span className="max-w-[100px] text-center text-xs font-medium">
+      <span className="max-w-25 text-center text-xs font-medium drop-shadow-md">
         {item.name}
       </span>
-    </button>
+    </motion.button>
   );
 }

@@ -33,12 +33,14 @@ const tips = [
   },
 ];
 
-export default function OnboardingOverlay({ onDismiss }: OnboardingOverlayProps) {
+export default function OnboardingOverlay({
+  onDismiss,
+}: OnboardingOverlayProps) {
   const headingId = "onboarding-heading";
 
   return (
     <div
-      className="absolute inset-0 z-[1200] flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur"
+      className="absolute inset-0 z-1200 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
@@ -62,7 +64,10 @@ export default function OnboardingOverlay({ onDismiss }: OnboardingOverlayProps)
               key={tip.title}
               className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80"
             >
-              <tip.icon className="mb-3 h-5 w-5 text-emerald-300" aria-hidden="true" />
+              <tip.icon
+                className="mb-3 h-5 w-5 text-emerald-300"
+                aria-hidden="true"
+              />
               <p className="text-base font-semibold text-white">{tip.title}</p>
               <p className="mt-1 text-white/70">{tip.description}</p>
             </article>
@@ -71,7 +76,7 @@ export default function OnboardingOverlay({ onDismiss }: OnboardingOverlayProps)
 
         <button
           onClick={onDismiss}
-          className="mt-6 w-full rounded-2xl bg-emerald-500 px-6 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+          className="mt-6 w-full rounded-2xl bg-emerald-500 px-6 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
         >
           Listo, entrar al escritorio
         </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DesktopIcon from "@/components/game/desktop/DesktopIcon";
 import Taskbar from "@/components/game/desktop/Taskbar";
 import BriefingModal from "@/components/game/modals/BriefingModal";
@@ -13,6 +13,7 @@ import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { DesktopItem, Briefing, Difficulty } from "@/types/game";
 import VictoryModal from "@/components/game/modals/VictoryModal";
 import OnboardingOverlay from "@/components/game/modals/OnboardingOverlay";
+
 type DesktopProps = {
   items: DesktopItem[];
   briefing: Briefing;
@@ -20,6 +21,8 @@ type DesktopProps = {
 };
 
 export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
   const openWindows = useGameUIStore((state) => state.openWindows);
   const openWindow = useGameUIStore((state) => state.openWindow);
   const setDifficulty = useGameUIStore((state) => state.setDifficulty);
@@ -46,6 +49,10 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         return "from-slate-900 via-slate-800 to-slate-950";
     }
   }, [wallpaperTheme]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     setDifficulty(difficulty);
@@ -80,17 +87,30 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [openWindow]);
 
+  if (!isMounted) {
+    return (
+      <main
+        className={`relative h-screen w-full overflow-hidden bg-linear-to-br ${wallpaperClasses}`}
+      />
+    );
+  }
+
   return (
     <main
-      className={`relative h-screen w-full overflow-hidden bg-gradient-to-br ${wallpaperClasses}`}
+      className={`relative h-screen w-full overflow-hidden bg-linear-to-br ${wallpaperClasses}`}
     >
       {/* Wallpaper overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.15),transparent_30%)]" />
 
       {/* Desktop icons */}
-      <div className="relative z-10 flex h-[calc(100vh-120px)] max-w-full flex-col flex-wrap items-start content-start gap-4 p-6">
-        {items.map((item) => (
-          <DesktopIcon key={item.id} item={item} />
+      <div className="relative z-10 h-[calc(100vh-120px)] w-full">
+        {items.map((item, index) => (
+          <DesktopIcon
+            key={item.id}
+            item={item}
+            defaultIndex={index}
+            allItems={items}
+          />
         ))}
       </div>
 
@@ -123,6 +143,8 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         <OnboardingOverlay onDismiss={completeOnboarding} />
       )}
       <Taskbar />
+
+      <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay"></div>
     </main>
   );
 }

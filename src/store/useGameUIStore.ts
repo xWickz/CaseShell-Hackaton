@@ -10,12 +10,14 @@ type GameUIState = {
   openWindows: WindowInstance[];
   zCounter: number;
   wallpaperTheme: WallpaperTheme;
+  iconPositions: Record<string, { x: number; y: number }>;
 
   closeBriefing: () => void;
   completeOnboarding: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
   setWallpaperTheme: (theme: WallpaperTheme) => void;
   cycleWallpaperTheme: () => void;
+  setIconPosition: (id: string, position: { x: number; y: number }) => void;
 
   openWindow: (
     window: Omit<WindowInstance, "zIndex" | "position"> & {
@@ -39,11 +41,13 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   openWindows: [],
   zCounter: 10,
   wallpaperTheme: "aurora",
+  iconPositions: {},
 
   closeBriefing: () => set({ briefingOpen: false }),
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
 
-  setDifficulty: (difficulty) => set({ selectedDifficulty: difficulty }),
+  setDifficulty: (difficulty) =>
+    set({ selectedDifficulty: difficulty, iconPositions: {} }),
 
   setWallpaperTheme: (theme) => set({ wallpaperTheme: theme }),
   cycleWallpaperTheme: () =>
@@ -54,7 +58,16 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
       return { wallpaperTheme: nextTheme };
     }),
 
+  setIconPosition: (id, position) =>
+    set((state) => ({
+      iconPositions: {
+        ...state.iconPositions,
+        [id]: position,
+      },
+    })),
+
   openWindow: (window) => {
+    // Lines 60-84 omitted
     const { openWindows, zCounter } = get();
 
     const existing = openWindows.find((w) => w.id === window.id);
@@ -69,11 +82,10 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
       return;
     }
 
-    const defaultPosition =
-      window.position ?? {
-        x: BASE_WINDOW_POSITION.x + WINDOW_OFFSET * openWindows.length,
-        y: BASE_WINDOW_POSITION.y + WINDOW_OFFSET * openWindows.length,
-      };
+    const defaultPosition = window.position ?? {
+      x: BASE_WINDOW_POSITION.x + WINDOW_OFFSET * openWindows.length,
+      y: BASE_WINDOW_POSITION.y + WINDOW_OFFSET * openWindows.length,
+    };
 
     set({
       openWindows: [
