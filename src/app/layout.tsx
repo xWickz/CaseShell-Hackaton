@@ -13,9 +13,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CaseShell",
+  metadataBase: new URL("https://caseshell.vercel.app"), // Cámbiarlo por tu URL real de Vercel cuando la tengas
+  title: {
+    default: "CaseShell | The Ultimate Terminal Puzzle",
+    template: "%s | CaseShell",
+  },
   description:
-    "Investigación técnica interactiva dentro de un entorno virtual.",
+    "Hackea el sistema. Resuelve el caso. Un simulador de sistema operativo donde tu terminal es la escena del crimen. Creado para la Hackathon de CubePath.",
+  keywords: [
+    "hackathon",
+    "cubepath",
+    "terminal",
+    "puzzle",
+    "juego",
+    "os simulator",
+    "sysadmin",
+    "ciberseguridad",
+  ],
+  authors: [{ name: "Wickz", url: "https://wickz.dev" }],
+  creator: "Wickz",
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: "https://caseshell.vercel.app",
+    title: "CaseShell | The Ultimate Terminal Puzzle",
+    description:
+      "Hackea el sistema. Resuelve el caso. Un simulador de sistema operativo donde tu terminal es la escena del crimen.",
+    siteName: "CaseShell",
+    images: [
+      {
+        url: "/og-image.png", // Next.js lo tomará de public/ o de src/app/
+        width: 1200,
+        height: 630,
+        alt: "CaseShell - Pantalla principal con efecto glitch",
+      },
+    ],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -25,7 +63,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

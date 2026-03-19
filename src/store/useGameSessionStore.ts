@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type {
   CaseState,
   CaseKnowledge,
@@ -83,31 +84,39 @@ const createInitialTerminalHistory = (
   },
 ];
 
-export const useGameSessionStore = create<GameSessionState>((set) => ({
-  terminalHistory: createInitialTerminalHistory(DEFAULT_DIFFICULTY),
-  currentInput: "",
-  commandLog: [],
-  commandStats: { total: 0, success: 0, error: 0 },
-  caseState: createInitialCaseState(),
-  currentDifficulty: DEFAULT_DIFFICULTY,
-
-  startTime: null,
-  endTime: null,
-
-  isVictoryOpen: false,
-
-  initializeSession: (difficulty) =>
-    set(() => ({
-      currentDifficulty: difficulty,
-      terminalHistory: createInitialTerminalHistory(difficulty),
+export const useGameSessionStore = create<GameSessionState>()(
+  persist(
+    (set) => ({
+      terminalHistory: createInitialTerminalHistory(DEFAULT_DIFFICULTY),
       currentInput: "",
-      caseState: createInitialCaseState(),
-      startTime: null,
-      endTime: null,
-      isVictoryOpen: false,
       commandLog: [],
       commandStats: { total: 0, success: 0, error: 0 },
-    })),
+      caseState: createInitialCaseState(),
+      currentDifficulty: DEFAULT_DIFFICULTY,
+
+      startTime: null,
+      endTime: null,
+
+      isVictoryOpen: false,
+
+      initializeSession: (difficulty) =>
+        set((state) => {
+          // If we are changing difficulty or it's empty, reset state
+          if (state.currentDifficulty !== difficulty) {
+            return {
+              currentDifficulty: difficulty,
+              terminalHistory: createInitialTerminalHistory(difficulty),
+              currentInput: "",
+              caseState: createInitialCaseState(),
+              startTime: null,
+              endTime: null,
+              isVictoryOpen: false,
+              commandLog: [],
+              commandStats: { total: 0, success: 0, error: 0 },
+            };
+          }
+          return {}; // Keep existing state if difficulty matches
+        }),
 
   setCurrentInput: (value) => set({ currentInput: value }),
 
@@ -203,4 +212,10 @@ export const useGameSessionStore = create<GameSessionState>((set) => ({
         error: state.commandStats.error + (outcome === "error" ? 1 : 0),
       },
     })),
-}));
+    }),
+    {
+      name: "caseshell-session-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);

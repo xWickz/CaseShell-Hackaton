@@ -1,20 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { House, Palette } from "lucide-react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { Palette, Power, RotateCcw, ChevronUp } from "lucide-react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import { useGameUIStore } from "@/store/useGameUIStore";
 import { getChecklistProgress } from "@/data/game/checklist";
 
 export default function Taskbar() {
   const [now, setNow] = useState(() => new Date());
+  const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
+  const startMenuRef = useRef<HTMLDivElement>(null);
+
   const caseState = useGameSessionStore((state) => state.caseState);
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
   const commandStats = useGameSessionStore((state) => state.commandStats);
   const startTime = useGameSessionStore((state) => state.startTime);
+  const resetSession = useGameSessionStore((state) => state.resetSession);
+  const clearTerminalHistory = useGameSessionStore(
+    (state) => state.clearTerminalHistory,
+  );
+
   const cycleWallpaperTheme = useGameUIStore(
     (state) => state.cycleWallpaperTheme,
   );
@@ -23,6 +31,22 @@ export default function Taskbar() {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        startMenuRef.current &&
+        !startMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsStartMenuOpen(false);
+      }
+    };
+
+    if (isStartMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isStartMenuOpen]);
 
   const { timeLabel, dateLabel, elapsedSeconds } = useMemo(() => {
     const timeLabel = now.toLocaleTimeString(undefined, {
@@ -60,15 +84,59 @@ export default function Taskbar() {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
-      <div className="flex items-center gap-2">
-        <Link
-          href="/"
-          aria-label="Ir al escritorio principal"
-          className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+    <div className="absolute bottom-0 left-0 right-0 z-[999] flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
+      <div className="flex items-center gap-2 relative" ref={startMenuRef}>
+        {/* Start Menu Button */}
+        <button
+          type="button"
+          onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
+          aria-label="Abrir menú de inicio"
+          className={`rounded-xl p-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white flex items-center gap-1 ${isStartMenuOpen ? "bg-white/30" : "bg-white/10 hover:bg-white/20"}`}
         >
-          <House className="h-5 w-5" />
-        </Link>
+          <ChevronUp
+            className={`h-5 w-5 transition-transform ${isStartMenuOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {/* Start Menu Dropdown */}
+        {isStartMenuOpen && (
+          <div className="absolute bottom-[calc(100%+1rem)] left-0 w-64 rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-2xl backdrop-blur-xl animate-scale-in">
+            <div className="mb-2 px-3 py-2 border-b border-white/5">
+              <span className="text-xs font-bold text-white/50 uppercase tracking-wider">
+                Sistema
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                const confirmed = window.confirm(
+                  "¿Estás seguro de reiniciar el caso? Perderás todo tu progreso actual.",
+                );
+                if (confirmed) {
+                  resetSession();
+                  window.location.reload();
+                }
+              }}
+              className="w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reiniciar Sistema
+            </button>
+            <button
+              onClick={() => {
+                const confirmed = window.confirm(
+                  "¿Volver al menú principal? Tu progreso lógico se ha guardado.",
+                );
+                if (confirmed) {
+                  window.location.href = "/game";
+                }
+              }}
+              className="w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors mt-1"
+            >
+              <Power className="h-4 w-4" />
+              Apagar y Salir
+            </button>
+          </div>
+        )}
 
         <button
           type="button"
@@ -81,14 +149,7 @@ export default function Taskbar() {
       </div>
 
       <div className="flex flex-1 items-center justify-center gap-3 text-xs text-white/80">
-        <span className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-white/50 sm:inline">
-          CaseShell OS
-        </span>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Badge
-            label="Incidentes"
-            value={`${progressStats.completed}/${progressStats.total}`}
-          />
           <Badge label="Tiempo" value={formatElapsed()} />
           <Badge
             label="Precisión"

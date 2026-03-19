@@ -9,15 +9,17 @@ export default function HomePage() {
       <header>
         <Navbar />
       </header>
-      <main className="min-h-screen bg-black px-10 lg:px-20 font-sans pb-20">
-        <div className="max-w-7xl mx-auto flex flex-col gap-32">
+      {/* Reduje el px-10 a px-6 en móvil para que no coma tanto espacio a los lados */}
+      <main className="min-h-screen bg-black px-6 md:px-10 lg:px-20 font-sans pb-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col gap-24 lg:gap-32">
+          {/* 1. SECCIÓN HERO (Intro) */}
+          {/* Cambié h-fijo por min-h para que en móvil no se corte si el texto es largo */}
           <div
-            className="animate-fade-in flex flex-col lg:flex-row items-center justify-between w-full gap-10 h-[calc(100vh-5rem)] lg:h-[calc(100vh-80px)]"
+            className="animate-fade-in flex flex-col lg:flex-row items-center justify-center lg:justify-between w-full gap-10 min-h-[calc(100vh-5rem)] lg:min-h-0 lg:h-[calc(100vh-80px)] py-10 lg:py-0"
             id="intro"
           >
-            {" "}
             <section
-              className="w-full flex flex-col items-start gap-6 lg:max-w-xl"
+              className="w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:max-w-xl"
               aria-label="Introducción al juego"
             >
               <div className="flex items-center gap-2">
@@ -26,16 +28,16 @@ export default function HomePage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                     Hackatón de CubePath
                   </span>
                 </a>
               </div>
 
-              <h1 className="text-7xl text-white font-bold tracking-tight">
+              <h1 className="text-5xl md:text-7xl text-white font-bold tracking-tight">
                 Case<span className="text-red-600">Shell</span>
               </h1>
-              <p className="text-lg text-slate-400 mt-2 mb-5 max-w-md text-justify">
+              <p className="text-base md:text-lg text-slate-400 mt-2 mb-5 max-w-md text-center lg:text-justify">
                 <strong className="text-slate-300">Investiga</strong> incidentes
                 técnicos dentro de un entorno virtual, explora archivos, usa la{" "}
                 <strong className="text-slate-300">terminal</strong> y resuelve
@@ -44,6 +46,8 @@ export default function HomePage() {
               </p>
               <GlowButton href="/game">Jugar</GlowButton>
             </section>
+
+            {/* Esta imagen ya estaba oculta en móvil (hidden lg:block), ¡perfecto! */}
             <aside className="relative hidden shrink-0 lg:block rotate-1 w-full max-w-137.5">
               <Image
                 src="/demo1.webp"
@@ -58,11 +62,11 @@ export default function HomePage() {
 
           {/* 2. SECCIÓN ¿QUÉ ES? */}
           <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-10 border-t border-white/10 pt-20 timeline-view animate-slide-in-left animate-range-[entry_5%_contain_20%]">
-            <section className="w-full lg:max-w-xl">
+            <section className="w-full lg:max-w-xl flex flex-col items-center lg:items-start text-center lg:text-left">
               <h2 className="text-3xl text-white font-semibold tracking-tight mb-6">
                 ¿Qué es CaseShell?
               </h2>
-              <p className="text-lg text-slate-400 mb-5 text-justify leading-relaxed">
+              <p className="text-base md:text-lg text-slate-400 mb-5 text-center lg:text-justify leading-relaxed">
                 CaseShell es un mini-juego de investigación, dónde se simulará
                 un sistema operativo en el cuál podrás interacturar con:{" "}
                 <strong className="text-slate-300">
@@ -84,18 +88,15 @@ export default function HomePage() {
             </aside>
           </div>
 
-          {/* 3. SECCIÓN MECÁNICAS (Simetría Total) */}
+          {/* 3. SECCIÓN MECÁNICAS */}
           <section className="border-t border-white/10 pt-20 max-w-7xl mx-auto w-full">
-            {/* Título alineado a la derecha del contenedor general */}
-            <h2 className="text-3xl text-white font-semibold tracking-tight mb-16 text-right">
+            <h2 className="text-3xl text-white font-semibold tracking-tight mb-10 lg:mb-16 text-center lg:text-right">
               Mecánicas del juego
             </h2>
 
-            {/* Contenedor con w-full y justify-between para empujar a los extremos */}
             <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-12 lg:gap-24">
-              {/* IZQUIERDA: Bento Grid con ancho controlado */}
-              <div className="w-full lg:w-125 xl:w-150 grid grid-cols-2 grid-rows-2 gap-4 h-112.5">
-                {/* Imagen 1: Grande */}
+              {/* Ocultamos el Bento Grid en móvil con "hidden lg:grid" */}
+              <div className="hidden lg:grid w-full lg:w-125 xl:w-150 grid-cols-2 grid-rows-2 gap-4 h-112.5">
                 <div className="row-span-2 bg-gray-900/50 rounded-3xl border border-white/10 overflow-hidden relative group">
                   <Image
                     src="/demo3_escritorio.webp"
@@ -104,8 +105,6 @@ export default function HomePage() {
                     className="object-cover transition-transform group-hover:scale-105"
                   />
                 </div>
-
-                {/* Imagen 2: Superior Derecha */}
                 <div className="bg-gray-900/50 rounded-3xl border border-white/10 overflow-hidden relative group">
                   <Image
                     src="/demo3_consola.webp"
@@ -114,8 +113,6 @@ export default function HomePage() {
                     className="object-cover transition-transform group-hover:scale-105"
                   />
                 </div>
-
-                {/* Imagen 3: Inferior Derecha */}
                 <div className="bg-gray-900/50 rounded-3xl border border-white/10 overflow-hidden relative group">
                   <Image
                     src="/demo3_notas.webp"
@@ -126,25 +123,25 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* DERECHA: Texto alineado al borde derecho */}
-              <div className="flex flex-col items-end flex-1">
-                <div className="grid grid-cols-1 gap-10 text-lg text-slate-400 max-w-xl text-right">
+              {/* Texto centrado en móvil, alineado a la derecha en PC */}
+              <div className="flex flex-col items-center lg:items-end flex-1 w-full">
+                <div className="grid grid-cols-1 gap-10 text-base md:text-lg text-slate-400 max-w-xl text-center lg:text-right">
                   <div>
-                    <strong className="text-slate-300 text-xl block mb-1">
+                    <strong className="text-slate-300 text-xl block mb-2 lg:mb-1">
                       Sistema Operativo
                     </strong>
                     Navega por un entorno de escritorio simulado, interactúa con
                     archivos y ventanas para descubrir pistas.
                   </div>
                   <div>
-                    <strong className="text-slate-300 text-xl block mb-1">
+                    <strong className="text-slate-300 text-xl block mb-2 lg:mb-1">
                       Terminal Funcional
                     </strong>
                     Usa comandos reales para explorar el sistema, analizar
                     archivos y ejecutar programas que te ayudarán.
                   </div>
                   <div>
-                    <strong className="text-slate-300 text-xl block mb-1">
+                    <strong className="text-slate-300 text-xl block mb-2 lg:mb-1">
                       Pistas y Red Herrings
                     </strong>
                     No todo lo que encuentres será útil. Aprende a distinguir
@@ -155,15 +152,16 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* 3. dificultades */}
-          <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-10 border-t border-white/10 pt-20 timeline-view animate-slide-in-left animate-range-[entry_5%_contain_20%]">
+          {/* 4. DIFICULTADES */}
+          <div className="flex flex-col items-center lg:items-start w-full gap-10 border-t border-white/10 pt-20 timeline-view animate-slide-in-left animate-range-[entry_5%_contain_20%]">
             <section className="w-full">
-              <h2 className="text-3xl text-white font-semibold tracking-tight mb-6">
+              <h2 className="text-3xl text-white font-semibold tracking-tight mb-8 text-center lg:text-left">
                 Dificultades
               </h2>
-              <div className="grid grid-cols-3 gap-6">
-                <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 text-center">
-                  <h3 className="text-xl font-semibold text-green-400 mb-2">
+              {/* Cambiado a grid-cols-1 en móvil para que se apilen, y grid-cols-3 en md/lg */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 md:p-8 text-center">
+                  <h3 className="text-2xl lg:text-xl font-semibold text-green-400 mb-3 lg:mb-2">
                     Fácil
                   </h3>
                   <p className="text-slate-400">
@@ -171,16 +169,16 @@ export default function HomePage() {
                     principiantes y tener una noción básica del juego.
                   </p>
                 </div>
-                <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 text-center">
-                  <h3 className="text-xl font-semibold text-orange-400 mb-2">
+                <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 md:p-8 text-center">
+                  <h3 className="text-2xl lg:text-xl font-semibold text-orange-400 mb-3 lg:mb-2">
                     Intermedio
                   </h3>
                   <p className="text-slate-400">
                     Más archivos, pistas menos directas y comandos avanzados.
                   </p>
                 </div>
-                <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 text-center">
-                  <h3 className="text-xl font-semibold text-red-500 mb-2">
+                <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 md:p-8 text-center">
+                  <h3 className="text-2xl lg:text-xl font-semibold text-red-500 mb-3 lg:mb-2">
                     Difícil
                   </h3>
                   <p className="text-slate-400">
@@ -193,10 +191,11 @@ export default function HomePage() {
           </div>
         </div>
       </main>
-      <footer className="bg-zinc-950 border-t border-white/10 px-10 lg:px-20">
+
+      {/* FOOTER: Ajustado para apilarse en móvil */}
+      <footer className="bg-zinc-950 border-t border-white/10 px-6 md:px-10 lg:px-20">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between py-10 text-sm text-zinc-400 font-sans gap-8">
-          {/* IZQUIERDA: Créditos */}
-          <div className="flex-1 text-left">
+          <div className="flex-1 text-center lg:text-left order-3 lg:order-1">
             <p>
               Desarrollado por{" "}
               <a
@@ -208,28 +207,26 @@ export default function HomePage() {
                 Wickz
               </a>
             </p>
-            <p className="text-xs text-zinc-500">© 2026</p>
+            <p className="text-xs text-zinc-500 mt-1">© 2026</p>
           </div>
 
-          {/* CENTRO: Volver */}
-          <div className="flex-1 text-center">
+          <div className="flex-1 text-center order-1 lg:order-2">
             <a
               href="#intro"
-              className="text-white text-md border rounded-full border-white/30 px-2 py-2 font-bold transition-colors"
+              className="text-white text-md border rounded-full border-white/30 px-6 py-2 font-bold transition-colors hover:bg-white hover:text-black"
             >
               Volver al inicio
             </a>
           </div>
 
-          {/* DERECHA: GitHub */}
-          <div className="flex-1 flex justify-end">
+          <div className="flex-1 flex justify-center lg:justify-end order-2 lg:order-3">
             <a
               href="https://github.com/xWickz/CaseShell-Hackaton"
               className="text-zinc-400 hover:text-white transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <GitHub className="w-6 h-6" />
+              <GitHub className="w-8 h-8 lg:w-6 lg:h-6" />
             </a>
           </div>
         </div>

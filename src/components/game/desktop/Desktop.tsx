@@ -13,6 +13,7 @@ import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { DesktopItem, Briefing, Difficulty } from "@/types/game";
 import VictoryModal from "@/components/game/modals/VictoryModal";
 import OnboardingOverlay from "@/components/game/modals/OnboardingOverlay";
+import Link from "next/link";
 
 type DesktopProps = {
   items: DesktopItem[];
@@ -87,6 +88,17 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [openWindow]);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue =
+        "¿Seguro que quieres salir? Tu vista se reiniciará aunque se guarde el progreso del caso.";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
   if (!isMounted) {
     return (
       <main
@@ -145,6 +157,40 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       <Taskbar />
 
       <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay"></div>
+
+      {/* Mobile Blocker Overlay */}
+      <div className="md:hidden fixed inset-0 z-10000 bg-zinc-950 flex flex-col items-center justify-center p-8 text-center font-mono">
+        <div className="text-red-500 mb-4">
+          {/* Ícono de Computadora/Monitor */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect width="20" height="14" x="2" y="3" rx="2" ry="2" />
+            <line x1="8" x2="16" y1="21" y2="21" />
+            <line x1="12" x2="12" y1="17" y2="21" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Acceso Denegado</h2>
+        <p className="text-zinc-400 mb-6 max-w-sm">
+          Este entorno de investigación requiere teclado físico y una pantalla
+          amplia. Por favor, <strong>accede desde un ordenador</strong>.
+        </p>
+        <Link
+          href="/"
+          title="Volver al Inicio"
+          className="text-white text-md border border-white/30 px-6 py-2 rounded-full font-bold hover:bg-white/10 transition-colors"
+        >
+          Volver al Inicio
+        </Link>
+      </div>
     </main>
   );
 }

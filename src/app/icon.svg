@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Fondo negro estilo terminal con bordes redondeados -->
+  <rect width="256" height="256" fill="#000000" rx="48" />
+  
+  <!-- Símbolo de comando ">" en color Blanco -->
+  <path d="M 60 70 L 130 128 L 60 186" fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Prompt "_" en color Rojo CaseShell -->
+  <line x1="140" y1="186" x2="200" y2="186" stroke="#dc2626" stroke-width="28" stroke-linecap="round" />
+</svg>
