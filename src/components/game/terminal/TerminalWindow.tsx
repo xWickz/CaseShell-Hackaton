@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useGameSessionStore } from "@/store/useGameSessionStore";
+import {
+  useGameSessionStore,
+  type CommandOutcome,
+} from "@/store/useGameSessionStore";
 import { executeCaseCommand } from "@/lib/game/case-engine";
 
 export default function TerminalWindow() {
@@ -22,6 +25,7 @@ export default function TerminalWindow() {
   const setCaseState = useGameSessionStore((state) => state.setCaseState);
   const startSession = useGameSessionStore((state) => state.startSession);
   const completeSession = useGameSessionStore((state) => state.completeSession);
+  const logCommand = useGameSessionStore((state) => state.logCommand);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -56,12 +60,19 @@ export default function TerminalWindow() {
 
     if (rawInput.toLowerCase() === "clear") {
       clearTerminalHistory();
+      logCommand(rawInput, "success");
       setCurrentInput("");
       inputRef.current?.focus();
       return;
     }
 
     const result = executeCaseCommand(currentDifficulty, rawInput, caseState);
+
+    const outcome: CommandOutcome = result.lines.some(
+      (line) => line.type === "error",
+    )
+      ? "error"
+      : "success";
 
     if (result.lines.length > 0) {
       addTerminalLines(result.lines);
@@ -75,6 +86,7 @@ export default function TerminalWindow() {
       completeSession();
     }
 
+    logCommand(rawInput, outcome);
     setCurrentInput("");
     inputRef.current?.focus();
   }

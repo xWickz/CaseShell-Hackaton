@@ -233,7 +233,9 @@ export default function DesktopIcon({
   return (
     <button
       onDoubleClick={handleOpen}
-      className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10"
+      className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+      aria-label={`Abrir ${item.name}`}
+      title={item.name}
     >
       {renderIcon()}
       <span className="max-w-[100px] text-center text-xs font-medium">

@@ -5,12 +5,17 @@ import type { Difficulty, WindowInstance, WindowPosition } from "@/types/game";
 
 type GameUIState = {
   briefingOpen: boolean;
+  hasSeenOnboarding: boolean;
   selectedDifficulty: Difficulty | null;
   openWindows: WindowInstance[];
   zCounter: number;
+  wallpaperTheme: WallpaperTheme;
 
   closeBriefing: () => void;
+  completeOnboarding: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
+  setWallpaperTheme: (theme: WallpaperTheme) => void;
+  cycleWallpaperTheme: () => void;
 
   openWindow: (
     window: Omit<WindowInstance, "zIndex" | "position"> & {
@@ -22,18 +27,32 @@ type GameUIState = {
   setWindowPosition: (id: string, position: WindowPosition) => void;
 };
 
+export type WallpaperTheme = "aurora" | "ocean" | "matrix";
+
 const BASE_WINDOW_POSITION: WindowPosition = { x: 120, y: 120 };
 const WINDOW_OFFSET = 28;
 
 export const useGameUIStore = create<GameUIState>((set, get) => ({
   briefingOpen: true,
+  hasSeenOnboarding: false,
   selectedDifficulty: null,
   openWindows: [],
   zCounter: 10,
+  wallpaperTheme: "aurora",
 
   closeBriefing: () => set({ briefingOpen: false }),
+  completeOnboarding: () => set({ hasSeenOnboarding: true }),
 
   setDifficulty: (difficulty) => set({ selectedDifficulty: difficulty }),
+
+  setWallpaperTheme: (theme) => set({ wallpaperTheme: theme }),
+  cycleWallpaperTheme: () =>
+    set((state) => {
+      const nextOrder: WallpaperTheme[] = ["aurora", "ocean", "matrix"];
+      const currentIndex = nextOrder.indexOf(state.wallpaperTheme);
+      const nextTheme = nextOrder[(currentIndex + 1) % nextOrder.length];
+      return { wallpaperTheme: nextTheme };
+    }),
 
   openWindow: (window) => {
     const { openWindows, zCounter } = get();

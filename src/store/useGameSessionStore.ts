@@ -1,12 +1,23 @@
 "use client";
 
 import { create } from "zustand";
-import type { CaseState, CaseKnowledge, TerminalLine } from "@/types/game-engine";
+import type {
+  CaseState,
+  CaseKnowledge,
+  TerminalLine,
+} from "@/types/game-engine";
 import type { Difficulty } from "@/types/game";
 
 type GameSessionState = {
   terminalHistory: TerminalLine[];
   currentInput: string;
+
+  commandLog: CommandLogEntry[];
+  commandStats: {
+    total: number;
+    success: number;
+    error: number;
+  };
 
   caseState: CaseState;
   currentDifficulty: Difficulty;
@@ -27,6 +38,16 @@ type GameSessionState = {
   completeSession: () => void;
   resetSession: () => void;
   closeVictoryModal: () => void;
+  logCommand: (input: string, outcome: CommandOutcome) => void;
+};
+
+export type CommandOutcome = "success" | "error";
+
+export type CommandLogEntry = {
+  id: string;
+  command: string;
+  timestamp: number;
+  outcome: CommandOutcome;
 };
 
 const DEFAULT_DIFFICULTY: Difficulty = "easy";
@@ -65,6 +86,8 @@ const createInitialTerminalHistory = (
 export const useGameSessionStore = create<GameSessionState>((set) => ({
   terminalHistory: createInitialTerminalHistory(DEFAULT_DIFFICULTY),
   currentInput: "",
+  commandLog: [],
+  commandStats: { total: 0, success: 0, error: 0 },
   caseState: createInitialCaseState(),
   currentDifficulty: DEFAULT_DIFFICULTY,
 
@@ -82,6 +105,8 @@ export const useGameSessionStore = create<GameSessionState>((set) => ({
       startTime: null,
       endTime: null,
       isVictoryOpen: false,
+      commandLog: [],
+      commandStats: { total: 0, success: 0, error: 0 },
     })),
 
   setCurrentInput: (value) => set({ currentInput: value }),
@@ -155,7 +180,27 @@ export const useGameSessionStore = create<GameSessionState>((set) => ({
       startTime: null,
       endTime: null,
       isVictoryOpen: false,
+      commandLog: [],
+      commandStats: { total: 0, success: 0, error: 0 },
     })),
 
   closeVictoryModal: () => set({ isVictoryOpen: false }),
+
+  logCommand: (command, outcome) =>
+    set((state) => ({
+      commandLog: [
+        ...state.commandLog,
+        {
+          id: crypto.randomUUID(),
+          command,
+          outcome,
+          timestamp: Date.now(),
+        },
+      ],
+      commandStats: {
+        total: state.commandStats.total + 1,
+        success: state.commandStats.success + (outcome === "success" ? 1 : 0),
+        error: state.commandStats.error + (outcome === "error" ? 1 : 0),
+      },
+    })),
 }));

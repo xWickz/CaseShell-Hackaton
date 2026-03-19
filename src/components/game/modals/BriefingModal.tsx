@@ -13,14 +13,21 @@ export default function BriefingModal({ briefing }: BriefingModalProps) {
 
   if (!briefingOpen) return null;
 
+  const headingId = "briefing-heading";
+
   return (
-    <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+    <div
+      className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={headingId}
+    >
       <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900/95 p-6 shadow-2xl">
         <div className="mb-4">
           <p className="text-sm uppercase tracking-[0.2em] text-cyan-300">
             {briefing.title}
           </p>
-          <h2 className="mt-2 text-3xl font-bold text-white">
+          <h2 id={headingId} className="mt-2 text-3xl font-bold text-white">
             Investigación iniciada
           </h2>
         </div>
