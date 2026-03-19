@@ -53,7 +53,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.15),transparent_30%)]" />
 
       {/* Desktop icons */}
-      <div className="relative z-10 grid w-fit grid-cols-1 gap-4 p-6">
+      <div className="relative z-10 flex h-[calc(100vh-120px)] max-w-full flex-col flex-wrap items-start content-start gap-4 p-6">
         {items.map((item) => (
           <DesktopIcon key={item.id} item={item} />
         ))}

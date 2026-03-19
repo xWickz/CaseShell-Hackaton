@@ -18,6 +18,13 @@ export type CaseKnowledge = {
   knowsDnsFix?: boolean;
   knowsServiceRestart?: boolean;
   knowsSwitchFix?: boolean;
+  knowsDnsDiagnostics?: boolean;
+  knowsServicesVerification?: boolean;
+  knowsIncidentReport?: boolean;
+  knowsSwitchAudit?: boolean;
+  knowsPerimeterScan?: boolean;
+  knowsDnsOverride?: boolean;
+  knowsWatchdog?: boolean;
 };
 
 export type CaseProgress = {
@@ -27,6 +34,13 @@ export type CaseProgress = {
   dnsFixed?: boolean;
   servicesRestarted?: boolean;
   switchPortEnabled?: boolean;
+  dnsDiagnosticsComplete?: boolean;
+  overrideValidated?: boolean;
+  servicesVerified?: boolean;
+  incidentReportFiled?: boolean;
+  switchAuditComplete?: boolean;
+  perimeterScanComplete?: boolean;
+  watchdogDeployed?: boolean;
   completed?: boolean;
 };
 

@@ -37,11 +37,20 @@ export function executeMediumCommand(
           line("- cat suspicious-processes.txt", "hint"),
           line("- cat resolver.conf", "hint"),
           line("- cat system.log", "hint"),
+          line("- cat ops-note.txt", "hint"),
+          line("- cat dns-runes.png", "hint"),
+          line("- cat dns-lock.png", "hint"),
+          line("- cat service-manual.txt", "hint"),
+          line("- cat incident-template.txt", "hint"),
           line("- fix wifi", "hint"),
           line("- fix firewall", "hint"),
           line("- kill malware", "hint"),
+          line("- diag dns", "hint"),
+          line("- enter override 884", "hint"),
           line("- fix dns", "hint"),
+          line("- verify services", "hint"),
           line("- restart services", "hint"),
+          line("- file report", "hint"),
           line("- status", "hint"),
           line("- submit", "hint"),
           line(
@@ -64,8 +73,84 @@ export function executeMediumCommand(
           line("- suspicious-processes.txt"),
           line("- resolver.conf"),
           line("- system.log"),
+          line("- ops-note.txt"),
+          line("- dns-runes.png"),
+          line("- dns-lock.png"),
+          line("- service-manual.txt"),
+          line("- incident-template.txt"),
         ],
       };
+    case "cat ops-note.txt":
+      return {
+        lines: [
+          line("=== OPERATIONS NOTE ===", "hint"),
+          line("Los símbolos del rompecabezas DNS indican el orden correcto."),
+          line("Primero ejecuta 'diag dns', luego 'fix dns'."),
+          line("Has registrado el procedimiento de diagnóstico.", "success"),
+        ],
+        nextState: {
+          knowledge: {
+            knowsDnsDiagnostics: true,
+          },
+        },
+      };
+
+    case "cat dns-runes.png":
+      return {
+        lines: [
+          line("=== RUNAS DNS ===", "hint"),
+          line("Triángulo ➜ Medir ➜ Reparar."),
+          line("Traducción: ejecuta 'diag dns' antes de 'fix dns'."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsDnsDiagnostics: true,
+          },
+        },
+      };
+
+    case "cat dns-lock.png":
+      return {
+        lines: [
+          line("=== DNS LOCK ===", "hint"),
+          line("Tres discos marcan la combinación 8-8-4."),
+          line("Ingresa el override con 'enter override 884'."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsDnsOverride: true,
+          },
+        },
+      };
+
+    case "cat service-manual.txt":
+      return {
+        lines: [
+          line("=== SERVICE PLAYBOOK ===", "hint"),
+          line("No reinicies nada sin pasar por 'verify services'."),
+          line("Cuando no haya alertas podrás usar 'restart services'."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsServicesVerification: true,
+          },
+        },
+      };
+
+    case "cat incident-template.txt":
+      return {
+        lines: [
+          line("=== INCIDENT REPORT TEMPLATE ===", "hint"),
+          line("Debes documentar DNS, servicios y verificaciones."),
+          line("Comando final: 'file report'."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsIncidentReport: true,
+          },
+        },
+      };
+
 
     case "cat caso.txt":
       return {
@@ -237,12 +322,62 @@ export function executeMediumCommand(
         },
       };
 
+    case "diag dns":
+      if (!state.knowledge.knowsDnsDiagnostics) {
+        return {
+          lines: [
+            line("No tienes aún el procedimiento de diagnóstico.", "error"),
+            line("Revisa ops-note.txt o las runas DNS.", "hint"),
+          ],
+        };
+      }
+
+      if (state.progress.dnsDiagnosticsComplete) {
+        return {
+          lines: [line("Ya cuentas con la lectura de DNS más reciente.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Ejecutando diagnóstico de DNS...", "system"),
+          line("Reporte: latencia establecida, errores catalogados.", "success"),
+        ],
+        nextState: {
+          progress: {
+            dnsDiagnosticsComplete: true,
+          },
+        },
+      };
+
     case "fix dns":
       if (!state.knowledge.knowsDnsFix) {
         return {
           lines: [
             line("No tienes el procedimiento para reparar DNS.", "error"),
             line("Resolver.conf contiene la pista.", "hint"),
+          ],
+        };
+      }
+
+      if (!state.progress.dnsDiagnosticsComplete) {
+        return {
+          lines: [
+            line(
+              "Aún no has corrido 'diag dns'. Necesitas datos frescos antes de reparar.",
+              "error",
+            ),
+          ],
+        };
+      }
+
+      if (!state.progress.overrideValidated) {
+        return {
+          lines: [
+            line(
+              "La consola sigue bloqueada. Ingresa el código del candado con 'enter override 884'.",
+              "error",
+            ),
           ],
         };
       }
@@ -265,6 +400,50 @@ export function executeMediumCommand(
         },
       };
 
+    case "verify services":
+      if (!state.knowledge.knowsServicesVerification) {
+        return {
+          lines: [
+            line("No tienes el playbook de verificación.", "error"),
+            line("Revisa service-manual.txt.", "hint"),
+          ],
+        };
+      }
+
+      if (
+        !state.progress.wifiFixed ||
+        !state.progress.firewallFixed ||
+        !state.progress.malwareKilled ||
+        !state.progress.dnsFixed
+      ) {
+        return {
+          lines: [
+            line(
+              "Completa conectividad, firewall, malware y DNS antes de verificar servicios.",
+              "error",
+            ),
+          ],
+        };
+      }
+
+      if (state.progress.servicesVerified) {
+        return {
+          lines: [line("Las dependencias ya fueron verificadas.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Ejecutando verificación de dependencias...", "system"),
+          line("Servicios listos para reinicio coordinado.", "success"),
+        ],
+        nextState: {
+          progress: {
+            servicesVerified: true,
+          },
+        },
+      };
+
     case "restart services":
       if (!state.knowledge.knowsServiceRestart) {
         return {
@@ -275,14 +454,11 @@ export function executeMediumCommand(
         };
       }
 
-      if (!state.progress.wifiFixed || !state.progress.dnsFixed) {
+      if (!state.progress.servicesVerified) {
         return {
           lines: [
-            line(
-              "Los servicios solo pueden reiniciarse tras estabilizar red y DNS.",
-              "error",
-            ),
-            line("Verifica 'status' antes de reintentar.", "hint"),
+            line("Debes ejecutar 'verify services' antes de reiniciar.", "error"),
+            line("Sigue el playbook del SRE.", "hint"),
           ],
         };
       }
@@ -305,12 +481,55 @@ export function executeMediumCommand(
         },
       };
 
+    case "file report":
+      if (!state.knowledge.knowsIncidentReport) {
+        return {
+          lines: [
+            line("No tienes el formato del informe.", "error"),
+            line("Abre incident-template.txt para ver los requisitos.", "hint"),
+          ],
+        };
+      }
+
+      if (!state.progress.servicesRestarted) {
+        return {
+          lines: [
+            line(
+              "No puedes generar el informe sin reinicio exitoso.",
+              "error",
+            ),
+          ],
+        };
+      }
+
+      if (state.progress.incidentReportFiled) {
+        return {
+          lines: [line("El informe ya fue enviado.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Compilando hallazgos finales...", "system"),
+          line("Informe MED-002 archivado correctamente.", "success"),
+        ],
+        nextState: {
+          progress: {
+            incidentReportFiled: true,
+          },
+        },
+      };
+
     case "status": {
       const wifi = state.progress.wifiFixed ? "OK" : "PENDIENTE";
       const firewall = state.progress.firewallFixed ? "OK" : "PENDIENTE";
       const malware = state.progress.malwareKilled ? "OK" : "PENDIENTE";
       const dns = state.progress.dnsFixed ? "OK" : "PENDIENTE";
       const services = state.progress.servicesRestarted ? "OK" : "PENDIENTE";
+      const dnsDiag = state.progress.dnsDiagnosticsComplete ? "OK" : "PENDIENTE";
+      const override = state.progress.overrideValidated ? "OK" : "PENDIENTE";
+      const verification = state.progress.servicesVerified ? "OK" : "PENDIENTE";
+      const report = state.progress.incidentReportFiled ? "OK" : "PENDIENTE";
 
       const discovered = [
         state.knowledge.knowsWifiFix ? "fix wifi" : null,
@@ -318,6 +537,10 @@ export function executeMediumCommand(
         state.knowledge.knowsMalwareFix ? "kill malware" : null,
         state.knowledge.knowsDnsFix ? "fix dns" : null,
         state.knowledge.knowsServiceRestart ? "restart services" : null,
+        state.knowledge.knowsDnsDiagnostics ? "diag dns" : null,
+        state.knowledge.knowsDnsOverride ? "enter override" : null,
+        state.knowledge.knowsServicesVerification ? "verify services" : null,
+        state.knowledge.knowsIncidentReport ? "file report" : null,
       ].filter(Boolean);
 
       return {
@@ -327,7 +550,11 @@ export function executeMediumCommand(
           line(`Firewall: ${firewall}`),
           line(`Malware: ${malware}`),
           line(`DNS: ${dns}`),
+          line(`Diag DNS: ${dnsDiag}`),
+          line(`Override: ${override}`),
+          line(`Verificación servicios: ${verification}`),
           line(`Servicios: ${services}`),
+          line(`Informe final: ${report}`),
           line(
             `Comandos descubiertos: ${
               discovered.length ? discovered.join(", ") : "ninguno"
@@ -343,7 +570,9 @@ export function executeMediumCommand(
         state.progress.firewallFixed &&
         state.progress.malwareKilled &&
         state.progress.dnsFixed &&
-        state.progress.servicesRestarted;
+        state.progress.overrideValidated &&
+        state.progress.servicesRestarted &&
+        state.progress.incidentReportFiled;
 
       if (!ready) {
         return {
@@ -367,6 +596,61 @@ export function executeMediumCommand(
     }
 
     default:
+      if (input.startsWith("enter override")) {
+        if (!state.knowledge.knowsDnsOverride) {
+          return {
+            lines: [
+              line(
+                "No conoces el procedimiento del override. Revisa el candado en dns-lock.png.",
+                "error",
+              ),
+            ],
+          };
+        }
+
+        if (!state.progress.dnsDiagnosticsComplete) {
+          return {
+            lines: [
+              line(
+                "Debes ejecutar 'diag dns' antes de ingresar el override.",
+                "error",
+              ),
+            ],
+          };
+        }
+
+        if (state.progress.overrideValidated) {
+          return {
+            lines: [line("El override ya fue aceptado.", "hint")],
+          };
+        }
+
+        const code = input.replace("enter override", "").trim();
+
+        if (!code) {
+          return {
+            lines: [line("Debes indicar el código del override.", "error")],
+          };
+        }
+
+        if (code !== "884") {
+          return {
+            lines: [line("Código incorrecto. Revisa dns-lock.png nuevamente.", "error")],
+          };
+        }
+
+        return {
+          lines: [
+            line("Override aceptado. Consola DNS desbloqueada.", "success"),
+          ],
+          nextState: {
+            progress: {
+              overrideValidated: true,
+            },
+          },
+        };
+      }
+
       return {
         lines: [
           line(`Comando no reconocido: ${rawInput}`, "error"),

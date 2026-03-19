@@ -27,8 +27,14 @@ const CHECKLIST_CONFIG: Array<{
   { key: "firewallFixed", label: "Firewall corregido", difficulties: ["easy", "medium", "hard"] },
   { key: "malwareKilled", label: "Malware eliminado", difficulties: ["easy", "medium", "hard"] },
   { key: "dnsFixed", label: "DNS normalizado", difficulties: ["medium", "hard"] },
+  { key: "dnsDiagnosticsComplete", label: "Diagnóstico DNS", difficulties: ["medium", "hard"] },
+  { key: "overrideValidated", label: "Override aplicado", difficulties: ["medium", "hard"] },
   { key: "servicesRestarted", label: "Servicios reiniciados", difficulties: ["medium", "hard"] },
+  { key: "servicesVerified", label: "Servicios verificados", difficulties: ["medium", "hard"] },
+  { key: "incidentReportFiled", label: "Informe final enviado", difficulties: ["medium", "hard"] },
   { key: "switchPortEnabled", label: "Puerto crítico habilitado", difficulties: ["hard"] },
+  { key: "perimeterScanComplete", label: "Escaneo perimetral", difficulties: ["hard"] },
+  { key: "watchdogDeployed", label: "Watchdog desplegado", difficulties: ["hard"] },
 ];
 
 function formatTime(seconds: number) {
@@ -71,7 +77,7 @@ export default function VictoryModal() {
 
   return (
     <div className="absolute inset-0 z-[999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-xl rounded-3xl border border-emerald-500/20 bg-slate-900/95 p-8 shadow-2xl shadow-emerald-500/10">
+      <div className="w-full max-w-xl rounded-3xl border border-emerald-500/20 bg-slate-900/95 p-8 shadow-2xl shadow-emerald-500/10 max-h-[calc(100vh-40px)] overflow-y-auto">
         {/* Badge */}
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-300">
           <span className="h-2 w-2 rounded-full bg-emerald-400" />

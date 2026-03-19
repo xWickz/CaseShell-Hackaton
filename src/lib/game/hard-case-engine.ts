@@ -38,12 +38,28 @@ export function executeHardCommand(
           line("- cat resolver.conf", "hint"),
           line("- cat system.log", "hint"),
           line("- cat switch.conf", "hint"),
+          line("- cat ops-note.txt", "hint"),
+          line("- cat dns-runes.png", "hint"),
+          line("- cat dns-lock.png", "hint"),
+          line("- cat service-manual.txt", "hint"),
+          line("- cat incident-template.txt", "hint"),
+          line("- cat perimeter-note.txt", "hint"),
+          line("- cat switch-override.txt", "hint"),
+          line("- cat chain-of-custody.txt", "hint"),
+          line("- cat watchdog-brief.txt", "hint"),
           line("- fix wifi", "hint"),
           line("- fix firewall", "hint"),
           line("- kill malware", "hint"),
+          line("- diag dns", "hint"),
+          line("- enter override 884", "hint"),
           line("- fix dns", "hint"),
+          line("- verify services", "hint"),
           line("- restart services", "hint"),
+          line("- scan perimeter", "hint"),
+          line("- audit switch", "hint"),
+          line("- deploy watchdog", "hint"),
           line("- enable port", "hint"),
+          line("- file report", "hint"),
           line("- status", "hint"),
           line("- submit", "hint"),
           line("Lee cada archivo; esconden pasos críticos.", "hint"),
@@ -64,6 +80,15 @@ export function executeHardCommand(
           line("- resolver.conf"),
           line("- system.log"),
           line("- switch.conf"),
+          line("- ops-note.txt"),
+          line("- dns-runes.png"),
+          line("- dns-lock.png"),
+          line("- service-manual.txt"),
+          line("- incident-template.txt"),
+          line("- perimeter-note.txt"),
+          line("- switch-override.txt"),
+          line("- chain-of-custody.txt"),
+          line("- watchdog-brief.txt"),
         ],
       };
 
@@ -89,6 +114,127 @@ export function executeHardCommand(
         nextState: {
           knowledge: {
             knowsSwitchFix: true,
+          },
+        },
+      };
+
+    case "cat ops-note.txt":
+      return {
+        lines: [
+          line("=== OPERATIONS NOTE ===", "hint"),
+          line("Secuencia requerida: 'diag dns' ➜ 'enter override 884' ➜ 'fix dns'."),
+          line("No reinicies servicios sin la verificación previa."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsDnsDiagnostics: true,
+          },
+        },
+      };
+
+    case "cat dns-runes.png":
+      return {
+        lines: [
+          line("=== RUNAS DNS ===", "hint"),
+          line("Las runas remarcan la misma secuencia: Medir ➜ Desbloquear ➜ Reparar."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsDnsDiagnostics: true,
+          },
+        },
+      };
+
+    case "cat dns-lock.png":
+      return {
+        lines: [
+          line("=== DNS LOCK ===", "hint"),
+          line("Tres discos muestran la combinación 8-8-4."),
+          line("Usa 'enter override 884' tras el diagnóstico."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsDnsOverride: true,
+          },
+        },
+      };
+
+    case "cat service-manual.txt":
+      return {
+        lines: [
+          line("=== SERVICE PLAYBOOK ===", "hint"),
+          line("'verify services' es obligatorio antes de 'restart services'."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsServicesVerification: true,
+          },
+        },
+      };
+
+    case "cat incident-template.txt":
+      return {
+        lines: [
+          line("=== INCIDENT TEMPLATE ===", "hint"),
+          line("El informe debe incluir DNS, perímetro y switching."),
+          line("Cierra con 'file report'."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsIncidentReport: true,
+          },
+        },
+      };
+
+    case "cat perimeter-note.txt":
+      return {
+        lines: [
+          line("=== PERIMETER NOTE ===", "hint"),
+          line("Ejecuta 'scan perimeter' después de eliminar el malware."),
+          line("Sin ese registro el SOC no firma el cierre."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsPerimeterScan: true,
+          },
+        },
+      };
+
+    case "cat switch-override.txt":
+      return {
+        lines: [
+          line("=== SWITCH OVERRIDE ===", "hint"),
+          line("Asegura 'audit switch' antes de habilitar el puerto."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsSwitchAudit: true,
+          },
+        },
+      };
+
+    case "cat chain-of-custody.txt":
+      return {
+        lines: [
+          line("=== CHAIN OF CUSTODY ===", "hint"),
+          line("El informe debe citar el puerto habilitado y el escaneo perimetral."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsIncidentReport: true,
+          },
+        },
+      };
+
+    case "cat watchdog-brief.txt":
+      return {
+        lines: [
+          line("=== WATCHDOG BRIEF ===", "hint"),
+          line("Despliega el watchdog con 'deploy watchdog' tras 'scan perimeter'."),
+        ],
+        nextState: {
+          knowledge: {
+            knowsWatchdog: true,
           },
         },
       };
@@ -247,6 +393,34 @@ export function executeHardCommand(
         },
       };
 
+    case "diag dns":
+      if (!state.knowledge.knowsDnsDiagnostics) {
+        return {
+          lines: [
+            line("No tienes aún el procedimiento de diagnóstico.", "error"),
+            line("Revisa ops-note.txt o las runas DNS.", "hint"),
+          ],
+        };
+      }
+
+      if (state.progress.dnsDiagnosticsComplete) {
+        return {
+          lines: [line("El diagnóstico de DNS ya está actualizado.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Ejecutando diagnóstico de DNS...", "system"),
+          line("Errores catalogados, métricas capturadas.", "success"),
+        ],
+        nextState: {
+          progress: {
+            dnsDiagnosticsComplete: true,
+          },
+        },
+      };
+
     case "fix dns":
       if (!state.knowledge.knowsDnsFix) {
         return {
@@ -262,6 +436,22 @@ export function executeHardCommand(
           lines: [
             line("Asegura red y firewall antes de tocar DNS.", "error"),
             line("Consulta 'status' para el orden sugerido.", "hint"),
+          ],
+        };
+      }
+
+      if (!state.progress.dnsDiagnosticsComplete) {
+        return {
+          lines: [
+            line("Falta un diagnóstico reciente. Ejecuta 'diag dns'.", "error"),
+          ],
+        };
+      }
+
+      if (!state.progress.overrideValidated) {
+        return {
+          lines: [
+            line("La consola de DNS sigue bloqueada. Usa 'enter override 884'.", "error"),
           ],
         };
       }
@@ -282,6 +472,50 @@ export function executeHardCommand(
         },
       };
 
+    case "verify services":
+      if (!state.knowledge.knowsServicesVerification) {
+        return {
+          lines: [
+            line("No tienes el playbook de verificación.", "error"),
+            line("Revisa service-manual.txt.", "hint"),
+          ],
+        };
+      }
+
+      if (
+        !state.progress.wifiFixed ||
+        !state.progress.firewallFixed ||
+        !state.progress.malwareKilled ||
+        !state.progress.dnsFixed
+      ) {
+        return {
+          lines: [
+            line(
+              "Completa conectividad, firewall, malware y DNS antes de verificar servicios.",
+              "error",
+            ),
+          ],
+        };
+      }
+
+      if (state.progress.servicesVerified) {
+        return {
+          lines: [line("Las dependencias ya fueron verificadas.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Ejecutando verificación de dependencias...", "system"),
+          line("Servicios listos para reinicio coordinado.", "success"),
+        ],
+        nextState: {
+          progress: {
+            servicesVerified: true,
+          },
+        },
+      };
+
     case "restart services":
       if (!state.knowledge.knowsServiceRestart) {
         return {
@@ -292,18 +526,10 @@ export function executeHardCommand(
         };
       }
 
-      if (
-        !state.progress.wifiFixed ||
-        !state.progress.dnsFixed ||
-        !state.progress.malwareKilled
-      ) {
+      if (!state.progress.servicesVerified) {
         return {
           lines: [
-            line(
-              "Asegura red, DNS y elimina malware antes de reiniciar servicios.",
-              "error",
-            ),
-            line("Verifica el estado general.", "hint"),
+            line("Debes ejecutar 'verify services' antes de reiniciar.", "error"),
           ],
         };
       }
@@ -324,6 +550,158 @@ export function executeHardCommand(
         },
       };
 
+    case "scan perimeter":
+      if (!state.knowledge.knowsPerimeterScan) {
+        return {
+          lines: [
+            line("No hay orden para ese escaneo.", "error"),
+            line("Consulta perimeter-note.txt o tamper-photo.png.", "hint"),
+          ],
+        };
+      }
+
+      if (!state.progress.malwareKilled) {
+        return {
+          lines: [
+            line("El malware sigue activo. El SOC no permite el escaneo aún.", "error"),
+          ],
+        };
+      }
+
+      if (state.progress.perimeterScanComplete) {
+        return {
+          lines: [line("El perímetro ya fue escaneado.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Escaneando perímetro externo...", "system"),
+          line("Anomalías controladas. Informe listo.", "success"),
+        ],
+        nextState: {
+          progress: {
+            perimeterScanComplete: true,
+          },
+        },
+      };
+
+    case "audit switch":
+      if (!state.knowledge.knowsSwitchAudit) {
+        return {
+          lines: [
+            line("No tienes el checklist de auditoría.", "error"),
+            line("Revisa switch-override.txt.", "hint"),
+          ],
+        };
+      }
+
+      if (!state.progress.servicesRestarted) {
+        return {
+          lines: [
+            line("Completa el reinicio coordinado antes de auditar el switch.", "error"),
+          ],
+        };
+      }
+
+      if (state.progress.switchAuditComplete) {
+        return {
+          lines: [line("La auditoría del switch ya se completó.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Auditoría de VLAN y puertos en curso...", "system"),
+          line("Switch listo para habilitar el puerto crítico.", "success"),
+        ],
+        nextState: {
+          progress: {
+            switchAuditComplete: true,
+          },
+        },
+      };
+
+    case "deploy watchdog":
+      if (!state.knowledge.knowsWatchdog) {
+        return {
+          lines: [
+            line("No tienes autorización para desplegar el watchdog.", "error"),
+            line("Lee watchdog-brief.txt.", "hint"),
+          ],
+        };
+      }
+
+      if (!state.progress.perimeterScanComplete) {
+        return {
+          lines: [
+            line("Necesitas registrar 'scan perimeter' antes de desplegar el watchdog.", "error"),
+          ],
+        };
+      }
+
+      if (state.progress.watchdogDeployed) {
+        return {
+          lines: [line("El watchdog ya monitorea el perímetro.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Desplegando watchdog del SOC...", "system"),
+          line("Watchdog operativo, token archivado.", "success"),
+        ],
+        nextState: {
+          progress: {
+            watchdogDeployed: true,
+          },
+        },
+      };
+
+    case "file report":
+      if (!state.knowledge.knowsIncidentReport) {
+        return {
+          lines: [
+            line("No tienes el formato del informe.", "error"),
+            line("Abre incident-template.txt o chain-of-custody.txt.", "hint"),
+          ],
+        };
+      }
+
+      if (
+        !state.progress.servicesRestarted ||
+        !state.progress.perimeterScanComplete ||
+        !state.progress.watchdogDeployed ||
+        !state.progress.switchPortEnabled
+      ) {
+        return {
+          lines: [
+            line(
+              "Necesitas reinicio, escaneo, watchdog y puerto habilitado antes de documentar el caso.",
+              "error",
+            ),
+          ],
+        };
+      }
+
+      if (state.progress.incidentReportFiled) {
+        return {
+          lines: [line("El informe ya fue enviado al SOC.", "hint")],
+        };
+      }
+
+      return {
+        lines: [
+          line("Compilando cadena de custodia...", "system"),
+          line("Informe HARD-003 archivado correctamente.", "success"),
+        ],
+        nextState: {
+          progress: {
+            incidentReportFiled: true,
+          },
+        },
+      };
+
     case "enable port":
       if (!state.knowledge.knowsSwitchFix) {
         return {
@@ -333,11 +711,11 @@ export function executeHardCommand(
         };
       }
 
-      if (!state.progress.servicesRestarted) {
+      if (!state.progress.switchAuditComplete) {
         return {
           lines: [
             line(
-              "Reinicia los servicios antes de reactivar el puerto crítico.",
+              "Ejecuta 'audit switch' (tras el reinicio) antes de habilitar el puerto.",
               "error",
             ),
           ],
@@ -367,6 +745,13 @@ export function executeHardCommand(
       const dns = state.progress.dnsFixed ? "OK" : "PENDIENTE";
       const services = state.progress.servicesRestarted ? "OK" : "PENDIENTE";
       const port = state.progress.switchPortEnabled ? "OK" : "PENDIENTE";
+      const dnsDiag = state.progress.dnsDiagnosticsComplete ? "OK" : "PENDIENTE";
+      const override = state.progress.overrideValidated ? "OK" : "PENDIENTE";
+      const verification = state.progress.servicesVerified ? "OK" : "PENDIENTE";
+      const perimeter = state.progress.perimeterScanComplete ? "OK" : "PENDIENTE";
+      const audit = state.progress.switchAuditComplete ? "OK" : "PENDIENTE";
+      const watchdog = state.progress.watchdogDeployed ? "OK" : "PENDIENTE";
+      const report = state.progress.incidentReportFiled ? "OK" : "PENDIENTE";
 
       const discovered = [
         state.knowledge.knowsWifiFix ? "fix wifi" : null,
@@ -375,6 +760,13 @@ export function executeHardCommand(
         state.knowledge.knowsDnsFix ? "fix dns" : null,
         state.knowledge.knowsServiceRestart ? "restart services" : null,
         state.knowledge.knowsSwitchFix ? "enable port" : null,
+        state.knowledge.knowsDnsDiagnostics ? "diag dns" : null,
+        state.knowledge.knowsDnsOverride ? "enter override" : null,
+        state.knowledge.knowsServicesVerification ? "verify services" : null,
+        state.knowledge.knowsPerimeterScan ? "scan perimeter" : null,
+        state.knowledge.knowsSwitchAudit ? "audit switch" : null,
+        state.knowledge.knowsWatchdog ? "deploy watchdog" : null,
+        state.knowledge.knowsIncidentReport ? "file report" : null,
       ].filter(Boolean);
 
       return {
@@ -384,8 +776,15 @@ export function executeHardCommand(
           line(`Firewall: ${firewall}`),
           line(`Malware: ${malware}`),
           line(`DNS: ${dns}`),
+          line(`Diag DNS: ${dnsDiag}`),
+          line(`Override: ${override}`),
+          line(`Verificación servicios: ${verification}`),
           line(`Servicios: ${services}`),
           line(`Puerto 4: ${port}`),
+          line(`Perímetro: ${perimeter}`),
+          line(`Auditoría switch: ${audit}`),
+          line(`Watchdog: ${watchdog}`),
+          line(`Informe: ${report}`),
           line(
             `Comandos descubiertos: ${
               discovered.length ? discovered.join(", ") : "ninguno"
@@ -402,7 +801,10 @@ export function executeHardCommand(
         state.progress.malwareKilled &&
         state.progress.dnsFixed &&
         state.progress.servicesRestarted &&
-        state.progress.switchPortEnabled;
+        state.progress.switchPortEnabled &&
+        state.progress.perimeterScanComplete &&
+        state.progress.watchdogDeployed &&
+        state.progress.incidentReportFiled;
 
       if (!ready) {
         return {
@@ -424,6 +826,56 @@ export function executeHardCommand(
     }
 
     default:
+      if (input.startsWith("enter override")) {
+        if (!state.knowledge.knowsDnsOverride) {
+          return {
+            lines: [
+              line(
+                "No conoces el procedimiento del override. Consulta dns-lock.png.",
+                "error",
+              ),
+            ],
+          };
+        }
+
+        if (!state.progress.dnsDiagnosticsComplete) {
+          return {
+            lines: [
+              line("Ejecuta 'diag dns' antes de ingresar el override.", "error"),
+            ],
+          };
+        }
+
+        if (state.progress.overrideValidated) {
+          return {
+            lines: [line("El override ya fue aceptado.", "hint")],
+          };
+        }
+
+        const code = input.replace("enter override", "").trim();
+
+        if (!code) {
+          return {
+            lines: [line("Indica el código del override.", "error")],
+          };
+        }
+
+        if (code !== "884") {
+          return {
+            lines: [line("Código incorrecto. Vuelve a revisar el candado.", "error")],
+          };
+        }
+
+        return {
+          lines: [line("Override aceptado. Consola DNS desbloqueada.", "success")],
+          nextState: {
+            progress: {
+              overrideValidated: true,
+            },
+          },
+        };
+      }
+
       return {
         lines: [
           line(`Comando no reconocido: ${rawInput}`, "error"),

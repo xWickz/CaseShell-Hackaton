@@ -93,6 +93,116 @@ export default function DesktopIcon({
       ]);
     }
 
+    if (item.name === "ops-note.txt" && currentDifficulty !== "easy") {
+      discoverKnowledge("knowsDnsDiagnostics");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "Las notas operativas ordenan ejecutar 'diag dns' antes de aplicar cualquier fix.",
+        },
+      ]);
+    }
+
+    if (item.name === "dns-runes.png" && currentDifficulty !== "easy") {
+      discoverKnowledge("knowsDnsDiagnostics");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "El rompecabezas DNS confirma que la secuencia correcta es DIAG ➜ FIX.",
+        },
+      ]);
+    }
+
+    if (item.name === "dns-lock.png" && currentDifficulty !== "easy") {
+      discoverKnowledge("knowsDnsOverride");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "El candado DNS revela el override 8-8-4 necesario para desbloquear el fix.",
+        },
+      ]);
+    }
+
+    if (item.name === "service-manual.txt" && currentDifficulty !== "easy") {
+      discoverKnowledge("knowsServicesVerification");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "El playbook exige correr 'verify services' antes de 'restart services'.",
+        },
+      ]);
+    }
+
+    if (item.name === "incident-template.txt" && currentDifficulty !== "easy") {
+      discoverKnowledge("knowsIncidentReport");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "Necesitarás completar el informe ejecutando 'file report' tras los arreglos.",
+        },
+      ]);
+    }
+
+    if (item.name === "switch-override.txt" && currentDifficulty === "hard") {
+      discoverKnowledge("knowsSwitchAudit");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "Notas del switch: corre 'audit switch' antes de 'enable port'.",
+        },
+      ]);
+    }
+
+    if (item.name === "tamper-photo.png" && currentDifficulty === "hard") {
+      discoverKnowledge("knowsPerimeterScan");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "La foto del sello manipulado sugiere ejecutar 'scan perimeter'.",
+        },
+      ]);
+    }
+
+    if (item.name === "perimeter-note.txt" && currentDifficulty === "hard") {
+      discoverKnowledge("knowsPerimeterScan");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "El memo de perímetro exige documentar un 'scan perimeter' antes del cierre.",
+        },
+      ]);
+    }
+
+    if (item.name === "chain-of-custody.txt" && currentDifficulty === "hard") {
+      discoverKnowledge("knowsIncidentReport");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "La cadena de custodia detalla los datos requeridos por 'file report'.",
+        },
+      ]);
+    }
+
+    if (item.name === "watchdog-brief.txt" && currentDifficulty === "hard") {
+      discoverKnowledge("knowsWatchdog");
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "hint",
+          text: "El briefing del SOC exige desplegar un watchdog tras el escaneo perimetral.",
+        },
+      ]);
+    }
+
     openWindow({
       id: item.id,
       title: item.name,
@@ -123,7 +233,7 @@ export default function DesktopIcon({
   return (
     <button
       onDoubleClick={handleOpen}
-      className="flex w-full flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10"
+      className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10"
     >
       {renderIcon()}
       <span className="max-w-[100px] text-center text-xs font-medium">
