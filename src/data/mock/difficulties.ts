@@ -23,6 +23,6 @@ export const difficulties: DifficultyOption[] = [
     id: "hard",
     label: "Colapso Crítico",
     description:
-      "n ataque de ransomware ha bloqueado el acceso a la unidad central. El atacante dejó trampas (pistas falsas y scripts engañosos). Debes analizar logs corruptos, entender permisos de sistema complejos y ejecutar la secuencia de comandos de contramedida exacta. Un error podría formatear los discos.",
+      "Un ataque de ransomware ha bloqueado el acceso a la unidad central. El atacante dejó trampas (pistas falsas y scripts engañosos). Debes analizar logs corruptos, entender permisos de sistema complejos y ejecutar la secuencia de comandos de contramedida exacta. Un error podría formatear los discos.",
   },
 ];

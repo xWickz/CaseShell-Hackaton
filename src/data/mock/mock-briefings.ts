@@ -2,7 +2,7 @@ import type { Briefing, Difficulty } from "@/types/game";
 
 export const briefingsByDifficulty: Record<Difficulty, Briefing> = {
   easy: {
-    title: "Incidente 01",
+    title: "Acceso Denegado",
     description:
       "La oficina no puede acceder a la aplicación interna. Investiga el escritorio, revisa archivos y encuentra la causa raíz del problema.",
     hints: [
@@ -12,7 +12,7 @@ export const briefingsByDifficulty: Record<Difficulty, Briefing> = {
     ],
   },
   medium: {
-    title: "Incidente 002",
+    title: "Fuga de Datos",
     description:
       "Hay múltiples fallos en la red interna. Reúne evidencia, revisa logs y corrige la configuración.",
     hints: [
@@ -21,9 +21,9 @@ export const briefingsByDifficulty: Record<Difficulty, Briefing> = {
     ],
   },
   hard: {
-    title: "Incidente 003",
+    title: "Colapso Crítico",
     description:
-      "La infraestructura presenta fallos encadenados. Analiza servicios, configuración de red y componentes internos.",
+      "La infraestructura presenta fallos encadenados. Analiza servicios, configuración de red y componentes internos. No se tiene mucha información sobre este caso, debes indagar por tus propios medios. Confiamos en ti, ¡por algo te contratamos! suerte, junior.",
     hints: ["Habrá más de una causa", "No te quedes solo en una carpeta"],
   },
 };

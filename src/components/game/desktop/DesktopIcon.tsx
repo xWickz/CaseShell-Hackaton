@@ -243,9 +243,9 @@ export default function DesktopIcon({
 
   // Calculate default grid position (top-to-bottom, then left-to-right columns)
   // Assuming a max height roughly matching 1080p for default layout
-  const MAX_ROWS = 8;
+  const MAX_ROWS = 7; // Baja a 7 para que los iconos default tampoco se sobrepongan al taskbar en pantallas 1080p y 720p
   const PADDING = 16;
-  const TASKBAR_HEIGHT = 80;
+  const DESKTOP_OFFSET = 120; // Espacio que usa el Desktop.tsx antes del taskbar
 
   const getDefaultPositionForIndex = (index: number) => {
     const col = Math.floor(index / MAX_ROWS);
@@ -294,14 +294,15 @@ export default function DesktopIcon({
     let snappedY =
       Math.round((rawY - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
 
-    // Window physical bounds
+    // Window physical bounds relative to the desktop container (which is h-[calc(100vh-120px)])
+    const DESKTOP_OFFSET = 120; // Matches calc(100vh - 120px) from Desktop.tsx
     const maxX =
       typeof window !== "undefined"
         ? window.innerWidth - GRID_SIZE - PADDING
         : 1920;
     const maxY =
       typeof window !== "undefined"
-        ? window.innerHeight - TASKBAR_HEIGHT - GRID_SIZE
+        ? window.innerHeight - DESKTOP_OFFSET - GRID_SIZE
         : 1080;
 
     // Prevent going out of negative bounds

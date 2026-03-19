@@ -115,7 +115,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.15),transparent_30%)]" />
 
       {/* Desktop icons */}
-      <div className="relative z-10 h-[calc(100vh-120px)] w-full">
+      <div className="relative z-10 h-[calc(100vh-140px)] w-full">
         {items.map((item, index) => (
           <DesktopIcon
             key={item.id}
