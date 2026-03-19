@@ -69,7 +69,7 @@ const createInitialTerminalHistory = (
   {
     id: crypto.randomUUID(),
     type: "system",
-    text: "CubePath VPS Training Terminal v0.1",
+    text: "CaseShell [Versión 10.0.22631.6199]",
   },
   {
     id: crypto.randomUUID(),

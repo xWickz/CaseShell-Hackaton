@@ -2,7 +2,7 @@ import type { Briefing, Difficulty } from "@/types/game";
 
 export const briefingsByDifficulty: Record<Difficulty, Briefing> = {
   easy: {
-    title: "Incidente 001",
+    title: "Incidente 01",
     description:
       "La oficina no puede acceder a la aplicación interna. Investiga el escritorio, revisa archivos y encuentra la causa raíz del problema.",
     hints: [
