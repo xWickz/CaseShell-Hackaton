@@ -226,7 +226,7 @@ export default function VictoryModal() {
           </button>
 
           <Link
-            href="/play"
+            href="/game"
             className="rounded-xl border border-slate-600 px-5 py-3 text-center font-semibold text-slate-200 transition hover:bg-slate-800"
           >
             Menú principal

@@ -1,6 +1,38 @@
 import type { DesktopItem, Difficulty } from "@/types/game";
 
-const easyDesktopItems: DesktopItem[] = [
+const mediumCaseFileContent = `INCIDENTE 2 - PERSISTE LA INTERMITENCIA
+
+Situación:
+
+Tras la restauración inicial, el panel volvió a presentar errores esporádicos. El equipo de operaciones sospecha de DNS y de un reinicio mal hecho.
+
+Objetivos:
+- Validar que la red realmente está estable.
+- Recolectar evidencia antes de aplicar cambios a DNS.
+- Reiniciar servicios solo cuando todas las dependencias estén verificadas.
+
+Pistas:
+- Los símbolos en dns-runes.png explican el orden correcto.
+- No reinicies nada sin ejecutar 'verify services'.
+- Documenta absolutamente todo en incident-template.txt.`;
+
+const hardCaseFileContent = `INCIDENTE 3 - COMPROMISO CRÍTICO
+
+Situación:
+
+Después de los ajustes de DNS aparecieron signos de sabotaje físico en la red. Se encontró un switch alterado y alertas del SOC sobre tráfico externo.
+
+Objetivos:
+- Restablecer el enlace físico del servidor.
+- Ejecutar el escaneo perimetral y desplegar el watchdog.
+- Actualizar la cadena de custodia antes de cerrar el caso.
+
+Pistas:
+- Revisa tamper-photo.png para detectar el puerto afectado.
+- No olvides registrar el token de deploy watchdog.
+- El informe final debe incluir diagnóstico de DNS, perímetro y switch.`;
+
+const createEasyDesktopItems = (): DesktopItem[] => [
   {
     id: "terminal-main",
     name: "Terminal",
@@ -171,8 +203,7 @@ No tengo ni la más menor idea de qué son estos links o cómo podrían ayudar, 
   },
 ];
 
-const mediumDesktopItems: DesktopItem[] = [
-  ...easyDesktopItems,
+const createMediumExtras = (): DesktopItem[] => [
   {
     id: "dns-folder",
     name: "dns",
@@ -215,8 +246,7 @@ Recordatorio: no reinicies servicios sin verificar la capa de aplicación.`,
     id: "dns-runes",
     name: "dns-runes.png",
     type: "image",
-    imageUrl:
-      "https://placehold.co/900x520/0f172a/38bdf8?text=DNS+Runes+Puzzle",
+    imageUrl: "https://placehold.co/900x520/0f172a/38bdf8?text=DNS+Runes+Puzzle",
   },
   {
     id: "dns-lock",
@@ -257,8 +287,7 @@ Para cerrar el incidente ejecuta 'file report' después del reinicio exitoso.`,
   },
 ];
 
-const hardDesktopItems: DesktopItem[] = [
-  ...mediumDesktopItems,
+const createHardExtras = (): DesktopItem[] => [
   {
     id: "infra-folder",
     name: "infra",
@@ -342,8 +371,33 @@ Sin el watchdog activo el incidente no puede cerrarse.`,
   },
 ];
 
+const updateCaseFileContent = (
+  items: DesktopItem[],
+  newContent?: string,
+): DesktopItem[] =>
+  !newContent
+    ? items
+    : items.map((item) =>
+        item.id === "case-file"
+          ? {
+              ...item,
+              content: newContent,
+            }
+          : item,
+      );
+
+const createMediumDesktopItems = (): DesktopItem[] => {
+  const base = updateCaseFileContent(createEasyDesktopItems(), mediumCaseFileContent);
+  return [...base, ...createMediumExtras()];
+};
+
+const createHardDesktopItems = (): DesktopItem[] => {
+  const base = updateCaseFileContent(createMediumDesktopItems(), hardCaseFileContent);
+  return [...base, ...createHardExtras()];
+};
+
 export const mockDesktopItemsByDifficulty: Record<Difficulty, DesktopItem[]> = {
-  easy: easyDesktopItems,
-  medium: mediumDesktopItems,
-  hard: hardDesktopItems,
+  easy: createEasyDesktopItems(),
+  medium: createMediumDesktopItems(),
+  hard: createHardDesktopItems(),
 };
