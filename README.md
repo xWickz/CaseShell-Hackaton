@@ -17,7 +17,7 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de sistema operativ
 
 **CaseShell** es un juego de investigación gamificado que simula un entorno de escritorio completo (OS) directamente en el navegador. El jugador asume el rol de un investigador/hacker que debe navegar a través de un sistema de archivos enigmático utilizando comandos de terminal reales, examinar carpetas, clasificar pruebas y evitar pistas falsas para resolver el misterio antes de que sea demasiado tarde.
 
-## ✨ Características Principales (Lo que hace especial al proyecto)
+## ✨ Características Principales
 
 - **🖥️ OS Simulator Realista:** Interfaz tipo escritorio con ventanas arrastrables, superposición y sistema de colisiones
 - **⌨️ Terminal Funcional:** Intérprete de comandos integrado que valida la lógica del juego y el sistema de archivos mockeado
