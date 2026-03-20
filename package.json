@@ -1,6 +1,6 @@
 {
   "name": "caseshell",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,11 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.99.3",
+    "@auth/prisma-adapter": "2.11.1",
+    "@prisma/client": "6.19.2",
     "clsx": "2.1.1",
     "framer-motion": "12.38.0",
     "lucide-react": "0.577.0",
     "next": "16.2.0",
+    "next-auth": "5.0.0-beta.30",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tailwind-animations": "1.0.1",
@@ -27,6 +29,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "9",
     "eslint-config-next": "16.2.0",
+    "prisma": "^6.19.2",
     "tailwindcss": "4",
     "typescript": "5"
   }

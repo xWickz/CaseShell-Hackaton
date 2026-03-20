@@ -5,8 +5,9 @@ import { useMemo, useState, useEffect } from "react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { Difficulty } from "@/types/game";
 import { getChecklistForDifficulty } from "@/data/game/checklist";
-import { supabase } from "@/lib/supabase";
-import type { User } from "@supabase/supabase-js";
+import { signIn, getSession } from "next-auth/react";
+import type { Session } from "next-auth";
+import { submitRankingAction } from "@/app/actions/ranking";
 import { GitHub } from "@/components/game/ui/github";
 
 const CASE_IDS: Record<Difficulty, string> = {
@@ -40,15 +41,13 @@ export default function VictoryModal() {
     (state) => state.currentDifficulty,
   );
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Session["user"] | null>(null);
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const session = await getSession();
       setUser(session?.user || null);
     };
     if (isVictoryOpen) checkUser();
@@ -72,11 +71,15 @@ export default function VictoryModal() {
   const headingId = "victory-heading";
 
   const handleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: window.location.origin + "/ranking", // O redireccionar de vuelta al juego
-      },
+    localStorage.setItem(
+      "pendingScore",
+      JSON.stringify({
+        difficulty: currentDifficulty,
+        timeElapsed: elapsedSeconds,
+      }),
+    );
+    await signIn("github", {
+      callbackUrl: window.location.origin + "/ranking",
     });
   };
 
@@ -84,23 +87,10 @@ export default function VictoryModal() {
     if (!user || submitted) return;
     setIsSubmiting(true);
     try {
-      const { error } = await supabase.from("rankings").insert([
-        {
-          user_name:
-            user?.user_metadata?.user_name ||
-            user?.user_metadata?.full_name ||
-            "Hacker",
-          avatar_url: user?.user_metadata?.avatar_url,
-          difficulty: currentDifficulty,
-          time_seconds: elapsedSeconds,
-        },
-      ]);
-
-      if (error) throw error;
+      await submitRankingAction(currentDifficulty, elapsedSeconds);
       setSubmitted(true);
-    } catch (err) {
-      console.error("Error guardando puntuación:", err);
-      alert("Hubo un error al guardar tu puntuación. Intenta de nuevo.");
+    } catch (error) {
+      console.error("Error al guardar ranking", error);
     } finally {
       setIsSubmiting(false);
     }
@@ -116,18 +106,12 @@ export default function VictoryModal() {
       aria-labelledby={headingId}
     >
       <div className="w-full max-w-7xl max-h-7xl rounded-3xl border border-emerald-500/20 bg-slate-900/95 p-8 shadow-2xl shadow-emerald-500/10 h-150 overflow-y-auto">
-        {/* Badge */}
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-300">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
-          Mission Complete
-        </div>
-
         {/* Title */}
         <h2
           id={headingId}
           className="text-3xl font-bold text-white sm:text-4xl"
         >
-          🎉 Caso Resuelto
+          Caso Resuelto
         </h2>
 
         <p className="mt-3 text-slate-300">
@@ -185,7 +169,7 @@ export default function VictoryModal() {
           {!user ? (
             <>
               <p className="text-sm font-semibold text-blue-200">
-                ¿Quieres entrar al Salón de la Fama?
+                ¿Quieres entrar en la clasificación?
               </p>
               <p className="text-xs text-blue-300/70 mb-2">
                 Ingresa para guardar tu mejor récord global de la hackathon.
@@ -201,10 +185,7 @@ export default function VictoryModal() {
           ) : (
             <>
               <p className="text-sm font-semibold text-blue-200">
-                Conectado como{" "}
-                <span className="text-white">
-                  {user.user_metadata?.user_name}
-                </span>
+                Conectado como <span className="text-white">{user.name}</span>
               </p>
               <button
                 onClick={submitScore}

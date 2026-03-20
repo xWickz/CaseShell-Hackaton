@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
 import { Clock, Target } from "lucide-react";
+import { getRankingsAction } from "@/app/actions/ranking";
 
 type Ranking = {
   id: string;
-  user_name: string;
-  avatar_url: string;
-  difficulty: "easy" | "medium" | "hard";
-  time_seconds: number;
-  created_at: string;
+  difficulty: string;
+  timeElapsed: number;
+  user: {
+    name: string | null;
+    image: string | null;
+  };
 };
 
 export default function RankingTable() {
@@ -22,19 +23,14 @@ export default function RankingTable() {
   useEffect(() => {
     const fetchRankings = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("rankings")
-        .select("*")
-        .eq("difficulty", filter)
-        .order("time_seconds", { ascending: true })
-        .limit(50);
-
-      if (error) {
+      try {
+        const data = await getRankingsAction(filter);
+        setRankings(data as unknown as Ranking[]);
+      } catch (error) {
         console.error("Error fetching rankings:", error);
-      } else {
-        setRankings(data || []);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchRankings();
@@ -113,28 +109,28 @@ export default function RankingTable() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        {run.avatar_url ? (
+                        {run.user?.image ? (
                           <Image
-                            src={run.avatar_url}
-                            alt={run.user_name}
+                            src={run.user.image}
+                            alt={run.user.name || "User"}
                             width={32}
                             height={32}
                             className="rounded-full bg-slate-800"
                           />
                         ) : (
                           <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs">
-                            {run.user_name.charAt(0).toUpperCase()}
+                            {(run.user?.name || "H").charAt(0).toUpperCase()}
                           </div>
                         )}
                         <span className="font-medium text-slate-200">
-                          {run.user_name}
+                          {run.user?.name || "Hacker Anónimo"}
                         </span>
                       </div>
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2 font-mono text-emerald-400 font-medium">
                         <Clock className="w-4 h-4 opacity-70" />
-                        {formatTime(run.time_seconds)}
+                        {formatTime(run.timeElapsed)}
                       </div>
                     </td>
                   </tr>
