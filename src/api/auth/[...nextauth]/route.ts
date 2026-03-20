@@ -1,2 +1,2 @@
-import { handlers } from "@/auth"; // Asegúrate de que la ruta apunte al auth.ts que acabamos de crear
+import { handlers } from "@/auth";
 export const { GET, POST } = handlers;

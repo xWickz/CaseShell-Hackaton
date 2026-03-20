@@ -4,7 +4,6 @@ import Navbar from "@/components/game/ui/navbar";
 import Footer from "@/components/game/ui/footer";
 
 export default function GameSelectPage() {
-  // Mapeo de estilos para que Tailwind los detecte siempre
   const difficultyStyles: Record<
     string,
     { text: string; border: string; bg: string }
@@ -42,8 +41,6 @@ export default function GameSelectPage() {
               técnicos únicos en la terminal.
             </p>
           </section>
-
-          {/* GRID FULL WIDTH */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
             {difficulties.map((diff) => {
               const styles = difficultyStyles[diff.id] || difficultyStyles.easy;
@@ -81,8 +78,6 @@ export default function GameSelectPage() {
           </div>
         </div>
       </main>
-
-      {/* FOOTER */}
       <Footer />
     </>
   );

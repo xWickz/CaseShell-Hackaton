@@ -9,11 +9,8 @@ export default function HomePage() {
       <header>
         <Navbar />
       </header>
-      {/* Reduje el px-10 a px-6 en móvil para que no coma tanto espacio a los lados */}
       <main className="min-h-screen bg-black px-6 md:px-10 lg:px-20 font-sans pb-20 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col gap-24 lg:gap-32">
-          {/* 1. SECCIÓN HERO (Intro) */}
-          {/* Cambié h-fijo por min-h para que en móvil no se corte si el texto es largo */}
           <div
             className="animate-fade-in flex flex-col lg:flex-row items-center justify-center lg:justify-between w-full gap-10 min-h-[calc(100vh-5rem)] lg:min-h-0 lg:h-[calc(100vh-80px)] py-10 lg:py-0"
             id="intro"
@@ -47,7 +44,6 @@ export default function HomePage() {
               <GlowButton href="/game">Jugar</GlowButton>
             </section>
 
-            {/* Esta imagen ya estaba oculta en móvil (hidden lg:block), ¡perfecto! */}
             <aside className="relative hidden shrink-0 lg:block rotate-1 w-full max-w-137.5">
               <Image
                 src="/demo1.webp"
@@ -59,8 +55,6 @@ export default function HomePage() {
               />
             </aside>
           </div>
-
-          {/* 2. SECCIÓN ¿QUÉ ES? */}
           <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-10 border-t border-white/10 pt-20 timeline-view animate-slide-in-left animate-range-[entry_5%_contain_20%]">
             <section className="w-full lg:max-w-xl flex flex-col items-center lg:items-start text-center lg:text-left">
               <h2 className="text-3xl text-white font-semibold tracking-tight mb-6">
@@ -87,15 +81,12 @@ export default function HomePage() {
               />
             </aside>
           </div>
-
-          {/* 3. SECCIÓN MECÁNICAS */}
           <section className="border-t border-white/10 pt-20 max-w-7xl mx-auto w-full">
             <h2 className="text-3xl text-white font-semibold tracking-tight mb-10 lg:mb-16 text-center lg:text-right">
               Mecánicas del juego
             </h2>
 
             <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-12 lg:gap-24">
-              {/* Ocultamos el Bento Grid en móvil con "hidden lg:grid" */}
               <div className="hidden lg:grid w-full lg:w-125 xl:w-150 grid-cols-2 grid-rows-2 gap-4 h-112.5">
                 <div className="row-span-2 bg-gray-900/50 rounded-3xl border border-white/10 overflow-hidden relative group">
                   <Image
@@ -122,8 +113,6 @@ export default function HomePage() {
                   />
                 </div>
               </div>
-
-              {/* Texto centrado en móvil, alineado a la derecha en PC */}
               <div className="flex flex-col items-center lg:items-end flex-1 w-full">
                 <div className="grid grid-cols-1 gap-10 text-base md:text-lg text-slate-400 max-w-xl text-center lg:text-right">
                   <div>
@@ -151,14 +140,12 @@ export default function HomePage() {
               </div>
             </div>
           </section>
-
-          {/* 4. DIFICULTADES */}
           <div className="flex flex-col items-center lg:items-start w-full gap-10 border-t border-white/10 pt-20 timeline-view animate-slide-in-left animate-range-[entry_5%_contain_20%]">
             <section className="w-full">
               <h2 className="text-3xl text-white font-semibold tracking-tight mb-8 text-center lg:text-left">
                 Dificultades
               </h2>
-              {/* Cambiado a grid-cols-1 en móvil para que se apilen, y grid-cols-3 en md/lg */}
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 md:p-8 text-center">
                   <h3 className="text-2xl lg:text-xl font-semibold text-green-400 mb-3 lg:mb-2">
@@ -191,8 +178,6 @@ export default function HomePage() {
           </div>
         </div>
       </main>
-
-      {/* FOOTER */}
       <Footer />
     </>
   );

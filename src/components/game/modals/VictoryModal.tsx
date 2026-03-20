@@ -11,9 +11,9 @@ import { submitRankingAction } from "@/app/actions/ranking";
 import { GitHub } from "@/components/game/ui/github";
 
 const CASE_IDS: Record<Difficulty, string> = {
-  easy: "EASY-001",
-  medium: "MED-002",
-  hard: "HARD-003",
+  easy: "EASY-001-ACCESS-NOT-GRANTED",
+  medium: "MED-002-DATA-LEAK",
+  hard: "HARD-003-CRITICAL-COLLAPSE",
 };
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {

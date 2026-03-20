@@ -22,6 +22,7 @@ export default function FileViewer({
   if (type === "image") {
     return (
       <div className="flex h-full items-center justify-center rounded-lg bg-neutral-950 p-4">
+        {/* se sabe que hay que usar next/image, luego */}
         <img
           src={imageUrl}
           alt="Archivo visual"

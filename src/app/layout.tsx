@@ -13,7 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://caseshell.vercel.app"), // Cámbiarlo por tu URL real de Vercel cuando la tengas
+  metadataBase: new URL(
+    "https://wawa-cases-wickz-hi2ufv-f7affe-157-254-174-56.traefik.me/",
+  ),
   title: {
     default: "CaseShell | The Ultimate Terminal Puzzle",
     template: "%s | CaseShell",
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://caseshell.vercel.app",
+    url: "https://wawa-cases-wickz-hi2ufv-f7affe-157-254-174-56.traefik.me/",
     title: "CaseShell | The Ultimate Terminal Puzzle",
     description:
       "Hackea el sistema. Resuelve el caso. Un simulador de sistema operativo donde tu terminal es la escena del crimen.",
