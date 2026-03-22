@@ -6,6 +6,7 @@ import {
   type CommandOutcome,
 } from "@/store/useGameSessionStore";
 import { executeCaseCommand } from "@/lib/game/case-engine";
+import { useTerminalAudio } from "@/hooks/useTerminalAudio";
 
 export default function TerminalWindow() {
   const terminalHistory = useGameSessionStore((state) => state.terminalHistory);
@@ -26,9 +27,14 @@ export default function TerminalWindow() {
   const startSession = useGameSessionStore((state) => state.startSession);
   const completeSession = useGameSessionStore((state) => state.completeSession);
   const logCommand = useGameSessionStore((state) => state.logCommand);
+  const commandLog = useGameSessionStore((state) => state.commandLog);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const lastCountRef = useRef(0);
+  const completionRef = useRef(false);
+
+  const { playOutcome, playCompletion } = useTerminalAudio();
 
   useEffect(() => {
     if (!caseState.progress.completed) {
@@ -42,6 +48,26 @@ export default function TerminalWindow() {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [terminalHistory]);
+
+  useEffect(() => {
+    if (!commandLog.length) return;
+    if (commandLog.length === lastCountRef.current) return;
+    const lastCommand = commandLog[commandLog.length - 1];
+    playOutcome(lastCommand.outcome);
+    lastCountRef.current = commandLog.length;
+  }, [commandLog, playOutcome]);
+
+  useEffect(() => {
+    if (caseState.progress.completed && !completionRef.current) {
+      playCompletion();
+      completionRef.current = true;
+      return;
+    }
+
+    if (!caseState.progress.completed) {
+      completionRef.current = false;
+    }
+  }, [caseState.progress.completed, playCompletion]);
 
   const prompt = useMemo(() => "agent@cubepath:~$", []);
 

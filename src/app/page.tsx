@@ -55,6 +55,50 @@ export default function HomePage() {
               />
             </aside>
           </div>
+          <section className="border-t border-white/10 pt-20">
+            <div className="grid items-center gap-10 lg:grid-cols-2">
+              <div className="space-y-5 text-center lg:text-left">
+                <p className="text-xs uppercase tracking-tight font-bold text-red-400/80">
+                  Demo en vivo
+                </p>
+                <h2 className="text-3xl text-white font-semibold">
+                  Mira el briefing, ejecuta comandos y envía el reporte en 90
+                  segundos.
+                </h2>
+                <p className="text-base text-slate-400">
+                  Este clip muestra el flujo real: briefing interactivo,
+                  terminal con motor de casos y envío al ranking. Todo corre
+                  dentro del entorno desplegado en CubePath.
+                </p>
+                <ul className="text-left text-slate-300 space-y-2 text-sm">
+                  <li>• Briefing cinemático con checklist por dificultad</li>
+                  <li>
+                    • Terminal real con comandos personalizados (
+                    <code>diag</code>, <code>fix</code>, <code>submit</code>)
+                  </li>
+                  <li>• Ranking y autosave sincronizados vía Server Actions</li>
+                </ul>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <GlowButton href="/game">Entrar al Caso</GlowButton>
+                  <a
+                    href="#gameplay"
+                    className="text-sm uppercase tracking-widest text-white/70 underline-offset-4 hover:text-white"
+                  >
+                    Leer gameplay loop
+                  </a>
+                </div>
+              </div>
+              <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/70 shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 via-transparent to-cyan-500/20" />
+                <img
+                  src="https://i.imgur.com/7FUmfbx.gif"
+                  alt="Gameplay del escritorio CaseShell"
+                  loading="lazy"
+                  className="relative w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </section>
           <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-10 border-t border-white/10 pt-20 timeline-view animate-slide-in-left animate-range-[entry_5%_contain_20%]">
             <section className="w-full lg:max-w-xl flex flex-col items-center lg:items-start text-center lg:text-left">
               <h2 className="text-3xl text-white font-semibold tracking-tight mb-6">

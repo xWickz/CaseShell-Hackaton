@@ -1,4 +1,5 @@
 import type { FileType } from "@/types/game";
+import Image from "next/image";
 
 type FileViewerProps = {
   type: FileType;
@@ -21,13 +22,17 @@ export default function FileViewer({
 
   if (type === "image") {
     return (
-      <div className="flex h-full items-center justify-center rounded-lg bg-neutral-950 p-4">
-        {/* se sabe que hay que usar next/image, luego */}
-        <img
-          src={imageUrl}
-          alt="Archivo visual"
-          className="max-h-full max-w-full rounded-lg border border-white/10"
-        />
+      <div className="flex h-full w-full items-center justify-center rounded-lg bg-neutral-950 p-4">
+        <div className="relative w-full h-full">
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt="Archivo visual"
+              fill
+              className="max-h-full max-w-full rounded-lg border border-white/10"
+            />
+          )}
+        </div>
       </div>
     );
   }

@@ -11,6 +11,8 @@ type GameUIState = {
   zCounter: number;
   wallpaperTheme: WallpaperTheme;
   iconPositions: Record<string, { x: number; y: number }>;
+  objectivePanelVisible: boolean;
+  objectivePanelCollapsed: boolean;
 
   closeBriefing: () => void;
   completeOnboarding: () => void;
@@ -18,6 +20,10 @@ type GameUIState = {
   setWallpaperTheme: (theme: WallpaperTheme) => void;
   cycleWallpaperTheme: () => void;
   setIconPosition: (id: string, position: { x: number; y: number }) => void;
+  openObjectivePanel: () => void;
+  closeObjectivePanel: () => void;
+  toggleObjectivePanelCollapsed: () => void;
+  setObjectivePanelCollapsed: (collapsed: boolean) => void;
 
   openWindow: (
     window: Omit<WindowInstance, "zIndex" | "position"> & {
@@ -42,6 +48,8 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   zCounter: 10,
   wallpaperTheme: "aurora",
   iconPositions: {},
+  objectivePanelVisible: true,
+  objectivePanelCollapsed: false,
 
   closeBriefing: () => set({ briefingOpen: false }),
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
@@ -65,6 +73,17 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
         [id]: position,
       },
     })),
+
+  openObjectivePanel: () =>
+    set({ objectivePanelVisible: true, objectivePanelCollapsed: false }),
+  closeObjectivePanel: () => set({ objectivePanelVisible: false }),
+  toggleObjectivePanelCollapsed: () =>
+    set((state) => ({
+      objectivePanelCollapsed: !state.objectivePanelCollapsed,
+      objectivePanelVisible: true,
+    })),
+  setObjectivePanelCollapsed: (collapsed) =>
+    set({ objectivePanelCollapsed: collapsed }),
 
   openWindow: (window) => {
     // Lines 60-84 omitted

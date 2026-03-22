@@ -2,7 +2,13 @@
 
 import { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
-import { FileText, Folder, ImageIcon, TerminalSquare } from "lucide-react";
+import {
+  FileText,
+  Folder,
+  ImageIcon,
+  TerminalSquare,
+  MessageSquareText,
+} from "lucide-react";
 import { useGameUIStore } from "@/store/useGameUIStore";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { DesktopItem } from "@/types/game";
@@ -236,16 +242,16 @@ export default function DesktopIcon({
         return <Folder className={`${iconClass} text-yellow-300`} />;
       case "terminal":
         return <TerminalSquare className={`${iconClass} text-green-300`} />;
+      case "chat":
+        return <MessageSquareText className={`${iconClass} text-emerald-200`} />;
       default:
         return <FileText className={`${iconClass} text-white`} />;
     }
   };
 
-  // Calculate default grid position (top-to-bottom, then left-to-right columns)
-  // Assuming a max height roughly matching 1080p for default layout
-  const MAX_ROWS = 7; // Baja a 7 para que los iconos default tampoco se sobrepongan al taskbar en pantallas 1080p y 720p
+  const MAX_ROWS = 7; 
   const PADDING = 16;
-  const DESKTOP_OFFSET = 120; // Espacio que usa el Desktop.tsx antes del taskbar
+  const DESKTOP_OFFSET = 120;
 
   const getDefaultPositionForIndex = (index: number) => {
     const col = Math.floor(index / MAX_ROWS);
@@ -288,14 +294,12 @@ export default function DesktopIcon({
     const rawX = currentPos.x + info.offset.x;
     const rawY = currentPos.y + info.offset.y;
 
-    // Snap to closest grid cell
     let snappedX =
       Math.round((rawX - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
     let snappedY =
       Math.round((rawY - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
 
-    // Window physical bounds relative to the desktop container (which is h-[calc(100vh-120px)])
-    const DESKTOP_OFFSET = 120; // Matches calc(100vh - 120px) from Desktop.tsx
+    const DESKTOP_OFFSET = 120; 
     const maxX =
       typeof window !== "undefined"
         ? window.innerWidth - GRID_SIZE - PADDING
@@ -305,11 +309,9 @@ export default function DesktopIcon({
         ? window.innerHeight - DESKTOP_OFFSET - GRID_SIZE
         : 1080;
 
-    // Prevent going out of negative bounds
     if (snappedX < PADDING) snappedX = PADDING;
     if (snappedY < PADDING) snappedY = PADDING;
 
-    // Prevent going under taskbar or out of right screen edge
     if (snappedX > maxX)
       snappedX = Math.floor((maxX - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
     if (snappedY > maxY)
@@ -317,21 +319,14 @@ export default function DesktopIcon({
 
     const occupies = (x: number, y: number) => {
       const storePositions = useGameUIStore.getState().iconPositions;
-
-      // Check against all items (both moved and unmoved)
       return allItems.some((otherItem, index) => {
         if (otherItem.id === item.id) return false;
-
-        // If other item has a saved position, use it. Otherwise, use its default calculated spot.
         const otherPos =
           storePositions[otherItem.id] ?? getDefaultPositionForIndex(index);
-
-        // Distance check (allow small margin of floating point error)
         return Math.abs(otherPos.x - x) < 10 && Math.abs(otherPos.y - y) < 10;
       });
     };
 
-    // If occupied, safely revert to original pos visually instantly
     if (occupies(snappedX, snappedY)) {
       controls.start({
         x: currentPos.x,

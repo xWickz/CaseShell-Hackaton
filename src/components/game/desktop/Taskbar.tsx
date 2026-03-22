@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { Palette, Power, RotateCcw, ChevronUp } from "lucide-react";
+import {
+  Palette,
+  Power,
+  RotateCcw,
+  ChevronUp,
+  ClipboardList,
+} from "lucide-react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import { useGameUIStore } from "@/store/useGameUIStore";
 
@@ -16,6 +22,12 @@ export default function Taskbar() {
 
   const cycleWallpaperTheme = useGameUIStore(
     (state) => state.cycleWallpaperTheme,
+  );
+  const openObjectivePanel = useGameUIStore(
+    (state) => state.openObjectivePanel,
+  );
+  const objectivePanelVisible = useGameUIStore(
+    (state) => state.objectivePanelVisible,
   );
 
   useEffect(() => {
@@ -132,6 +144,17 @@ export default function Taskbar() {
           className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           <Palette className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={openObjectivePanel}
+          aria-label="Mostrar panel de objetivos"
+          className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${objectivePanelVisible ? "bg-emerald-500/15 text-emerald-100" : "bg-white/10 text-white/80 hover:bg-white/20"}`}
+        >
+          <ClipboardList className="h-4 w-4" />
+          <span className="font-semibold tracking-wide uppercase text-[0.65rem]">
+            Objetivos
+          </span>
         </button>
       </div>
 

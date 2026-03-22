@@ -39,6 +39,13 @@ const createEasyDesktopItems = (): DesktopItem[] => [
     type: "terminal",
   },
   {
+    id: "ops-chat",
+    name: "CubePath OPS.chat",
+    type: "chat",
+    content:
+      "Canal de texto con el equipo de operaciones. Recibirás pings conforme avances en el caso.",
+  },
+  {
     id: "case-file",
     name: "caso.txt",
     type: "text",
@@ -80,7 +87,7 @@ Hoy es mi primer día de trabajo y ya me metí en problemas... el panel interno 
     id: "router-image",
     name: "router-photo.png",
     type: "image",
-    imageUrl: "https://placehold.co/800x500/111827/ffffff?text=Router+Photo",
+    imageUrl: "/game/router-photo.webp",
   },
   {
     id: "config-folder",
@@ -246,13 +253,13 @@ Recordatorio: no reinicies servicios sin verificar la capa de aplicación.`,
     id: "dns-runes",
     name: "dns-runes.png",
     type: "image",
-    imageUrl: "https://placehold.co/900x520/0f172a/38bdf8?text=DNS+Runes+Puzzle",
+    imageUrl: "/game/dns-runes.webp",
   },
   {
     id: "dns-lock",
     name: "dns-lock.png",
     type: "image",
-    imageUrl: "https://placehold.co/900x520/082f49/93c5fd?text=Override+Lock",
+    imageUrl: "/game/dns-lock.webp",
   },
   {
     id: "service-manual",
@@ -326,7 +333,7 @@ El diagrama en tamper-photo.png muestra el sello de seguridad alterado.`,
     id: "tamper-photo",
     name: "tamper-photo.png",
     type: "image",
-    imageUrl: "https://placehold.co/900x520/111827/facc15?text=Tamper+Evidence",
+    imageUrl: "/game/tamper-photo.webp",
   },
   {
     id: "perimeter-note",
@@ -387,12 +394,18 @@ const updateCaseFileContent = (
       );
 
 const createMediumDesktopItems = (): DesktopItem[] => {
-  const base = updateCaseFileContent(createEasyDesktopItems(), mediumCaseFileContent);
+  const base = updateCaseFileContent(
+    createEasyDesktopItems(),
+    mediumCaseFileContent,
+  );
   return [...base, ...createMediumExtras()];
 };
 
 const createHardDesktopItems = (): DesktopItem[] => {
-  const base = updateCaseFileContent(createMediumDesktopItems(), hardCaseFileContent);
+  const base = updateCaseFileContent(
+    createMediumDesktopItems(),
+    hardCaseFileContent,
+  );
   return [...base, ...createHardExtras()];
 };
 

@@ -14,6 +14,8 @@ import type { DesktopItem, Briefing, Difficulty } from "@/types/game";
 import VictoryModal from "@/components/game/modals/VictoryModal";
 import OnboardingOverlay from "@/components/game/modals/OnboardingOverlay";
 import Link from "next/link";
+import ObjectiveTracker from "@/components/game/desktop/ObjectiveTracker";
+import OpsChatWindow from "@/components/game/chat/OpsChatWindow";
 
 type DesktopProps = {
   items: DesktopItem[];
@@ -31,6 +33,18 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const hasSeenOnboarding = useGameUIStore((state) => state.hasSeenOnboarding);
   const completeOnboarding = useGameUIStore(
     (state) => state.completeOnboarding,
+  );
+  const objectivePanelVisible = useGameUIStore(
+    (state) => state.objectivePanelVisible,
+  );
+  const objectivePanelCollapsed = useGameUIStore(
+    (state) => state.objectivePanelCollapsed,
+  );
+  const closeObjectivePanel = useGameUIStore(
+    (state) => state.closeObjectivePanel,
+  );
+  const toggleObjectivePanelCollapsed = useGameUIStore(
+    (state) => state.toggleObjectivePanelCollapsed,
   );
 
   const initializeSession = useGameSessionStore(
@@ -139,6 +153,8 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
             <TerminalWindow />
           ) : window.type === "folder" ? (
             <FolderViewer items={window.children ?? []} />
+          ) : window.type === "chat" ? (
+            <OpsChatWindow difficulty={difficulty} />
           ) : (
             <FileViewer
               type={window.type}
@@ -148,6 +164,16 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
           )}
         </WindowFrame>
       ))}
+
+      {objectivePanelVisible && (
+        <div className="pointer-events-none absolute right-6 top-6 z-[1200] hidden xl:block">
+          <ObjectiveTracker
+            collapsed={objectivePanelCollapsed}
+            onToggleCollapse={toggleObjectivePanelCollapsed}
+            onClose={closeObjectivePanel}
+          />
+        </div>
+      )}
 
       <BriefingModal briefing={briefing} />
       <VictoryModal />

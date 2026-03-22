@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useGameUIStore } from "@/store/useGameUIStore";
 import type { Briefing } from "@/types/game";
 
@@ -10,10 +11,45 @@ type BriefingModalProps = {
 export default function BriefingModal({ briefing }: BriefingModalProps) {
   const briefingOpen = useGameUIStore((state) => state.briefingOpen);
   const closeBriefing = useGameUIStore((state) => state.closeBriefing);
-
-  if (!briefingOpen) return null;
+  const [canDismiss, setCanDismiss] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const headingId = "briefing-heading";
+
+  useEffect(() => {
+    let frame: number | null = null;
+
+    const runMeasurement = () => {
+      const container = contentRef.current;
+      if (!container) return;
+      const needsScroll = container.scrollHeight > container.clientHeight + 4;
+      setCanDismiss(!needsScroll);
+    };
+
+    frame = requestAnimationFrame(() => {
+      if (!briefingOpen) {
+        setCanDismiss(false);
+        return;
+      }
+      runMeasurement();
+    });
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [briefing, briefingOpen]);
+
+  const handleScroll = () => {
+    if (!briefingOpen) return;
+    const container = contentRef.current;
+    if (!container || canDismiss) return;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    if (scrollTop + clientHeight >= scrollHeight - 8) {
+      setCanDismiss(true);
+    }
+  };
+
+  if (!briefingOpen) return null;
 
   return (
     <div
@@ -32,21 +68,34 @@ export default function BriefingModal({ briefing }: BriefingModalProps) {
           </h2>
         </div>
 
-        <p className="mb-6 text-white/80">{briefing.description}</p>
+        <div
+          ref={contentRef}
+          onScroll={handleScroll}
+          className="mb-4 max-h-72 space-y-6 overflow-y-auto pr-2 text-white/80"
+        >
+          <p>{briefing.description}</p>
 
-        {briefing.hints?.length ? (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
-            {briefing.hints.map((hint, index) => (
-              <p key={index}>- {hint}</p>
-            ))}
-          </div>
-        ) : null}
+          {briefing.hints?.length ? (
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+              {briefing.hints.map((hint, index) => (
+                <p key={index}>- {hint}</p>
+              ))}
+            </div>
+          ) : null}
+        </div>
 
         <button
           onClick={closeBriefing}
-          className="mt-6 w-full rounded-2xl bg-cyan-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400"
+          disabled={!canDismiss}
+          className={`mt-2 w-full rounded-2xl px-5 py-3 font-semibold text-slate-950 transition ${
+            canDismiss
+              ? "bg-cyan-500 hover:bg-cyan-400"
+              : "bg-cyan-900/50 text-white/50"
+          }`}
         >
-          Comenzar investigación
+          {canDismiss
+            ? "Comenzar investigación"
+            : "Desplázate para desbloquear"}
         </button>
       </div>
     </div>

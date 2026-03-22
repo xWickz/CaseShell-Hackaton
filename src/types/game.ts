@@ -1,6 +1,6 @@
 export type Difficulty = "easy" | "medium" | "hard";
 
-export type FileType = "text" | "image" | "folder" | "terminal";
+export type FileType = "text" | "image" | "folder" | "terminal" | "chat";
 
 export type DesktopItem = {
   id: string;

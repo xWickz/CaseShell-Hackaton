@@ -29,7 +29,7 @@ const tips = [
     icon: Sparkles,
     title: "Completa objetivos",
     description:
-      "Busca pistas, ejecuta comandos y revisa la barra inferior para revisar tu progreso en tiempo real.",
+      "Busca pistas, ejecuta comandos y usa el panel lateral para seguir los objetivos disponibles.",
   },
 ];
 

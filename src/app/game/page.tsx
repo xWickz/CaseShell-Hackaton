@@ -54,7 +54,7 @@ export default function GameSelectPage() {
                     <span
                       className={`text-[10px] uppercase tracking-widest font-bold mb-2 block opacity-70 ${styles.text}`}
                     >
-                      CASO
+                      {diff.threat}
                     </span>
                     <h3
                       className={`text-3xl font-bold mb-4 tracking-tight ${styles.text}`}
@@ -64,6 +64,16 @@ export default function GameSelectPage() {
                     <p className="text-zinc-400 text-base leading-relaxed mb-10">
                       {diff.description}
                     </p>
+
+                    <div className="grid grid-cols-2 gap-3 text-left text-sm text-zinc-300">
+                      <Metric label="Duración" value={diff.meta.duration} />
+                      <Metric label="Archivos" value={`${diff.meta.files}+`} />
+                      <Metric
+                        label="Enfoque"
+                        value={diff.meta.focus}
+                        full
+                      />
+                    </div>
                   </div>
 
                   <Link
@@ -80,5 +90,24 @@ export default function GameSelectPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+type MetricProps = {
+  label: string;
+  value: string;
+  full?: boolean;
+};
+
+function Metric({ label, value, full = false }: MetricProps) {
+  return (
+    <div
+      className={`rounded-2xl border border-white/10 bg-white/5 p-3 ${full ? "col-span-2" : ""}`}
+    >
+      <p className="text-[0.65rem] uppercase tracking-[0.3em] text-white/50">
+        {label}
+      </p>
+      <p className="mt-1 text-base font-semibold text-white">{value}</p>
+    </div>
   );
 }
