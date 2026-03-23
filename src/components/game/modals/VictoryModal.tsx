@@ -8,26 +8,48 @@ import { getChecklistForDifficulty } from "@/data/game/checklist";
 import { signIn, getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { submitRankingAction } from "@/app/actions/ranking";
+import type { SubmitRankingResult } from "@/app/actions/ranking";
 import { GitHub } from "@/components/game/ui/github";
 
 const CASE_IDS: Record<Difficulty, string> = {
-  easy: "EASY-001-ACCESS-NOT-GRANTED",
-  medium: "MED-002-DATA-LEAK",
-  hard: "HARD-003-CRITICAL-COLLAPSE",
+  easy: "ACCESS-NOT-GRANTED",
+  medium: "DATA-LEAK",
+  hard: "CRITICAL-COLLAPSE",
 };
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: "Easy",
-  medium: "Medium",
-  hard: "Hard",
+  easy: "Fácil",
+  medium: "Medio",
+  hard: "Difícil",
+};
+
+type SubmissionFeedback = {
+  kind: SubmitRankingResult["status"];
+  currentTime: number;
+  previousTime?: number;
 };
 
 function formatTime(seconds: number) {
-  const mins = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
 
+  if (hours > 0) {
+    return `${hours}h ${mins}m ${secs}s`;
+  }
   if (mins <= 0) return `${secs}s`;
   return `${mins}m ${secs}s`;
+}
+
+function formatDeltaLabel(deltaSeconds: number) {
+  const sign = deltaSeconds >= 0 ? "+" : "-";
+  const absValue = Math.abs(deltaSeconds);
+  const mins = Math.floor(absValue / 60);
+  const secs = absValue % 60;
+  if (mins <= 0) {
+    return `${sign}${secs}s`;
+  }
+  return `${sign}${mins}m ${secs.toString().padStart(2, "0")}s`;
 }
 
 export default function VictoryModal() {
@@ -44,6 +66,11 @@ export default function VictoryModal() {
   const [user, setUser] = useState<Session["user"] | null>(null);
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submissionFeedback, setSubmissionFeedback] =
+    useState<SubmissionFeedback | null>(null);
+  const [autoResetTimeoutId, setAutoResetTimeoutId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     const checkUser = async () => {
@@ -52,6 +79,22 @@ export default function VictoryModal() {
     };
     if (isVictoryOpen) checkUser();
   }, [isVictoryOpen]);
+
+  useEffect(() => {
+    if (!isVictoryOpen) {
+      setSubmitted(false);
+      setSubmissionFeedback(null);
+      setIsSubmiting(false);
+    }
+  }, [isVictoryOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (autoResetTimeoutId !== null) {
+        window.clearTimeout(autoResetTimeoutId);
+      }
+    };
+  }, [autoResetTimeoutId]);
 
   const elapsedSeconds = useMemo(() => {
     if (!startTime || !endTime) return 0;
@@ -70,6 +113,23 @@ export default function VictoryModal() {
 
   const headingId = "victory-heading";
 
+  const submissionMessage = useMemo(() => {
+    if (!submissionFeedback) return null;
+    const { kind, previousTime, currentTime } = submissionFeedback;
+    if (kind === "created") {
+      return "Tiempo registrado en la clasificación. Reiniciaremos el caso automáticamente.";
+    }
+    if (kind === "improved" && previousTime !== undefined) {
+      const delta = previousTime - currentTime;
+      return `Nuevo récord: ${formatTime(currentTime)} (${formatDeltaLabel(delta)} vs ${formatTime(previousTime)}). Reiniciando el caso...`;
+    }
+    if (kind === "slower" && previousTime !== undefined) {
+      const delta = currentTime - previousTime;
+      return `Tu mejor marca es ${formatTime(previousTime)}. Esta corrida tomó ${formatTime(currentTime)} (${formatDeltaLabel(delta)} más lenta).`;
+    }
+    return null;
+  }, [submissionFeedback]);
+
   const handleLogin = async () => {
     localStorage.setItem(
       "pendingScore",
@@ -84,11 +144,29 @@ export default function VictoryModal() {
   };
 
   const submitScore = async () => {
-    if (!user || submitted) return;
+    if (!user || submitted || elapsedSeconds <= 0) return;
     setIsSubmiting(true);
+    setSubmissionFeedback(null);
     try {
-      await submitRankingAction(currentDifficulty, elapsedSeconds);
+      const result = await submitRankingAction(
+        currentDifficulty,
+        elapsedSeconds,
+      );
+      setSubmissionFeedback({
+        kind: result.status,
+        currentTime: result.currentTime,
+        previousTime: result.previousTime,
+      });
+
+      if (result.status === "slower") {
+        return;
+      }
+
       setSubmitted(true);
+      const timeoutId = window.setTimeout(() => {
+        resetSession();
+      }, 2000);
+      setAutoResetTimeoutId(timeoutId);
     } catch (error) {
       console.error("Error al guardar ranking", error);
     } finally {
@@ -100,48 +178,49 @@ export default function VictoryModal() {
 
   return (
     <div
-      className="absolute inset-0 z-999 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="font-sans fixed inset-0 z-[999] overflow-y-auto bg-black/70 px-4 py-10 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
     >
-      <div className="w-full max-w-7xl max-h-7xl rounded-3xl border border-emerald-500/20 bg-slate-900/95 p-8 shadow-2xl shadow-emerald-500/10 h-150 overflow-y-auto">
-        {/* Title */}
-        <h2
-          id={headingId}
-          className="text-3xl font-bold text-white sm:text-4xl"
-        >
-          Caso Resuelto
-        </h2>
+      <div className="mx-auto flex min-h-full w-full max-w-4xl items-center justify-center">
+        <div className="w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-emerald-500/30 bg-slate-900/95 p-8 shadow-[0_25px_120px_rgba(16,185,129,0.18)]">
+          {/* Title */}
+          <h2
+            id={headingId}
+            className="text-3xl font-bold text-white sm:text-4xl tracking-tight"
+          >
+            Caso Resuelto
+          </h2>
 
-        <p className="mt-3 text-slate-300">
-          Has restaurado los servicios del caso{" "}
-          <span className="font-semibold text-emerald-400">{caseId}</span> en
-          dificultad <span className="font-semibold">{difficultyLabel}</span>.
-        </p>
+          <p className="mt-3 text-slate-300">
+            Has restaurado los servicios del caso{" "}
+            <span className="font-semibold text-emerald-400">{caseId}</span> en
+            dificultad <span className="font-semibold">{difficultyLabel}</span>.
+          </p>
 
-        {/* Stats */}
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-slate-700 bg-slate-800/70 p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              Tiempo total
-            </p>
-            <p className="mt-2 text-2xl font-bold text-white">
-              {formatTime(elapsedSeconds)}
-            </p>
+          {/* Stats */}
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-slate-700 bg-slate-800/70 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Tiempo total
+              </p>
+              <p className="mt-2 text-2xl font-bold text-white">
+                {formatTime(elapsedSeconds)}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-700 bg-slate-800/70 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Dificultad
+              </p>
+              <p className="mt-2 text-2xl font-bold text-emerald-400">
+                {difficultyLabel}
+              </p>
+            </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-700 bg-slate-800/70 p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              Dificultad
-            </p>
-            <p className="mt-2 text-2xl font-bold text-emerald-400">
-              {difficultyLabel}
-            </p>
-          </div>
-        </div>
-
-        {/* Summary */}
+          {/* Summary 
         <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-800/50 p-5">
           <p className="text-sm font-semibold text-white">
             Resumen de acciones
@@ -162,82 +241,88 @@ export default function VictoryModal() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
-        {/* Auth / Ranking Section */}
-        <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-blue-500/20 bg-blue-900/10 p-5 items-center justify-center text-center">
-          {!user ? (
-            <>
-              <p className="text-sm font-semibold text-blue-200">
-                ¿Quieres entrar en la clasificación?
-              </p>
-              <p className="text-xs text-blue-300/70 mb-2">
-                Ingresa para guardar tu mejor récord global de la hackathon.
-              </p>
-              <button
-                onClick={handleLogin}
-                className="flex items-center gap-2 rounded-xl bg-[#24292e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2f363d]"
-              >
-                <GitHub className="w-5 h-5" />
-                Iniciar sesión con GitHub
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-semibold text-blue-200">
-                Conectado como <span className="text-white">{user.name}</span>
-              </p>
-              <button
-                onClick={submitScore}
-                disabled={isSubmiting || submitted}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition ${
-                  submitted
-                    ? "bg-emerald-500/50 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-500"
-                }`}
-              >
-                {isSubmiting
-                  ? "Guardando..."
-                  : submitted
-                    ? "¡Récord Guardado!"
-                    : "Publicar mi tiempo"}
-              </button>
-              {submitted && (
-                <Link
-                  href="/ranking"
-                  className="text-xs text-blue-300 hover:text-white underline mt-1"
+          {/* Auth / Ranking Section */}
+          <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-blue-500/20 bg-blue-900/10 p-5 items-center justify-center text-center">
+            {!user ? (
+              <>
+                <p className="text-sm font-semibold text-blue-200">
+                  ¿Quieres entrar en la clasificación?
+                </p>
+                <p className="text-xs text-blue-300/70 mb-2">
+                  Ingresa para guardar tu mejor récord global de la hackathon.
+                </p>
+                <button
+                  onClick={handleLogin}
+                  className="flex items-center gap-2 rounded-xl bg-[#24292e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2f363d]"
                 >
-                  Ver tabla de clasificaciones
-                </Link>
-              )}
-            </>
-          )}
-        </div>
+                  <GitHub className="w-5 h-5" />
+                  Iniciar sesión con GitHub
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-blue-200">
+                  Conectado como <span className="text-white">{user.name}</span>
+                </p>
+                <button
+                  onClick={submitScore}
+                  disabled={isSubmiting || submitted}
+                  className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition ${
+                    submitted
+                      ? "bg-emerald-500/50 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
+                >
+                  {isSubmiting
+                    ? "Guardando..."
+                    : submitted
+                      ? "¡Récord Guardado!"
+                      : "Publicar mi tiempo"}
+                </button>
+                {submissionMessage ? (
+                  <p className="text-xs text-blue-200/80 max-w-sm">
+                    {submissionMessage}
+                  </p>
+                ) : null}
+                {submitted && (
+                  <Link
+                    href="/ranking"
+                    className="text-xs text-blue-300 hover:text-white underline mt-1"
+                  >
+                    Ver tabla de clasificaciones
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
 
-        {/* Buttons */}
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <button
-            onClick={() => {
-              resetSession();
-            }}
-            className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
-          >
-            Volver a jugar
-          </button>
+          {/* Buttons */}
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <button
+              onClick={() => {
+                resetSession();
+              }}
+              className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
+            >
+              Volver a jugar
+            </button>
 
-          <Link
-            href="/game"
-            className="rounded-xl border border-slate-600 px-5 py-3 text-center font-semibold text-slate-200 transition hover:bg-slate-800"
-          >
-            Menú principal
-          </Link>
+            <Link
+              href="/game"
+              className="rounded-xl border border-slate-600 px-5 py-3 text-center font-semibold text-slate-200 transition hover:bg-slate-800"
+            >
+              Menú principal
+            </Link>
 
-          <Link
-            href="/ranking"
-            className="rounded-xl border border-slate-600 px-5 py-3 text-center font-semibold text-slate-200 transition hover:bg-slate-800"
-          >
-            Ver ranking
-          </Link>
+            <Link
+              href="/ranking"
+              className="rounded-xl border border-slate-600 px-5 py-3 text-center font-semibold text-slate-200 transition hover:bg-slate-800"
+            >
+              Ver ranking
+            </Link>
+          </div>
         </div>
       </div>
     </div>
