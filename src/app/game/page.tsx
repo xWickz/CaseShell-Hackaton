@@ -68,17 +68,13 @@ export default function GameSelectPage() {
                     <div className="grid grid-cols-2 gap-3 text-left text-sm text-zinc-300">
                       <Metric label="Duración" value={diff.meta.duration} />
                       <Metric label="Archivos" value={`${diff.meta.files}+`} />
-                      <Metric
-                        label="Enfoque"
-                        value={diff.meta.focus}
-                        full
-                      />
+                      <Metric label="Enfoque" value={diff.meta.focus} full />
                     </div>
                   </div>
 
                   <Link
                     href={`/game/${diff.id}`}
-                    className="w-full text-center text-white text-sm border border-white/10 rounded-2xl py-4 px-6 font-bold hover:bg-white hover:text-black transition-all duration-200 uppercase "
+                    className="mt-5 w-full text-center text-white text-sm border border-white/10 rounded-2xl py-4 px-6 font-bold hover:bg-white hover:text-black transition-all duration-200 uppercase "
                   >
                     Iniciar Investigación
                   </Link>

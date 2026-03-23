@@ -29,7 +29,7 @@ export const difficulties: DifficultyOption[] = [
     id: "medium",
     label: "Fuga de Datos",
     description:
-      "Datos confidenciales están siendo filtrados hacia IPs externas. El culpable ha intentado borrar sus huellas y ocultó la información en archivos encriptados. Necesitas navegar por la red, descifrar los archivos ocultos y encontrar el script malicioso antes de que se robe toda la base de datos.",
+      "Datos confidenciales están siendo filtrados hacia IPs externas. El culpable ha intentado borrar sus huellas y ocultó la información en archivos encriptados. Necesitas navegar por la red, descifrar los archivos ocultos y encontrar el script malicioso...",
     threat: "Incidente Nivel 2",
     meta: {
       duration: "12-18 min",

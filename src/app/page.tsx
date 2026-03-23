@@ -1,7 +1,12 @@
 import Image from "next/image";
 import GlowButton from "@/components/game/ui/glowingButton";
+import BorderButton from "@/components/game/ui/borderButton";
 import Navbar from "@/components/game/ui/navbar";
 import Footer from "@/components/game/ui/footer";
+
+import { HeroTitle } from "@/components/landing/HeroTitle";
+import { MatrixRain } from "@/components/landing/MatrixRain";
+import { TerminalMockup } from "@/components/landing/TerminalMockup";
 
 export default function HomePage() {
   return (
@@ -15,6 +20,7 @@ export default function HomePage() {
             className="animate-fade-in flex flex-col lg:flex-row items-center justify-center lg:justify-between w-full gap-10 min-h-[calc(100vh-5rem)] lg:min-h-0 lg:h-[calc(100vh-80px)] py-10 lg:py-0"
             id="intro"
           >
+            <MatrixRain />
             <section
               className="w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:max-w-xl"
               aria-label="Introducción al juego"
@@ -31,28 +37,19 @@ export default function HomePage() {
                 </a>
               </div>
 
-              <h1 className="text-5xl md:text-7xl text-white font-bold tracking-tight">
-                Case<span className="text-red-600">Shell</span>
-              </h1>
-              <p className="text-base md:text-lg text-slate-400 mt-2 mb-5 max-w-md text-center lg:text-justify">
+              <HeroTitle />
+              <p className="text-base md:text-lg text-slate-400 mt-2 max-w-md text-center lg:text-justify">
                 <strong className="text-slate-300">Investiga</strong> incidentes
                 técnicos dentro de un entorno virtual, explora archivos, usa la{" "}
                 <strong className="text-slate-300">terminal</strong> y resuelve
                 el <strong className="text-slate-300">caso</strong> como si
                 estuvieras dentro del sistema.
               </p>
-              <GlowButton href="/game">Jugar</GlowButton>
+              <BorderButton href="/game">Jugar Ahora</BorderButton>
             </section>
 
-            <aside className="relative hidden shrink-0 lg:block rotate-1 w-full max-w-137.5">
-              <Image
-                src="/demo1.webp"
-                alt="Captura de pantalla del juego"
-                width={800}
-                height={640}
-                className="h-auto w-full rounded-2xl shadow-2xl border border-white/10"
-                priority
-              />
+            <aside className="relative hidden shrink-0 lg:block w-full max-w-137.5 z-10">
+              <TerminalMockup />
             </aside>
           </div>
           <section className="border-t border-white/10 pt-20">
