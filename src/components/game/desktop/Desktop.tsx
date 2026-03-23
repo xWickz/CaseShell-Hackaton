@@ -148,6 +148,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
           title={window.title}
           zIndex={window.zIndex}
           position={window.position}
+          size={window.size}
         >
           {window.type === "terminal" ? (
             <TerminalWindow />

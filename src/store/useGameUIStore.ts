@@ -1,7 +1,13 @@
 "use client";
 
 import { create } from "zustand";
-import type { Difficulty, WindowInstance, WindowPosition } from "@/types/game";
+import type {
+  Difficulty,
+  FileType,
+  WindowInstance,
+  WindowPosition,
+  WindowSize,
+} from "@/types/game";
 
 type GameUIState = {
   briefingOpen: boolean;
@@ -26,19 +32,28 @@ type GameUIState = {
   setObjectivePanelCollapsed: (collapsed: boolean) => void;
 
   openWindow: (
-    window: Omit<WindowInstance, "zIndex" | "position"> & {
+    window: Omit<WindowInstance, "zIndex" | "position" | "size"> & {
       position?: WindowPosition;
+      size?: WindowSize;
     },
   ) => void;
   closeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
   setWindowPosition: (id: string, position: WindowPosition) => void;
+  setWindowSize: (id: string, size: WindowSize) => void;
 };
 
 export type WallpaperTheme = "aurora" | "ocean" | "matrix";
 
 const BASE_WINDOW_POSITION: WindowPosition = { x: 120, y: 120 };
 const WINDOW_OFFSET = 28;
+const DEFAULT_WINDOW_SIZES: Record<FileType, WindowSize> = {
+  text: { width: 640, height: 460 },
+  image: { width: 640, height: 520 },
+  folder: { width: 720, height: 520 },
+  terminal: { width: 860, height: 560 },
+  chat: { width: 440, height: 520 },
+};
 
 export const useGameUIStore = create<GameUIState>((set, get) => ({
   briefingOpen: true,
@@ -105,11 +120,21 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
       x: BASE_WINDOW_POSITION.x + WINDOW_OFFSET * openWindows.length,
       y: BASE_WINDOW_POSITION.y + WINDOW_OFFSET * openWindows.length,
     };
+    const defaultSize =
+      window.size ?? DEFAULT_WINDOW_SIZES[window.type] ?? {
+        width: 640,
+        height: 460,
+      };
 
     set({
       openWindows: [
         ...openWindows,
-        { ...window, zIndex: zCounter + 1, position: defaultPosition },
+        {
+          ...window,
+          zIndex: zCounter + 1,
+          position: defaultPosition,
+          size: defaultSize,
+        },
       ],
       zCounter: zCounter + 1,
     });
@@ -135,6 +160,12 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
     set((state) => ({
       openWindows: state.openWindows.map((w) =>
         w.id === id ? { ...w, position } : w,
+      ),
+    })),
+  setWindowSize: (id, size) =>
+    set((state) => ({
+      openWindows: state.openWindows.map((w) =>
+        w.id === id ? { ...w, size } : w,
       ),
     })),
 }));

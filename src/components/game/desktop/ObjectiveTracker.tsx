@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useId } from "react";
 import { CheckCircle2, CircleDot, Circle, ChevronDown, X } from "lucide-react";
 import type { Difficulty } from "@/types/game";
 import type { CaseProgress } from "@/types/game-engine";
@@ -127,6 +127,7 @@ export default function ObjectiveTracker({
 }: ObjectiveTrackerProps) {
   const difficulty = useGameSessionStore((state) => state.currentDifficulty);
   const progress = useGameSessionStore((state) => state.caseState.progress);
+  const contentId = useId();
 
   const { sections, completion } = useMemo(() => {
     const sections = trackerConfig[difficulty];
@@ -139,7 +140,6 @@ export default function ObjectiveTracker({
   return (
     <aside
       className={`pointer-events-auto flex w-80 flex-col gap-4 rounded-3xl border border-white/10 bg-slate-950/80 p-4 text-xs text-white shadow-2xl transition-[height] ${className}`}
-      aria-expanded={!collapsed}
     >
       <header className="flex items-start justify-between gap-4">
         <div>
@@ -158,6 +158,8 @@ export default function ObjectiveTracker({
             type="button"
             onClick={onToggleCollapse}
             aria-label={collapsed ? "Expandir panel de objetivos" : "Minimizar panel de objetivos"}
+            aria-expanded={!collapsed}
+            aria-controls={contentId}
             className="rounded-lg border border-white/15 bg-white/5 p-1 hover:bg-white/10"
           >
             <ChevronDown
@@ -177,11 +179,11 @@ export default function ObjectiveTracker({
       </header>
 
       {collapsed ? (
-        <p className="text-[0.7rem] text-white/60">
+        <p className="text-[0.7rem] text-white/60" id={contentId}>
           Panel minimizado. Usa la flecha o el acceso en la barra para volver a abrir la lista.
         </p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4" id={contentId}>
           {sections.map((section) => (
             <section key={section.title} className="rounded-2xl border border-white/10 bg-white/5 p-3">
               <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-wide text-white/60">

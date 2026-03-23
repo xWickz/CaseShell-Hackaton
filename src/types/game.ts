@@ -16,6 +16,11 @@ export type WindowPosition = {
   y: number;
 };
 
+export type WindowSize = {
+  width: number;
+  height: number;
+};
+
 export type WindowInstance = {
   id: string;
   title: string;
@@ -25,6 +30,7 @@ export type WindowInstance = {
   children?: DesktopItem[];
   zIndex: number;
   position: WindowPosition;
+  size: WindowSize;
 };
 
 export type Briefing = {

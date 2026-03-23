@@ -16,19 +16,24 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 
 > [CaseShell | The Ultimate Terminal Puzzle](https://wawa-cases-wickz-hi2ufv-f7affe-157-254-174-56.traefik.me/)
 
+### ⚠️ A la hora de entrar a la página te saldrá **La conexión no es privada**, esto se debe a que es un **dominio gratis** proporcionado por **Dokploy**, por lo tanto no tiene certificado SSL. Esto NO significa que la página no es segura.
+
 ## 💡 ¿De qué trata?
 
 **CaseShell** es un juego narrativo-investigativo que simula un OS corporativo ultra minimalista. Combina UI de escritorio interactiva + terminal real para recrear un incidente en la infraestructura de CubePath. El jugador actúa como analista SOC: debe inspeccionar archivos, ejecutar comandos, desbloquear pistas ocultas y cerrar el incidente antes de que escale.
 
 ## ✨ Características
 
-- **🖥️ Escritorio:** Simulación de un sistema operativo con archivos, textos, imágenes, terminal, temas (predeterminados)
-- **⌨️ Terminal con motor de casos:** Resolverás los casos en una terminal que trae el juego, en ella podrás ejecutar todos los comandos y resolver los casos
-- **🔐 Integración CubePath:** Siguiendo las reglas de la hackatón, el proyecto está alojado 100% en CubePath usando Dokploy para la web y para la base de datos en PostgreSQL para guardar la clasificación
-- **🧠 Narrativa progresiva:** Cada modo según su dificultad se vuelve más díficil, pero, contiene más historia y mas archivos lo cuál lo hace mas interesante
-- **⚙️ Autosave & Pending Scores:** El progreso es guardado por si quieres abandonar y volver luego, en la misma dificultad
+- **🖥️ Escritorio:** Simulación de un sistema operativo con archivos, textos, imágenes, terminal y temas personalizables
+- **🪟 Ventanas redimensionables:** Cada app (terminal, chat, visor de archivos) tiene marco arrastrable y handle de resize estilo OS antiguo
+- **⌨️ Terminal con motor de casos:** Ejecuta comandos reales (`diag`, `fix`, `kill`...) y escucha audio feedback instantáneo
+- **📡 OPS Chat con hints:** Conversaciones guionadas reaccionan al progreso y permiten pegar comandos con un click
+- **🎯 Panel de objetivos:** Tracker colapsable con checklist por dificultad y acceso rápido desde la barra.
+- **🔐 Integración CubePath:** Desplegado 100% en CubePath con Dokploy (Next.js + PostgreSQL para ranking global)
+- **🧠 Narrativa progresiva:** Cada dificultad añade archivos, puzzles visuales y cadenas de remediación más largas
+- **⚙️ Autosave & Pending Scores:** Guarda tu sesión y sincroniza el tiempo final al ranking aunque cierres la pestaña
 
-## 🎮 Gameplay Loop
+## 🎮 Gameplay
 
 1. **Briefing:** Es la pantalla inicial, aquí recibirás información básica del caso y de lo que debes hacer, en pocas palabras
 2. **Exploración Mixta:** Navega con la terminal (`ls`, `cat`, `diag`, comandos custom) o abre íconos del escritorio (carpetas, texto, imágenes)
@@ -63,3 +68,10 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 - **Nube CubePath + Dokploy:** hosteamos Base de Datos PostgreSQL y runtime de Next.js dentro de la VPS de CubePath
 - **Infra Observability:** Configuramos Health Checks y logs en Dokploy para presentar métricas durante el pitch
 - **Experiencia temática:** Toda la narrativa del juego recrea incidentes dentro de la red CubePath (nombres de hosts, dominios, comandos internos)
+
+**CubePath VPS**
+![CAP 7](https://i.imgur.com/AWFEcN5.png)
+
+**Dokploy**
+![CAP 8](https://i.imgur.com/OWggXAO.png)
+![CAP 9](https://i.imgur.com/49CaCeR.png)
