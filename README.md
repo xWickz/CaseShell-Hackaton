@@ -16,9 +16,9 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 
 > [CaseShell | The Ultimate Terminal Puzzle](https://wawa-cases-wickz-hi2ufv-f7affe-157-254-174-56.traefik.me/)
 
-⚠️ A la hora de entrar a la página te saldrá **La conexión no es privada**, esto se debe a que es un **dominio gratis** proporcionado por **Dokploy**, por lo tanto no tiene certificado SSL. Esto NO significa que la página no es segura.
+⚠️ A la hora de entrar a la página te saldrá **La conexión no es privada**, esto se debe a que es un **dominio gratis** proporcionado por **Dokploy**, por lo tanto no tiene certificado SSL. Esto NO significa que la página no es segura. Debes darle en Más Información (o parecido) y en continuar a la página.
 
-> Debes darle en Más Información (o parecido) y en continuar a la página.
+> Issue: [Issue #68](https://github.com/midudev/hackaton-cubepath-2026/issues/68)
 
 ## 💡 ¿De qué trata?
 
