@@ -18,6 +18,8 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 
 ### ⚠️ A la hora de entrar a la página te saldrá **La conexión no es privada**, esto se debe a que es un **dominio gratis** proporcionado por **Dokploy**, por lo tanto no tiene certificado SSL. Esto NO significa que la página no es segura.
 
+![CAP 10](https://i.imgur.com/WySbG6O.png)
+
 ## 💡 ¿De qué trata?
 
 **CaseShell** es un juego narrativo-investigativo que simula un OS corporativo ultra minimalista. Combina UI de escritorio interactiva + terminal real para recrear un incidente en la infraestructura de CubePath. El jugador actúa como analista SOC: debe inspeccionar archivos, ejecutar comandos, desbloquear pistas ocultas y cerrar el incidente antes de que escale.
