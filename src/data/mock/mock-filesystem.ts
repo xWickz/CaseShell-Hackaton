@@ -100,7 +100,7 @@ Hoy es mi primer día de trabajo y ya me metí en problemas... el panel interno 
         type: "text",
         content: `CONFIG DE RED
 
-SSID: PHERALB_BANEADO
+SSID: CubePath-Internal
 PASSWORD: ********
 STATUS: PENDING SETUP
 
