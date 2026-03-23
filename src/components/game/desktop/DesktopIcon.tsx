@@ -243,15 +243,16 @@ export default function DesktopIcon({
       case "terminal":
         return <TerminalSquare className={`${iconClass} text-green-300`} />;
       case "chat":
-        return <MessageSquareText className={`${iconClass} text-emerald-200`} />;
+        return (
+          <MessageSquareText className={`${iconClass} text-emerald-200`} />
+        );
       default:
         return <FileText className={`${iconClass} text-white`} />;
     }
   };
 
-  const MAX_ROWS = 7; 
+  const MAX_ROWS = 7;
   const PADDING = 16;
-  const DESKTOP_OFFSET = 120;
 
   const getDefaultPositionForIndex = (index: number) => {
     const col = Math.floor(index / MAX_ROWS);
@@ -299,7 +300,7 @@ export default function DesktopIcon({
     let snappedY =
       Math.round((rawY - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
 
-    const DESKTOP_OFFSET = 120; 
+    const DESKTOP_OFFSET = 120;
     const maxX =
       typeof window !== "undefined"
         ? window.innerWidth - GRID_SIZE - PADDING

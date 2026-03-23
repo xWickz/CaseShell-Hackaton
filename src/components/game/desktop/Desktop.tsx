@@ -166,7 +166,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       ))}
 
       {objectivePanelVisible && (
-        <div className="pointer-events-none absolute right-6 top-6 z-[1200] hidden xl:block">
+        <div className="pointer-events-none absolute right-6 top-6 z-1200 hidden xl:block">
           <ObjectiveTracker
             collapsed={objectivePanelCollapsed}
             onToggleCollapse={toggleObjectivePanelCollapsed}

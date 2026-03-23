@@ -53,7 +53,7 @@ export default function BriefingModal({ briefing }: BriefingModalProps) {
 
   return (
     <div
-      className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="absolute inset-0 z-1000 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}

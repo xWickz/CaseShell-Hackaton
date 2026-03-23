@@ -61,7 +61,7 @@ export default function HomePage() {
                 <p className="text-xs uppercase tracking-tight font-bold text-red-400/80">
                   Demo en vivo
                 </p>
-                <h2 className="text-3xl text-white font-semibold">
+                <h2 className="text-3xl text-white font-semibold tracking-tight">
                   Mira el briefing, ejecuta comandos y envía el reporte en 90
                   segundos.
                 </h2>
@@ -80,18 +80,14 @@ export default function HomePage() {
                 </ul>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <GlowButton href="/game">Entrar al Caso</GlowButton>
-                  <a
-                    href="#gameplay"
-                    className="text-sm uppercase tracking-widest text-white/70 underline-offset-4 hover:text-white"
-                  >
-                    Leer gameplay loop
-                  </a>
                 </div>
               </div>
               <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/70 shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 via-transparent to-cyan-500/20" />
-                <img
+                <div className="absolute inset-0 bg-linear-to-tr from-red-500/20 via-transparent to-cyan-500/20" />
+                <Image
                   src="https://i.imgur.com/7FUmfbx.gif"
+                  width={500}
+                  height={500}
                   alt="Gameplay del escritorio CaseShell"
                   loading="lazy"
                   className="relative w-full h-full object-cover"
