@@ -23,6 +23,9 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   hard: "Difícil",
 };
 
+const AUTO_RESET_DELAY_MS = 5000;
+const AUTO_RESET_DELAY_SECONDS = Math.floor(AUTO_RESET_DELAY_MS / 1000);
+
 type SubmissionFeedback = {
   kind: SubmitRankingResult["status"];
   currentTime: number;
@@ -71,6 +74,7 @@ export default function VictoryModal() {
   const [autoResetTimeoutId, setAutoResetTimeoutId] = useState<number | null>(
     null,
   );
+  const [resetCountdown, setResetCountdown] = useState<number | null>(null);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -85,8 +89,13 @@ export default function VictoryModal() {
       setSubmitted(false);
       setSubmissionFeedback(null);
       setIsSubmiting(false);
+      setResetCountdown(null);
+      if (autoResetTimeoutId !== null) {
+        window.clearTimeout(autoResetTimeoutId);
+        setAutoResetTimeoutId(null);
+      }
     }
-  }, [isVictoryOpen]);
+  }, [isVictoryOpen, autoResetTimeoutId]);
 
   useEffect(() => {
     return () => {
@@ -95,6 +104,17 @@ export default function VictoryModal() {
       }
     };
   }, [autoResetTimeoutId]);
+
+  useEffect(() => {
+    if (resetCountdown === null || resetCountdown <= 0) return;
+    const intervalId = window.setInterval(() => {
+      setResetCountdown((prev) => {
+        if (prev === null) return null;
+        return Math.max(0, prev - 1);
+      });
+    }, 1000);
+    return () => window.clearInterval(intervalId);
+  }, [resetCountdown]);
 
   const elapsedSeconds = useMemo(() => {
     if (!startTime || !endTime) return 0;
@@ -163,9 +183,15 @@ export default function VictoryModal() {
       }
 
       setSubmitted(true);
+      setResetCountdown(AUTO_RESET_DELAY_SECONDS);
+      if (autoResetTimeoutId !== null) {
+        window.clearTimeout(autoResetTimeoutId);
+      }
       const timeoutId = window.setTimeout(() => {
         resetSession();
-      }, 2000);
+        setResetCountdown(null);
+        setAutoResetTimeoutId(null);
+      }, AUTO_RESET_DELAY_MS);
       setAutoResetTimeoutId(timeoutId);
     } catch (error) {
       console.error("Error al guardar ranking", error);
@@ -284,6 +310,11 @@ export default function VictoryModal() {
                 {submissionMessage ? (
                   <p className="text-xs text-blue-200/80 max-w-sm">
                     {submissionMessage}
+                  </p>
+                ) : null}
+                {submitted && resetCountdown !== null ? (
+                  <p className="text-[11px] text-blue-100/80">
+                    Reinicio automático en {resetCountdown}s
                   </p>
                 ) : null}
                 {submitted && (

@@ -53,6 +53,10 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
+  const caseCompleted = useGameSessionStore(
+    (state) => state.caseState.progress.completed,
+  );
+  const resetSession = useGameSessionStore((state) => state.resetSession);
 
   const wallpaperClasses = useMemo(() => {
     switch (wallpaperTheme) {
@@ -73,8 +77,17 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     setDifficulty(difficulty);
     if (currentDifficulty !== difficulty) {
       initializeSession(difficulty);
+    } else if (caseCompleted) {
+      resetSession();
     }
-  }, [difficulty, currentDifficulty, setDifficulty, initializeSession]);
+  }, [
+    difficulty,
+    currentDifficulty,
+    caseCompleted,
+    setDifficulty,
+    initializeSession,
+    resetSession,
+  ]);
 
   useEffect(() => {
     openWindow({
