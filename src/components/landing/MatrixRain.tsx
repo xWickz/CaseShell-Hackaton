@@ -56,9 +56,12 @@ export const MatrixRain = () => {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full -z-10 opacity-20 pointer-events-none"
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full -z-10 opacity-50 pointer-events-none"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+    </>
   );
 };
