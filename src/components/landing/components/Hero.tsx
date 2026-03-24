@@ -11,6 +11,7 @@ export default function Hero() {
         id="intro"
       >
         <MatrixRain />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black" />
         <section
           className="w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:max-w-xl"
           aria-label="Introducción al juego"
