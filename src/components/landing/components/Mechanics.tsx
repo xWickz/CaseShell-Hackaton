@@ -2,14 +2,49 @@
 
 import { WobbleCard } from "@/components/game/ui/wobble-card";
 import Image from "next/image";
-import { DitherMatrix } from "@/components/landing/ditherBg";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+
+const DitherMatrix = dynamic(
+  () =>
+    import("@/components/landing/ditherBg").then((mod) => ({
+      default: mod.DitherMatrix,
+    })),
+  { ssr: false },
+);
 
 export default function Mechanics() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [showShader, setShowShader] = useState(false);
+
+  useEffect(() => {
+    const target = sectionRef.current;
+    if (!target || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          setShowShader(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -20% 0px" },
+    );
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-24 lg:gap-32">
-      <section className="relative border-t border-white/10 bg-black overflow-hidden">
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-          <DitherMatrix />
+      <section
+        ref={sectionRef}
+        className="relative border-t border-white/10 bg-black overflow-hidden"
+      >
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-40" aria-hidden="true">
+          {showShader ? <DitherMatrix /> : null}
         </div>
         <div className="relative z-10 px-6 md:px-10 lg:px-20 py-24 md:py-32">
           <div className="mb-12 md:mb-20 text-center lg:text-left">

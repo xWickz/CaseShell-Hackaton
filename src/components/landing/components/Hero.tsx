@@ -1,7 +1,34 @@
+"use client";
+
 import BorderButton from "@/components/game/ui/borderButton";
 import { CanvasTxt } from "@/components/landing/CanvasText";
-import { MatrixRain } from "@/components/landing/MatrixRain";
-import { TerminalMockup } from "@/components/landing/TerminalMockup";
+import dynamic from "next/dynamic";
+
+const MatrixRain = dynamic(
+  () =>
+    import("@/components/landing/MatrixRain").then((mod) => ({
+      default: mod.MatrixRain,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/40 to-black" />
+    ),
+  },
+);
+
+const TerminalMockup = dynamic(
+  () =>
+    import("@/components/landing/TerminalMockup").then((mod) => ({
+      default: mod.TerminalMockup,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full max-w-137.5 aspect-[5/4] rounded-2xl border border-white/10 bg-black/40" />
+    ),
+  },
+);
 
 export default function Hero() {
   return (
