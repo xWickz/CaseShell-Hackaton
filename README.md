@@ -45,13 +45,13 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 
 ## 📸 Capturas & GIFs
 
-![GIF](https://i.imgur.com/7FUmfbx.gif)
+![GIF](./public/demogif.avif)
 
-![CAP 1](https://i.imgur.com/FKTtCKb.png)
-![CAP 2](https://i.imgur.com/hpK42yd.png)
-![CAP 3](https://i.imgur.com/X8OCQz9.png)
-![CAP 4](https://i.imgur.com/4fqIwvP.png)
-![CAP 5](https://i.imgur.com/w8ApYoh.png)
+![CAP 1](https://i.imgur.com/5ro0Kmv.png)
+![CAP 2](https://i.imgur.com/ytcD8Wk.png)
+![CAP 3](https://i.imgur.com/k73DQZS.png)
+![CAP 4](https://i.imgur.com/7vVkAa8.png)
+![CAP 5](https://i.imgur.com/gLsJKeS.png)
 ![CAP 6](https://i.imgur.com/rwJsrnU.png)
 
 ## 🧱 Stack Tecnológico
