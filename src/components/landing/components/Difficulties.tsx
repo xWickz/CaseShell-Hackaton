@@ -9,7 +9,7 @@ export default function Difficulties() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
             <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 md:p-8 text-center">
-              <h3 className="text-2xl lg:text-xl font-semibold text-green-400 mb-3 lg:mb-2">
+              <h3 className="text-2xl lg:text-xl font-semibold text-white mb-3 lg:mb-2">
                 Fácil
               </h3>
               <p className="text-slate-400">
@@ -18,7 +18,7 @@ export default function Difficulties() {
               </p>
             </div>
             <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 md:p-8 text-center">
-              <h3 className="text-2xl lg:text-xl font-semibold text-orange-400 mb-3 lg:mb-2">
+              <h3 className="text-2xl lg:text-xl font-semibold text-white mb-3 lg:mb-2">
                 Intermedio
               </h3>
               <p className="text-slate-400">
@@ -26,7 +26,7 @@ export default function Difficulties() {
               </p>
             </div>
             <div className="bg-gray-900/50 rounded-2xl border border-white/10 p-6 md:p-8 text-center">
-              <h3 className="text-2xl lg:text-xl font-semibold text-red-500 mb-3 lg:mb-2">
+              <h3 className="text-2xl lg:text-xl font-semibold  text-white mb-3 lg:mb-2">
                 Difícil
               </h3>
               <p className="text-slate-400">

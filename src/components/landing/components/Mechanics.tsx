@@ -43,7 +43,10 @@ export default function Mechanics() {
         ref={sectionRef}
         className="relative border-t border-white/10 bg-black overflow-hidden"
       >
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40" aria-hidden="true">
+        <div
+          className="absolute inset-0 z-0 pointer-events-none opacity-40"
+          aria-hidden="true"
+        >
           {showShader ? <DitherMatrix /> : null}
         </div>
         <div className="relative z-10 px-6 md:px-10 lg:px-20 py-24 md:py-32">
@@ -101,7 +104,7 @@ export default function Mechanics() {
                 width={500}
                 height={500}
                 alt="OS Interface"
-                className="absolute -right-5 md:-right-[10%] lg:right-5 -bottom-12 object-contain rounded-2xl opacity-80"
+                className="absolute -right-5 md:-right-[10%] lg:right-0.5 -bottom-12 object-contain rounded-2xl opacity-80"
               />
             </WobbleCard>
           </div>

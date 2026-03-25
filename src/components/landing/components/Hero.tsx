@@ -1,6 +1,6 @@
 "use client";
 
-import BorderButton from "@/components/game/ui/borderButton";
+import GlowButton from "@/components/game/ui/glowingButton";
 import { CanvasTxt } from "@/components/landing/CanvasText";
 import dynamic from "next/dynamic";
 
@@ -72,7 +72,7 @@ export default function Hero() {
             <strong className="text-slate-300">caso</strong> como si estuvieras
             dentro del sistema.
           </p>
-          <BorderButton href="/game">Jugar Ahora</BorderButton>
+          <GlowButton href="/game"> Jugar ahora</GlowButton>
         </section>
 
         <aside className="relative hidden shrink-0 lg:block w-full max-w-137.5 z-10">
