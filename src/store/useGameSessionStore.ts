@@ -145,7 +145,6 @@ export const useGameSessionStore = create<GameSessionState>()(
 
       initializeSession: (difficulty) =>
         set((state) => {
-          // If we are changing difficulty or it's empty, reset state
           if (state.currentDifficulty !== difficulty) {
             return {
               currentDifficulty: difficulty,
@@ -162,7 +161,7 @@ export const useGameSessionStore = create<GameSessionState>()(
               alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
             };
           }
-          return {}; // Keep existing state if difficulty matches
+          return {};
         }),
 
       setCurrentInput: (value) => set({ currentInput: value }),
