@@ -58,3 +58,22 @@ export type CommandExecutionResult = {
 type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
+
+export type AlertEffectId =
+  | "filesystem-lock"
+  | "screen-obscure"
+  | "scramble-labels";
+
+export type AlertEffectState = {
+  filesystemLocked: boolean;
+  screenObscured: boolean;
+  labelsScrambled: boolean;
+};
+
+export type ActiveTerminalAlert = {
+  id: string;
+  resolveCommand: string;
+  reminder: string;
+  resolveLines: string[];
+  effect?: AlertEffectId;
+};

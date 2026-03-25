@@ -6,6 +6,9 @@ import type {
   CaseState,
   CaseKnowledge,
   TerminalLine,
+  ActiveTerminalAlert,
+  AlertEffectState,
+  AlertEffectId,
 } from "@/types/game-engine";
 import type { Difficulty } from "@/types/game";
 
@@ -14,6 +17,7 @@ type GameSessionState = {
   currentInput: string;
 
   commandLog: CommandLogEntry[];
+  commandHistory: string[];
   commandStats: {
     total: number;
     success: number;
@@ -28,6 +32,9 @@ type GameSessionState = {
 
   isVictoryOpen: boolean;
 
+  activeAlert: ActiveTerminalAlert | null;
+  alertEffectState: AlertEffectState;
+
   setCurrentInput: (value: string) => void;
   addTerminalLines: (lines: TerminalLine[]) => void;
   clearTerminalHistory: () => void;
@@ -40,6 +47,8 @@ type GameSessionState = {
   resetSession: () => void;
   closeVictoryModal: () => void;
   logCommand: (input: string, outcome: CommandOutcome) => void;
+  setActiveAlert: (alert: ActiveTerminalAlert) => void;
+  clearActiveAlert: () => void;
 };
 
 export type CommandOutcome = "success" | "error";
@@ -57,6 +66,37 @@ const CASE_CODES: Record<Difficulty, string> = {
   easy: "EASY-001-ACCESS-NOT-GRANTED",
   medium: "MED-002-DATA-LEAK",
   hard: "HARD-003-CRITICAL-COLLAPSE",
+};
+
+const MAX_COMMAND_HISTORY = 50;
+
+const INITIAL_ALERT_EFFECT_STATE: AlertEffectState = {
+  filesystemLocked: false,
+  screenObscured: false,
+  labelsScrambled: false,
+};
+
+const ALERT_EFFECT_MAP: Record<AlertEffectId, AlertEffectState> = {
+  "filesystem-lock": {
+    filesystemLocked: true,
+    screenObscured: false,
+    labelsScrambled: false,
+  },
+  "screen-obscure": {
+    filesystemLocked: false,
+    screenObscured: true,
+    labelsScrambled: false,
+  },
+  "scramble-labels": {
+    filesystemLocked: false,
+    screenObscured: false,
+    labelsScrambled: true,
+  },
+};
+
+const createAlertEffectState = (effect?: AlertEffectId | null) => {
+  if (!effect) return { ...INITIAL_ALERT_EFFECT_STATE };
+  return { ...INITIAL_ALERT_EFFECT_STATE, ...ALERT_EFFECT_MAP[effect] };
 };
 
 const createInitialCaseState = (): CaseState => ({
@@ -90,6 +130,7 @@ export const useGameSessionStore = create<GameSessionState>()(
       terminalHistory: createInitialTerminalHistory(DEFAULT_DIFFICULTY),
       currentInput: "",
       commandLog: [],
+      commandHistory: [],
       commandStats: { total: 0, success: 0, error: 0 },
       caseState: createInitialCaseState(),
       currentDifficulty: DEFAULT_DIFFICULTY,
@@ -98,6 +139,9 @@ export const useGameSessionStore = create<GameSessionState>()(
       endTime: null,
 
       isVictoryOpen: false,
+
+      activeAlert: null,
+      alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
 
       initializeSession: (difficulty) =>
         set((state) => {
@@ -112,7 +156,10 @@ export const useGameSessionStore = create<GameSessionState>()(
               endTime: null,
               isVictoryOpen: false,
               commandLog: [],
+              commandHistory: [],
               commandStats: { total: 0, success: 0, error: 0 },
+              activeAlert: null,
+              alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
             };
           }
           return {}; // Keep existing state if difficulty matches
@@ -192,7 +239,10 @@ export const useGameSessionStore = create<GameSessionState>()(
           endTime: null,
           isVictoryOpen: false,
           commandLog: [],
+          commandHistory: [],
           commandStats: { total: 0, success: 0, error: 0 },
+          activeAlert: null,
+          alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
         })),
 
       closeVictoryModal: () => set({ isVictoryOpen: false }),
@@ -208,6 +258,9 @@ export const useGameSessionStore = create<GameSessionState>()(
               timestamp: Date.now(),
             },
           ],
+          commandHistory: [...state.commandHistory, command].slice(
+            -MAX_COMMAND_HISTORY,
+          ),
           commandStats: {
             total: state.commandStats.total + 1,
             success:
@@ -215,6 +268,17 @@ export const useGameSessionStore = create<GameSessionState>()(
             error: state.commandStats.error + (outcome === "error" ? 1 : 0),
           },
         })),
+
+      setActiveAlert: (alert) =>
+        set({
+          activeAlert: alert,
+          alertEffectState: createAlertEffectState(alert?.effect ?? null),
+        }),
+      clearActiveAlert: () =>
+        set({
+          activeAlert: null,
+          alertEffectState: createAlertEffectState(null),
+        }),
     }),
     {
       name: "caseshell-session-storage",

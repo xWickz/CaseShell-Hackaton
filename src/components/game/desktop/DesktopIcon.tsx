@@ -42,8 +42,25 @@ export default function DesktopIcon({
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
+  const alertEffectState = useGameSessionStore(
+    (state) => state.alertEffectState,
+  );
+  const activeAlert = useGameSessionStore((state) => state.activeAlert);
 
   const handleOpen = () => {
+    if (alertEffectState.filesystemLocked) {
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "error",
+          text:
+            activeAlert?.reminder ??
+            "Acceso a archivos bloqueado. Resuelve la alerta activa para continuar.",
+        },
+      ]);
+      return;
+    }
+
     if (item.name === "network.txt") {
       discoverKnowledge("knowsWifiFix");
       addTerminalLines([
@@ -231,6 +248,12 @@ export default function DesktopIcon({
   };
 
   const iconClass = insideWindow ? "w-8 h-8" : "w-10 h-10";
+  const displayName = alertEffectState.labelsScrambled
+    ? scrambleLabel(item.name)
+    : item.name;
+  const scrambleMotionClass = alertEffectState.labelsScrambled
+    ? "motion-safe:animate-bounce"
+    : "";
 
   const renderIcon = () => {
     switch (item.type) {
@@ -276,13 +299,13 @@ export default function DesktopIcon({
     return (
       <button
         onDoubleClick={handleOpen}
-        className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
         aria-label={`Abrir ${item.name}`}
         title={item.name}
       >
         {renderIcon()}
         <span className="max-w-25 text-center text-xs font-medium">
-          {item.name}
+          {displayName}
         </span>
       </button>
     );
@@ -349,14 +372,31 @@ export default function DesktopIcon({
       animate={controls}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       style={{ position: "absolute" }}
-      className="flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+      className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
       aria-label={`Abrir ${item.name}`}
       title={item.name}
     >
       {renderIcon()}
       <span className="max-w-25 text-center text-xs font-medium drop-shadow-md">
-        {item.name}
+        {displayName}
       </span>
     </motion.button>
   );
+}
+
+function scrambleLabel(label: string) {
+  return label
+    .split("")
+    .map((char, index) => {
+      const base = char.charCodeAt(0);
+      const offset = (index * 7 + 13) % 26;
+      if (base >= 65 && base <= 90) {
+        return String.fromCharCode(((base - 65 + offset) % 26) + 65);
+      }
+      if (base >= 97 && base <= 122) {
+        return String.fromCharCode(((base - 97 + offset) % 26) + 97);
+      }
+      return char;
+    })
+    .join("");
 }

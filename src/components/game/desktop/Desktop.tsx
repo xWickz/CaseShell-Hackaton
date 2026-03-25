@@ -53,6 +53,10 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
+  const alertEffectState = useGameSessionStore(
+    (state) => state.alertEffectState,
+  );
+  const activeAlert = useGameSessionStore((state) => state.activeAlert);
 
   const wallpaperClasses = useMemo(() => {
     switch (wallpaperTheme) {
@@ -180,6 +184,21 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         <OnboardingOverlay onDismiss={completeOnboarding} />
       )}
       <Taskbar />
+
+      {alertEffectState.screenObscured && (
+        <div className="pointer-events-none absolute inset-0 z-[1500] flex flex-col items-center justify-center bg-black/70 text-center font-mono text-emerald-200 backdrop-blur-md">
+          <p className="text-xl font-semibold tracking-wider">Visor cegado</p>
+          <p className="mt-2 max-w-sm text-sm text-emerald-100">
+            {activeAlert?.reminder ??
+              "El HUD está saturado. Limpia la alerta para restaurar la imagen."}
+          </p>
+          {activeAlert?.resolveCommand && (
+            <p className="mt-6 text-xs uppercase tracking-[0.3em] text-emerald-400">
+              Ejecuta {activeAlert.resolveCommand}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay"></div>
 

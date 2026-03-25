@@ -7,6 +7,15 @@ import {
 } from "@/store/useGameSessionStore";
 import { executeCaseCommand } from "@/lib/game/case-engine";
 import { useTerminalAudio } from "@/hooks/useTerminalAudio";
+import {
+  createIntroLines,
+  createResolveLines,
+  getRandomAlert,
+  toActiveAlert,
+} from "@/data/game/random-alerts";
+
+const ALERT_PROBABILITY = 0.25;
+const MIN_COMMANDS_BETWEEN_ALERTS = 3;
 
 export default function TerminalWindow() {
   const terminalHistory = useGameSessionStore((state) => state.terminalHistory);
@@ -28,11 +37,20 @@ export default function TerminalWindow() {
   const completeSession = useGameSessionStore((state) => state.completeSession);
   const logCommand = useGameSessionStore((state) => state.logCommand);
   const commandLog = useGameSessionStore((state) => state.commandLog);
+  const commandHistory = useGameSessionStore((state) => state.commandHistory);
+  const activeAlert = useGameSessionStore((state) => state.activeAlert);
+  const setActiveAlert = useGameSessionStore((state) => state.setActiveAlert);
+  const clearActiveAlert = useGameSessionStore(
+    (state) => state.clearActiveAlert,
+  );
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const lastCountRef = useRef(0);
   const completionRef = useRef(false);
+  const historyIndexRef = useRef<number | null>(null);
+  const draftInputRef = useRef("");
+  const lastAlertCommandRef = useRef(0);
 
   const { playOutcome, playCompletion } = useTerminalAudio();
 
@@ -58,6 +76,12 @@ export default function TerminalWindow() {
   }, [commandLog, playOutcome]);
 
   useEffect(() => {
+    if (!commandLog.length) {
+      lastAlertCommandRef.current = 0;
+    }
+  }, [commandLog]);
+
+  useEffect(() => {
     if (caseState.progress.completed && !completionRef.current) {
       playCompletion();
       completionRef.current = true;
@@ -70,6 +94,54 @@ export default function TerminalWindow() {
   }, [caseState.progress.completed, playCompletion]);
 
   const prompt = useMemo(() => "agent@cubepath:~$", []);
+
+  function resetHistoryNavigation() {
+    historyIndexRef.current = null;
+    draftInputRef.current = "";
+  }
+
+  function navigateHistory(direction: "up" | "down") {
+    if (!commandHistory.length) return;
+
+    if (direction === "up") {
+      if (historyIndexRef.current === null) {
+        draftInputRef.current = currentInput;
+        historyIndexRef.current = commandHistory.length - 1;
+      } else if (historyIndexRef.current > 0) {
+        historyIndexRef.current -= 1;
+      }
+
+      if (historyIndexRef.current !== null) {
+        setCurrentInput(commandHistory[historyIndexRef.current]);
+      }
+      return;
+    }
+
+    if (historyIndexRef.current === null) return;
+
+    if (historyIndexRef.current < commandHistory.length - 1) {
+      historyIndexRef.current += 1;
+      setCurrentInput(commandHistory[historyIndexRef.current]);
+    } else {
+      historyIndexRef.current = null;
+      setCurrentInput(draftInputRef.current);
+    }
+  }
+
+  function maybeTriggerRandomAlert(commandsExecuted: number) {
+    if (activeAlert) return;
+    if (
+      commandsExecuted - lastAlertCommandRef.current <
+      MIN_COMMANDS_BETWEEN_ALERTS
+    )
+      return;
+    if (Math.random() > ALERT_PROBABILITY) return;
+
+    const definition = getRandomAlert();
+    addTerminalLines(createIntroLines(definition));
+    setActiveAlert(toActiveAlert(definition));
+    lastAlertCommandRef.current = commandsExecuted;
+  }
 
   function handleSubmit() {
     const rawInput = currentInput.trim();
@@ -84,11 +156,35 @@ export default function TerminalWindow() {
       },
     ]);
 
+    if (activeAlert) {
+      if (rawInput === activeAlert.resolveCommand) {
+        addTerminalLines(createResolveLines(activeAlert.resolveLines));
+        clearActiveAlert();
+        logCommand(rawInput, "success");
+      } else {
+        addTerminalLines([
+          {
+            id: crypto.randomUUID(),
+            type: "error",
+            text: `${activeAlert.reminder} Comando requerido: ${activeAlert.resolveCommand}.`,
+          },
+        ]);
+        logCommand(rawInput, "error");
+      }
+
+      setCurrentInput("");
+      resetHistoryNavigation();
+      inputRef.current?.focus();
+      return;
+    }
+
     if (rawInput.toLowerCase() === "clear") {
       clearTerminalHistory();
       logCommand(rawInput, "success");
       setCurrentInput("");
+      resetHistoryNavigation();
       inputRef.current?.focus();
+      maybeTriggerRandomAlert(commandLog.length + 1);
       return;
     }
 
@@ -114,7 +210,10 @@ export default function TerminalWindow() {
 
     logCommand(rawInput, outcome);
     setCurrentInput("");
+    resetHistoryNavigation();
     inputRef.current?.focus();
+
+    maybeTriggerRandomAlert(commandLog.length + 1);
   }
 
   return (
@@ -153,8 +252,25 @@ export default function TerminalWindow() {
         <input
           ref={inputRef}
           value={currentInput}
-          onChange={(e) => setCurrentInput(e.target.value)}
+          onChange={(e) => {
+            if (historyIndexRef.current !== null) {
+              resetHistoryNavigation();
+            }
+            setCurrentInput(e.target.value);
+          }}
           onKeyDown={(e) => {
+            if (e.key === "ArrowUp") {
+              e.preventDefault();
+              navigateHistory("up");
+              return;
+            }
+
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              navigateHistory("down");
+              return;
+            }
+
             if (e.key === "Enter") {
               e.preventDefault();
               handleSubmit();
