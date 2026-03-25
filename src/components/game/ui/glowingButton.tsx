@@ -9,7 +9,7 @@ type GlowButtonProps = {
 export default function GlowButton({ href, children }: GlowButtonProps) {
   return (
     <div className=" group relative inline-flex items-center justify-center gap-4">
-      <div className="absolute inset-0 rounded-xl bg-linear-to-r from-indigo-500 via-pink-500 to-yellow-400 opacity-60 blur-lg filter transition-all duration-1000 group-hover:opacity-100 group-hover:duration-200"></div>
+      <div className="absolute inset-0 rounded-xl bg-linear-to-r from-red-500 via-orange-500 to-yellow-500 opacity-60 blur-lg filter transition-all duration-1000 group-hover:opacity-100 group-hover:duration-200"></div>
       <Link
         href={href}
         role="button"

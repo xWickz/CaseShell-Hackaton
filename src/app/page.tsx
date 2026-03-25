@@ -4,6 +4,7 @@ import Hero from "@/components/landing/components/Hero";
 import About from "@/components/landing/components/About";
 import Mechanics from "@/components/landing/components/Mechanics";
 import Difficulties from "@/components/landing/components/Difficulties";
+import Ready from "@/components/landing/components/Ready";
 
 export default function HomePage() {
   return (
@@ -16,6 +17,7 @@ export default function HomePage() {
         <About />
         <Mechanics />
         <Difficulties />
+        <Ready />
       </main>
       <Footer />
     </>
