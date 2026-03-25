@@ -23,7 +23,7 @@ const difficulties = [
     label: "Difícil",
     threat: "Nivel de Amenaza: Crítico",
     description:
-      "Gran cantidad de archivos, pistas críticas y uso intensivo de la terminal. Sin comandos de ayuda.",
+      "Gran cantidad de archivos, pistas críticas y uso intensivo de la terminal. ¡Sin comandos de ayuda!",
     meta: { duration: "45+ min", files: 20, focus: "Investigación Forense" },
   },
 ];
