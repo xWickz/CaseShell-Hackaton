@@ -31,35 +31,6 @@ export function executeHardCommand(
           line("- help", "hint"),
           line("- clear", "hint"),
           line("- ls", "hint"),
-          line("- cat caso.txt", "hint"),
-          line("- cat network.txt", "hint"),
-          line("- cat firewall.txt", "hint"),
-          line("- cat suspicious-processes.txt", "hint"),
-          line("- cat resolver.conf", "hint"),
-          line("- cat system.log", "hint"),
-          line("- cat switch.conf", "hint"),
-          line("- cat ops-note.txt", "hint"),
-          line("- cat dns-runes.png", "hint"),
-          line("- cat dns-lock.png", "hint"),
-          line("- cat service-manual.txt", "hint"),
-          line("- cat incident-template.txt", "hint"),
-          line("- cat perimeter-note.txt", "hint"),
-          line("- cat switch-override.txt", "hint"),
-          line("- cat chain-of-custody.txt", "hint"),
-          line("- cat watchdog-brief.txt", "hint"),
-          line("- fix wifi", "hint"),
-          line("- fix firewall", "hint"),
-          line("- kill malware", "hint"),
-          line("- diag dns", "hint"),
-          line("- enter override 884", "hint"),
-          line("- fix dns", "hint"),
-          line("- verify services", "hint"),
-          line("- restart services", "hint"),
-          line("- scan perimeter", "hint"),
-          line("- audit switch", "hint"),
-          line("- deploy watchdog", "hint"),
-          line("- enable port", "hint"),
-          line("- file report", "hint"),
           line("- status", "hint"),
           line("- submit", "hint"),
           line("Lee cada archivo; esconden pasos críticos.", "hint"),
@@ -122,7 +93,9 @@ export function executeHardCommand(
       return {
         lines: [
           line("=== OPERATIONS NOTE ===", "hint"),
-          line("Secuencia requerida: 'diag dns' ➜ 'enter override 884' ➜ 'fix dns'."),
+          line(
+            "Secuencia requerida: 'diag dns' ➜ 'enter override 884' ➜ 'fix dns'.",
+          ),
           line("No reinicies servicios sin la verificación previa."),
         ],
         nextState: {
@@ -136,7 +109,9 @@ export function executeHardCommand(
       return {
         lines: [
           line("=== RUNAS DNS ===", "hint"),
-          line("Las runas remarcan la misma secuencia: Medir ➜ Desbloquear ➜ Reparar."),
+          line(
+            "Las runas remarcan la misma secuencia: Medir ➜ Desbloquear ➜ Reparar.",
+          ),
         ],
         nextState: {
           knowledge: {
@@ -217,7 +192,9 @@ export function executeHardCommand(
       return {
         lines: [
           line("=== CHAIN OF CUSTODY ===", "hint"),
-          line("El informe debe citar el puerto habilitado y el escaneo perimetral."),
+          line(
+            "El informe debe citar el puerto habilitado y el escaneo perimetral.",
+          ),
         ],
         nextState: {
           knowledge: {
@@ -230,7 +207,9 @@ export function executeHardCommand(
       return {
         lines: [
           line("=== WATCHDOG BRIEF ===", "hint"),
-          line("Despliega el watchdog con 'deploy watchdog' tras 'scan perimeter'."),
+          line(
+            "Despliega el watchdog con 'deploy watchdog' tras 'scan perimeter'.",
+          ),
         ],
         nextState: {
           knowledge: {
@@ -451,13 +430,18 @@ export function executeHardCommand(
       if (!state.progress.overrideValidated) {
         return {
           lines: [
-            line("La consola de DNS sigue bloqueada. Usa 'enter override 884'.", "error"),
+            line(
+              "La consola de DNS sigue bloqueada. Usa 'enter override 884'.",
+              "error",
+            ),
           ],
         };
       }
 
       if (state.progress.dnsFixed) {
-        return { lines: [line("Los reenviadores DNS ya son estables.", "hint")] };
+        return {
+          lines: [line("Los reenviadores DNS ya son estables.", "hint")],
+        };
       }
 
       return {
@@ -529,13 +513,18 @@ export function executeHardCommand(
       if (!state.progress.servicesVerified) {
         return {
           lines: [
-            line("Debes ejecutar 'verify services' antes de reiniciar.", "error"),
+            line(
+              "Debes ejecutar 'verify services' antes de reiniciar.",
+              "error",
+            ),
           ],
         };
       }
 
       if (state.progress.servicesRestarted) {
-        return { lines: [line("El reinicio orquestado ya fue aplicado.", "hint")] };
+        return {
+          lines: [line("El reinicio orquestado ya fue aplicado.", "hint")],
+        };
       }
 
       return {
@@ -563,7 +552,10 @@ export function executeHardCommand(
       if (!state.progress.malwareKilled) {
         return {
           lines: [
-            line("El malware sigue activo. El SOC no permite el escaneo aún.", "error"),
+            line(
+              "El malware sigue activo. El SOC no permite el escaneo aún.",
+              "error",
+            ),
           ],
         };
       }
@@ -599,7 +591,10 @@ export function executeHardCommand(
       if (!state.progress.servicesRestarted) {
         return {
           lines: [
-            line("Completa el reinicio coordinado antes de auditar el switch.", "error"),
+            line(
+              "Completa el reinicio coordinado antes de auditar el switch.",
+              "error",
+            ),
           ],
         };
       }
@@ -635,7 +630,10 @@ export function executeHardCommand(
       if (!state.progress.perimeterScanComplete) {
         return {
           lines: [
-            line("Necesitas registrar 'scan perimeter' antes de desplegar el watchdog.", "error"),
+            line(
+              "Necesitas registrar 'scan perimeter' antes de desplegar el watchdog.",
+              "error",
+            ),
           ],
         };
       }
@@ -706,7 +704,10 @@ export function executeHardCommand(
       if (!state.knowledge.knowsSwitchFix) {
         return {
           lines: [
-            line("Necesitas revisar switch.conf antes de tocar el puerto.", "error"),
+            line(
+              "Necesitas revisar switch.conf antes de tocar el puerto.",
+              "error",
+            ),
           ],
         };
       }
@@ -745,10 +746,14 @@ export function executeHardCommand(
       const dns = state.progress.dnsFixed ? "OK" : "PENDIENTE";
       const services = state.progress.servicesRestarted ? "OK" : "PENDIENTE";
       const port = state.progress.switchPortEnabled ? "OK" : "PENDIENTE";
-      const dnsDiag = state.progress.dnsDiagnosticsComplete ? "OK" : "PENDIENTE";
+      const dnsDiag = state.progress.dnsDiagnosticsComplete
+        ? "OK"
+        : "PENDIENTE";
       const override = state.progress.overrideValidated ? "OK" : "PENDIENTE";
       const verification = state.progress.servicesVerified ? "OK" : "PENDIENTE";
-      const perimeter = state.progress.perimeterScanComplete ? "OK" : "PENDIENTE";
+      const perimeter = state.progress.perimeterScanComplete
+        ? "OK"
+        : "PENDIENTE";
       const audit = state.progress.switchAuditComplete ? "OK" : "PENDIENTE";
       const watchdog = state.progress.watchdogDeployed ? "OK" : "PENDIENTE";
       const report = state.progress.incidentReportFiled ? "OK" : "PENDIENTE";
@@ -841,7 +846,10 @@ export function executeHardCommand(
         if (!state.progress.dnsDiagnosticsComplete) {
           return {
             lines: [
-              line("Ejecuta 'diag dns' antes de ingresar el override.", "error"),
+              line(
+                "Ejecuta 'diag dns' antes de ingresar el override.",
+                "error",
+              ),
             ],
           };
         }
@@ -862,12 +870,16 @@ export function executeHardCommand(
 
         if (code !== "884") {
           return {
-            lines: [line("Código incorrecto. Vuelve a revisar el candado.", "error")],
+            lines: [
+              line("Código incorrecto. Vuelve a revisar el candado.", "error"),
+            ],
           };
         }
 
         return {
-          lines: [line("Override aceptado. Consola DNS desbloqueada.", "success")],
+          lines: [
+            line("Override aceptado. Consola DNS desbloqueada.", "success"),
+          ],
           nextState: {
             progress: {
               overrideValidated: true,

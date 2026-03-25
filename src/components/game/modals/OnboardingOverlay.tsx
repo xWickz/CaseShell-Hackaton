@@ -40,7 +40,7 @@ export default function OnboardingOverlay({
 
   return (
     <div
-      className="absolute inset-0 z-1200 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur"
+      className="absolute inset-0 z-1200 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur font-sans"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
@@ -49,11 +49,12 @@ export default function OnboardingOverlay({
         <div className="mb-6 flex items-center gap-3 text-sky-300">
           <Sparkles className="h-6 w-6" aria-hidden="true" />
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+            <p className="text-xs uppercase tracking-tight text-white/60 ">
               Primer vistazo
             </p>
             <h2 id={headingId} className="text-2xl font-semibold text-white">
-              Consejos rápidos para investigar
+              Consejos <span className="text-red-600">rápidos</span> para
+              investigar
             </h2>
           </div>
         </div>

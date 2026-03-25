@@ -3,6 +3,7 @@
 import GlowButton from "@/components/game/ui/glowingButton";
 import { CanvasTxt } from "@/components/landing/CanvasText";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const MatrixRain = dynamic(
   () =>
@@ -12,7 +13,7 @@ const MatrixRain = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/40 to-black" />
+      <div className="absolute inset-0 -z-10 bg-linear-to-b from-black/40 to-black" />
     ),
   },
 );
@@ -25,7 +26,7 @@ const TerminalMockup = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full max-w-137.5 aspect-[5/4] rounded-2xl border border-white/10 bg-black/40" />
+      <div className="w-full max-w-137.5 aspect-5/4 rounded-2xl border border-white/10 bg-black/40" />
     ),
   },
 );
@@ -38,9 +39,9 @@ export default function Hero() {
         id="intro"
       >
         <MatrixRain />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black pointer-events-none" />
         <section
-          className="w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:max-w-xl"
+          className="w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:max-w-xl z-11"
           aria-label="Introducción al juego"
         >
           <div className="flex items-center gap-2">
@@ -72,7 +73,7 @@ export default function Hero() {
             <strong className="text-slate-300">caso</strong> como si estuvieras
             dentro del sistema.
           </p>
-          <GlowButton href="/game"> Jugar ahora</GlowButton>
+          <GlowButton href="/game">Jugar ahora</GlowButton>
         </section>
 
         <aside className="relative hidden shrink-0 lg:block w-full max-w-137.5 z-10">

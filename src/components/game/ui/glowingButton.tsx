@@ -13,7 +13,7 @@ export default function GlowButton({ href, children }: GlowButtonProps) {
       <Link
         href={href}
         role="button"
-        className="group relative inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-base font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-gray-600/30"
+        className="group relative inline-flex items-center justify-center rounded-xl bg-red-600 px-8 py-3 text-base font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-red-500/30"
       >
         {children}
         <svg

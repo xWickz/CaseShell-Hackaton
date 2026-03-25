@@ -53,21 +53,23 @@ export default function BriefingModal({ briefing }: BriefingModalProps) {
 
   return (
     <div
-      className="absolute inset-0 z-1000 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="absolute inset-0 z-1000 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm font-sans"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
     >
       <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900/95 p-6 shadow-2xl">
         <div className="mb-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-cyan-300">
+          <p className="text-sm uppercase tracking-tight font-semibold text-cyan-300">
             {briefing.title}
           </p>
-          <h2 id={headingId} className="mt-2 text-3xl font-bold text-white">
+          <h2 id={headingId} className="text-3xl font-bold text-white">
             Investigación iniciada
           </h2>
         </div>
-
+        <p className="text-sm uppercase tracking-tight font-semibold text-cyan-300/90">
+          Descripción
+        </p>
         <div
           ref={contentRef}
           onScroll={handleScroll}
@@ -75,6 +77,9 @@ export default function BriefingModal({ briefing }: BriefingModalProps) {
         >
           <p>{briefing.description}</p>
 
+          <p className="text-sm uppercase tracking-tight font-semibold text-cyan-300/90">
+            Notas
+          </p>
           {briefing.hints?.length ? (
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
               {briefing.hints.map((hint, index) => (

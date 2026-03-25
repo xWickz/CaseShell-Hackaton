@@ -208,6 +208,30 @@ No tengo ni la más menor idea de qué son estos links o cómo podrían ayudar, 
 - Lista de compras: leche, pan, huevos
 - Contraseña de mi Netflix: ********`,
   },
+  {
+    id: "how-to-use-terminal",
+    name: "terminal.txt",
+    type: "text",
+    content: `Marzo 25, 2026
+    
+    A todos los nuevos internos de la empresa, les adjunto una guía antigüa de como utilizar la terminal a su favor para resolver los incidentes:
+    
+1. Sabemos que la terminal al principio puede ser confusa y poco clara. Sin embargo, es fácil entenderla. Esto se hace para evitar hackeos o problemas.
+2. La terminal contiene los comandos para arreglar los problemas.
+3. Como medida adicional de seguridad, en las carpetas, notas o imágenes hay comandos anotados que necesitarás aprender.
+4. Los comandos no tienen un orden específico si es un problema muy fácil. 
+5. No puedes ejecutar comandos en la terminal sin revisar primero las notas o pistas, esto con el fin de garantizar que los trabajadores saben qué hacen.
+    
+    Marzo 31, 2026
+    
+    ¡NUEVAS NOTICIAS EQUIPO! Hemos logrado en conjunto a ShellAI agregar un chat integrado al sistema operativo para facilitar su trabajo, adjuntamos las mejoras:
+    
+1. El chat puede ayudar a los empleados facilitando las pistas o el trabajo.
+2. El chat tiene capacidad de ayudar al empleado mediante sugerencias.
+3. El chat avanza y te ayuda a medida que tú avanzas en los issues asignados.
+    
+    Creo que este chat es lo mejor que ha llegado a la empresa, espero que lo usen con sabiduria.`,
+  },
 ];
 
 const createMediumExtras = (): DesktopItem[] => [

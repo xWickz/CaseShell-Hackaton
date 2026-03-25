@@ -31,26 +31,6 @@ export function executeMediumCommand(
           line("- help", "hint"),
           line("- clear", "hint"),
           line("- ls", "hint"),
-          line("- cat caso.txt", "hint"),
-          line("- cat network.txt", "hint"),
-          line("- cat firewall.txt", "hint"),
-          line("- cat suspicious-processes.txt", "hint"),
-          line("- cat resolver.conf", "hint"),
-          line("- cat system.log", "hint"),
-          line("- cat ops-note.txt", "hint"),
-          line("- cat dns-runes.png", "hint"),
-          line("- cat dns-lock.png", "hint"),
-          line("- cat service-manual.txt", "hint"),
-          line("- cat incident-template.txt", "hint"),
-          line("- fix wifi", "hint"),
-          line("- fix firewall", "hint"),
-          line("- kill malware", "hint"),
-          line("- diag dns", "hint"),
-          line("- enter override 884", "hint"),
-          line("- fix dns", "hint"),
-          line("- verify services", "hint"),
-          line("- restart services", "hint"),
-          line("- file report", "hint"),
           line("- status", "hint"),
           line("- submit", "hint"),
           line(
@@ -150,7 +130,6 @@ export function executeMediumCommand(
           },
         },
       };
-
 
     case "cat caso.txt":
       return {
@@ -334,14 +313,19 @@ export function executeMediumCommand(
 
       if (state.progress.dnsDiagnosticsComplete) {
         return {
-          lines: [line("Ya cuentas con la lectura de DNS más reciente.", "hint")],
+          lines: [
+            line("Ya cuentas con la lectura de DNS más reciente.", "hint"),
+          ],
         };
       }
 
       return {
         lines: [
           line("Ejecutando diagnóstico de DNS...", "system"),
-          line("Reporte: latencia establecida, errores catalogados.", "success"),
+          line(
+            "Reporte: latencia establecida, errores catalogados.",
+            "success",
+          ),
         ],
         nextState: {
           progress: {
@@ -457,7 +441,10 @@ export function executeMediumCommand(
       if (!state.progress.servicesVerified) {
         return {
           lines: [
-            line("Debes ejecutar 'verify services' antes de reiniciar.", "error"),
+            line(
+              "Debes ejecutar 'verify services' antes de reiniciar.",
+              "error",
+            ),
             line("Sigue el playbook del SRE.", "hint"),
           ],
         };
@@ -494,10 +481,7 @@ export function executeMediumCommand(
       if (!state.progress.servicesRestarted) {
         return {
           lines: [
-            line(
-              "No puedes generar el informe sin reinicio exitoso.",
-              "error",
-            ),
+            line("No puedes generar el informe sin reinicio exitoso.", "error"),
           ],
         };
       }
@@ -526,7 +510,9 @@ export function executeMediumCommand(
       const malware = state.progress.malwareKilled ? "OK" : "PENDIENTE";
       const dns = state.progress.dnsFixed ? "OK" : "PENDIENTE";
       const services = state.progress.servicesRestarted ? "OK" : "PENDIENTE";
-      const dnsDiag = state.progress.dnsDiagnosticsComplete ? "OK" : "PENDIENTE";
+      const dnsDiag = state.progress.dnsDiagnosticsComplete
+        ? "OK"
+        : "PENDIENTE";
       const override = state.progress.overrideValidated ? "OK" : "PENDIENTE";
       const verification = state.progress.servicesVerified ? "OK" : "PENDIENTE";
       const report = state.progress.incidentReportFiled ? "OK" : "PENDIENTE";
@@ -635,7 +621,12 @@ export function executeMediumCommand(
 
         if (code !== "884") {
           return {
-            lines: [line("Código incorrecto. Revisa dns-lock.png nuevamente.", "error")],
+            lines: [
+              line(
+                "Código incorrecto. Revisa dns-lock.png nuevamente.",
+                "error",
+              ),
+            ],
           };
         }
 

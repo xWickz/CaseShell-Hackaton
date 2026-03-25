@@ -53,10 +53,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
-  const caseCompleted = useGameSessionStore(
-    (state) => state.caseState.progress.completed,
-  );
-  const resetSession = useGameSessionStore((state) => state.resetSession);
 
   const wallpaperClasses = useMemo(() => {
     switch (wallpaperTheme) {
@@ -77,17 +73,8 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     setDifficulty(difficulty);
     if (currentDifficulty !== difficulty) {
       initializeSession(difficulty);
-    } else if (caseCompleted) {
-      resetSession();
     }
-  }, [
-    difficulty,
-    currentDifficulty,
-    caseCompleted,
-    setDifficulty,
-    initializeSession,
-    resetSession,
-  ]);
+  }, [difficulty, currentDifficulty, setDifficulty, initializeSession]);
 
   useEffect(() => {
     openWindow({
@@ -118,8 +105,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue =
-        "¿Seguro que quieres salir? Tu vista se reiniciará aunque se guarde el progreso del caso.";
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);

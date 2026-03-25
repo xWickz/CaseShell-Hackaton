@@ -101,7 +101,6 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
     set({ objectivePanelCollapsed: collapsed }),
 
   openWindow: (window) => {
-    // Lines 60-84 omitted
     const { openWindows, zCounter } = get();
 
     const existing = openWindows.find((w) => w.id === window.id);
@@ -120,8 +119,8 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
       x: BASE_WINDOW_POSITION.x + WINDOW_OFFSET * openWindows.length,
       y: BASE_WINDOW_POSITION.y + WINDOW_OFFSET * openWindows.length,
     };
-    const defaultSize =
-      window.size ?? DEFAULT_WINDOW_SIZES[window.type] ?? {
+    const defaultSize = window.size ??
+      DEFAULT_WINDOW_SIZES[window.type] ?? {
         width: 640,
         height: 460,
       };

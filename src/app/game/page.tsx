@@ -52,12 +52,12 @@ export default function GameSelectPage() {
                 >
                   <div>
                     <span
-                      className={`text-[10px] uppercase tracking-widest font-bold mb-2 block opacity-70 ${styles.text}`}
+                      className={`text-[10px] uppercase tracking-widest font-bold mb-2 block opacity-90 ${styles.text}`}
                     >
                       {diff.threat}
                     </span>
                     <h3
-                      className={`text-3xl font-bold mb-4 tracking-tight ${styles.text}`}
+                      className={`text-3xl font-bold mb-4 tracking-tight text-white`}
                     >
                       {diff.label}
                     </h3>
