@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   useGameSessionStore,
   type CommandOutcome,
 } from "@/store/useGameSessionStore";
 import { executeCaseCommand } from "@/lib/game/case-engine";
 import { useTerminalAudio } from "@/hooks/useTerminalAudio";
+import { useGameUIStore } from "@/store/useGameUIStore";
 import {
   createIntroLines,
   createResolveLines,
@@ -16,6 +17,11 @@ import {
 
 const ALERT_PROBABILITY = 0.25;
 const MIN_COMMANDS_BETWEEN_ALERTS = 3;
+const ALERT_SFX_FILES = [
+  "/game/audio/audio1.mp3",
+  "/game/audio/audio2.mp3",
+  "/game/audio/audio3.mp3",
+] as const;
 
 export default function TerminalWindow() {
   const terminalHistory = useGameSessionStore((state) => state.terminalHistory);
@@ -43,6 +49,9 @@ export default function TerminalWindow() {
   const clearActiveAlert = useGameSessionStore(
     (state) => state.clearActiveAlert,
   );
+  const alertSoundsEnabled = useGameUIStore(
+    (state) => state.alertSoundsEnabled,
+  );
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -51,6 +60,8 @@ export default function TerminalWindow() {
   const historyIndexRef = useRef<number | null>(null);
   const draftInputRef = useRef("");
   const lastAlertCommandRef = useRef(0);
+  const alertAudioPoolRef = useRef<HTMLAudioElement[]>([]);
+  const getRandom = useStableRandom();
 
   const { playOutcome, playCompletion } = useTerminalAudio();
 
@@ -61,6 +72,22 @@ export default function TerminalWindow() {
 
     inputRef.current?.focus();
   }, [startSession, caseState.progress.completed]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const pool = ALERT_SFX_FILES.map((src) => {
+      const audio = new Audio(src);
+      audio.preload = "auto";
+      audio.volume = 0.45;
+      return audio;
+    });
+    alertAudioPoolRef.current = pool;
+
+    return () => {
+      pool.forEach((audio) => audio.pause());
+      alertAudioPoolRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -135,12 +162,26 @@ export default function TerminalWindow() {
       MIN_COMMANDS_BETWEEN_ALERTS
     )
       return;
-    if (Math.random() > ALERT_PROBABILITY) return;
+    if (getRandom() > ALERT_PROBABILITY) return;
 
     const definition = getRandomAlert();
     addTerminalLines(createIntroLines(definition));
     setActiveAlert(toActiveAlert(definition));
     lastAlertCommandRef.current = commandsExecuted;
+    playAlertSfx();
+  }
+
+  function playAlertSfx() {
+    if (!alertSoundsEnabled) return;
+    const pool = alertAudioPoolRef.current;
+    if (!pool.length) return;
+    const index = Math.floor(getRandom() * pool.length);
+    const audio = pool[index];
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.play().catch(() => {
+      // Autoplay restrictions may block playback until user interacts.
+    });
   }
 
   function handleSubmit() {
@@ -290,4 +331,22 @@ export default function TerminalWindow() {
       </div>
     </div>
   );
+}
+
+function useStableRandom() {
+  const [generator] = useState(() => {
+    const seed = (crypto?.getRandomValues?.(new Uint32Array(1))[0] ?? 1) | 1;
+    return createMulberry32(seed);
+  });
+
+  return useCallback(() => generator(), [generator]);
+}
+
+function createMulberry32(seed: number) {
+  return () => {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }

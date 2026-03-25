@@ -7,6 +7,8 @@ import {
   RotateCcw,
   ChevronUp,
   ClipboardList,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import { useGameUIStore } from "@/store/useGameUIStore";
@@ -28,6 +30,12 @@ export default function Taskbar() {
   );
   const objectivePanelVisible = useGameUIStore(
     (state) => state.objectivePanelVisible,
+  );
+  const alertSoundsEnabled = useGameUIStore(
+    (state) => state.alertSoundsEnabled,
+  );
+  const toggleAlertSounds = useGameUIStore(
+    (state) => state.toggleAlertSounds,
   );
 
   useEffect(() => {
@@ -105,6 +113,24 @@ export default function Taskbar() {
                 Sistema
               </span>
             </div>
+            <button
+              onClick={toggleAlertSounds}
+              className="mb-1 w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+            >
+              {alertSoundsEnabled ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )}
+              <div className="flex flex-col items-start text-left">
+                <span className="font-medium">
+                  Sonidos de virus
+                </span>
+                <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
+                  {alertSoundsEnabled ? "Activados" : "Silenciados"}
+                </span>
+              </div>
+            </button>
             <button
               onClick={() => {
                 const confirmed = window.confirm(

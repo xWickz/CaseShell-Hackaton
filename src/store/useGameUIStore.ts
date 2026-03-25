@@ -19,6 +19,7 @@ type GameUIState = {
   iconPositions: Record<string, { x: number; y: number }>;
   objectivePanelVisible: boolean;
   objectivePanelCollapsed: boolean;
+  alertSoundsEnabled: boolean;
 
   closeBriefing: () => void;
   completeOnboarding: () => void;
@@ -30,6 +31,8 @@ type GameUIState = {
   closeObjectivePanel: () => void;
   toggleObjectivePanelCollapsed: () => void;
   setObjectivePanelCollapsed: (collapsed: boolean) => void;
+  setAlertSoundsEnabled: (enabled: boolean) => void;
+  toggleAlertSounds: () => void;
 
   openWindow: (
     window: Omit<WindowInstance, "zIndex" | "position" | "size"> & {
@@ -65,6 +68,7 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   iconPositions: {},
   objectivePanelVisible: true,
   objectivePanelCollapsed: false,
+  alertSoundsEnabled: true,
 
   closeBriefing: () => set({ briefingOpen: false }),
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
@@ -99,6 +103,9 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
     })),
   setObjectivePanelCollapsed: (collapsed) =>
     set({ objectivePanelCollapsed: collapsed }),
+  setAlertSoundsEnabled: (enabled) => set({ alertSoundsEnabled: enabled }),
+  toggleAlertSounds: () =>
+    set((state) => ({ alertSoundsEnabled: !state.alertSoundsEnabled })),
 
   openWindow: (window) => {
     const { openWindows, zCounter } = get();
