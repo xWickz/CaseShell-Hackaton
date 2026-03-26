@@ -13,6 +13,8 @@ import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { DesktopItem, Briefing, Difficulty } from "@/types/game";
 import VictoryModal from "@/components/game/modals/VictoryModal";
 import OnboardingOverlay from "@/components/game/modals/OnboardingOverlay";
+import ExitModal from "@/components/game/modals/ExitModal";
+import ResetModal from "@/components/game/modals/ResetModal";
 import Link from "next/link";
 import ObjectiveTracker from "@/components/game/desktop/ObjectiveTracker";
 import OpsChatWindow from "@/components/game/chat/OpsChatWindow";
@@ -106,15 +108,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [openWindow]);
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
-
   if (!isMounted) {
     return (
       <main
@@ -180,6 +173,8 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
 
       <BriefingModal briefing={briefing} />
       <VictoryModal />
+      <ExitModal />
+      <ResetModal />
       {!hasSeenOnboarding && (
         <OnboardingOverlay onDismiss={completeOnboarding} />
       )}

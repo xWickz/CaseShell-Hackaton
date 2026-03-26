@@ -87,8 +87,10 @@ export default function Footer() {
             className="text-zinc-400 hover:text-white transition-colors"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Abrir el repositorio de CaseShell en GitHub"
           >
             <GitHub className="w-8 h-8 lg:w-6 lg:h-6" />
+            <span className="sr-only">Repositorio de CaseShell en GitHub</span>
           </a>
         </div>
       </div>
@@ -106,7 +108,7 @@ export default function Footer() {
           />
           <ContributorAvatar
             name="emecarrellan"
-            src="https://avatars.githubusercontent.com/u/259842543?v=4"
+            src="https://avatars.githubusercontent.com/u/105559539?v=4"
           />
         </section>
       </div>

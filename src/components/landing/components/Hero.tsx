@@ -3,7 +3,6 @@
 import GlowButton from "@/components/game/ui/glowingButton";
 import { CanvasTxt } from "@/components/landing/CanvasText";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 
 const MatrixRain = dynamic(
   () =>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { difficulties } from "@/data/mock/difficulties";
 import Navbar from "@/components/game/ui/navbar";
 import Footer from "@/components/game/ui/footer";
+import PendingSessionBanner from "@/components/game/ui/PendingSessionBanner";
 
 export default function GameSelectPage() {
   const difficultyStyles: Record<
@@ -41,6 +42,9 @@ export default function GameSelectPage() {
               técnicos únicos en la terminal.
             </p>
           </section>
+          <div className="mb-16">
+            <PendingSessionBanner />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
             {difficulties.map((diff) => {
               const styles = difficultyStyles[diff.id] || difficultyStyles.easy;

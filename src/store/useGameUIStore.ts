@@ -20,6 +20,8 @@ type GameUIState = {
   objectivePanelVisible: boolean;
   objectivePanelCollapsed: boolean;
   alertSoundsEnabled: boolean;
+  exitModalOpen: boolean;
+  resetModalOpen: boolean;
 
   closeBriefing: () => void;
   completeOnboarding: () => void;
@@ -33,6 +35,10 @@ type GameUIState = {
   setObjectivePanelCollapsed: (collapsed: boolean) => void;
   setAlertSoundsEnabled: (enabled: boolean) => void;
   toggleAlertSounds: () => void;
+  openExitModal: () => void;
+  closeExitModal: () => void;
+  openResetModal: () => void;
+  closeResetModal: () => void;
 
   openWindow: (
     window: Omit<WindowInstance, "zIndex" | "position" | "size"> & {
@@ -69,6 +75,8 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   objectivePanelVisible: true,
   objectivePanelCollapsed: false,
   alertSoundsEnabled: true,
+  exitModalOpen: false,
+  resetModalOpen: false,
 
   closeBriefing: () => set({ briefingOpen: false }),
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
@@ -106,6 +114,10 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   setAlertSoundsEnabled: (enabled) => set({ alertSoundsEnabled: enabled }),
   toggleAlertSounds: () =>
     set((state) => ({ alertSoundsEnabled: !state.alertSoundsEnabled })),
+  openExitModal: () => set({ exitModalOpen: true }),
+  closeExitModal: () => set({ exitModalOpen: false }),
+  openResetModal: () => set({ resetModalOpen: true }),
+  closeResetModal: () => set({ resetModalOpen: false }),
 
   openWindow: (window) => {
     const { openWindows, zCounter } = get();

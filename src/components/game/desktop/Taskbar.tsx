@@ -20,8 +20,6 @@ export default function Taskbar() {
 
   const commandStats = useGameSessionStore((state) => state.commandStats);
   const startTime = useGameSessionStore((state) => state.startTime);
-  const resetSession = useGameSessionStore((state) => state.resetSession);
-
   const cycleWallpaperTheme = useGameUIStore(
     (state) => state.cycleWallpaperTheme,
   );
@@ -37,6 +35,8 @@ export default function Taskbar() {
   const toggleAlertSounds = useGameUIStore(
     (state) => state.toggleAlertSounds,
   );
+  const openExitModal = useGameUIStore((state) => state.openExitModal);
+  const openResetModal = useGameUIStore((state) => state.openResetModal);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -133,13 +133,8 @@ export default function Taskbar() {
             </button>
             <button
               onClick={() => {
-                const confirmed = window.confirm(
-                  "¿Estás seguro de reiniciar el caso? Perderás todo tu progreso actual.",
-                );
-                if (confirmed) {
-                  resetSession();
-                  window.location.reload();
-                }
+                setIsStartMenuOpen(false);
+                openResetModal();
               }}
               className="w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
             >
@@ -148,12 +143,8 @@ export default function Taskbar() {
             </button>
             <button
               onClick={() => {
-                const confirmed = window.confirm(
-                  "¿Volver al menú principal? Tu progreso lógico se ha guardado.",
-                );
-                if (confirmed) {
-                  window.location.href = "/game";
-                }
+                setIsStartMenuOpen(false);
+                openExitModal();
               }}
               className="w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors mt-1"
             >

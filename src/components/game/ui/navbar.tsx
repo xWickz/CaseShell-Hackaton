@@ -110,6 +110,9 @@ function NavbarContent() {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="inline-flex items-center p-2 text-gray-400 rounded-lg md:hidden hover:bg-white/10 focus:outline-none"
+            aria-label={isOpen ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
+            aria-expanded={isOpen}
+            aria-controls="primary-navigation"
           >
             <svg
               className="w-6 h-6"
@@ -138,7 +141,10 @@ function NavbarContent() {
       </div>
 
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-black border-b border-white/10 md:hidden flex flex-col p-4 space-y-4 shadow-2xl">
+        <div
+          id="primary-navigation"
+          className="absolute top-16 left-0 w-full bg-black border-b border-white/10 md:hidden flex flex-col p-4 space-y-4 shadow-2xl"
+        >
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
