@@ -48,6 +48,9 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const toggleObjectivePanelCollapsed = useGameUIStore(
     (state) => state.toggleObjectivePanelCollapsed,
   );
+  const crtOverlayEnabled = useGameUIStore(
+    (state) => state.crtOverlayEnabled,
+  );
 
   const initializeSession = useGameSessionStore(
     (state) => state.initializeSession,
@@ -195,7 +198,9 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         </div>
       )}
 
-      <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay"></div>
+      {crtOverlayEnabled && (
+        <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay"></div>
+      )}
 
       {/* Mobile Blocker Overlay */}
       <div className="md:hidden fixed inset-0 z-10000 bg-zinc-950 flex flex-col items-center justify-center p-8 text-center font-mono">

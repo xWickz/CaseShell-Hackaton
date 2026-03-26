@@ -22,6 +22,7 @@ type GameUIState = {
   alertSoundsEnabled: boolean;
   exitModalOpen: boolean;
   resetModalOpen: boolean;
+  crtOverlayEnabled: boolean;
 
   closeBriefing: () => void;
   completeOnboarding: () => void;
@@ -39,6 +40,8 @@ type GameUIState = {
   closeExitModal: () => void;
   openResetModal: () => void;
   closeResetModal: () => void;
+  setCrtOverlayEnabled: (enabled: boolean) => void;
+  toggleCrtOverlay: () => void;
 
   openWindow: (
     window: Omit<WindowInstance, "zIndex" | "position" | "size"> & {
@@ -77,6 +80,7 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   alertSoundsEnabled: true,
   exitModalOpen: false,
   resetModalOpen: false,
+  crtOverlayEnabled: true,
 
   closeBriefing: () => set({ briefingOpen: false }),
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
@@ -118,6 +122,9 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   closeExitModal: () => set({ exitModalOpen: false }),
   openResetModal: () => set({ resetModalOpen: true }),
   closeResetModal: () => set({ resetModalOpen: false }),
+  setCrtOverlayEnabled: (enabled) => set({ crtOverlayEnabled: enabled }),
+  toggleCrtOverlay: () =>
+    set((state) => ({ crtOverlayEnabled: !state.crtOverlayEnabled })),
 
   openWindow: (window) => {
     const { openWindows, zCounter } = get();

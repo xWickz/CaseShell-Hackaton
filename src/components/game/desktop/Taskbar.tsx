@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Volume2,
   VolumeX,
+  Monitor,
 } from "lucide-react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import { useGameUIStore } from "@/store/useGameUIStore";
@@ -32,11 +33,11 @@ export default function Taskbar() {
   const alertSoundsEnabled = useGameUIStore(
     (state) => state.alertSoundsEnabled,
   );
-  const toggleAlertSounds = useGameUIStore(
-    (state) => state.toggleAlertSounds,
-  );
+  const toggleAlertSounds = useGameUIStore((state) => state.toggleAlertSounds);
   const openExitModal = useGameUIStore((state) => state.openExitModal);
   const openResetModal = useGameUIStore((state) => state.openResetModal);
+  const crtOverlayEnabled = useGameUIStore((state) => state.crtOverlayEnabled);
+  const toggleCrtOverlay = useGameUIStore((state) => state.toggleCrtOverlay);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -93,7 +94,6 @@ export default function Taskbar() {
   return (
     <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
       <div className="flex items-center gap-2 relative" ref={startMenuRef}>
-        {/* Start Menu Button */}
         <button
           type="button"
           onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
@@ -105,7 +105,6 @@ export default function Taskbar() {
           />
         </button>
 
-        {/* Start Menu Dropdown */}
         {isStartMenuOpen && (
           <div className="absolute bottom-[calc(100%+1rem)] left-0 w-64 rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-2xl backdrop-blur-xl animate-scale-in">
             <div className="mb-2 px-3 py-2 border-b border-white/5">
@@ -123,11 +122,21 @@ export default function Taskbar() {
                 <VolumeX className="h-4 w-4" />
               )}
               <div className="flex flex-col items-start text-left">
-                <span className="font-medium">
-                  Sonidos de virus
-                </span>
+                <span className="font-medium">Sonidos de virus</span>
                 <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
                   {alertSoundsEnabled ? "Activados" : "Silenciados"}
+                </span>
+              </div>
+            </button>
+            <button
+              onClick={toggleCrtOverlay}
+              className="mb-1 w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+            >
+              <Monitor className="h-4 w-4" />
+              <div className="flex flex-col items-start text-left">
+                <span className="font-medium">Filtro CRT</span>
+                <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
+                  {crtOverlayEnabled ? "Activo" : "Desactivado"}
                 </span>
               </div>
             </button>
@@ -168,10 +177,7 @@ export default function Taskbar() {
           aria-label="Mostrar panel de objetivos"
           className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${objectivePanelVisible ? "bg-emerald-500/15 text-emerald-100" : "bg-white/10 text-white/80 hover:bg-white/20"}`}
         >
-          <ClipboardList className="h-4 w-4" />
-          <span className="font-semibold tracking-wide uppercase text-[0.65rem]">
-            Objetivos
-          </span>
+          <ClipboardList className="h-5 w-5" />
         </button>
       </div>
 
