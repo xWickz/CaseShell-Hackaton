@@ -27,15 +27,15 @@ export default function About() {
               </p>
             </div>
             <div className="relative group w-full max-w-2xl mx-auto">
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm shadow-2xl">
+              <div className="relative overflow-hidden rounded-md border border-white/10 bg-black/40 backdrop-blur-sm shadow-2xl">
                 <Image
                   src="/demogif.avif"
                   width={700}
-                  height={450}
+                  height={550}
                   alt="Gameplay CaseShell"
                   unoptimized
                   loading="eager"
-                  className="w-full h-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                  className="w-full h-auto"
                 />
               </div>
             </div>
