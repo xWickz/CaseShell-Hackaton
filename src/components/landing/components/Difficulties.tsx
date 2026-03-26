@@ -1,6 +1,3 @@
-import Link from "next/link";
-
-// 1. Definición de los datos para que el map funcione
 const difficulties = [
   {
     id: "easy",
@@ -35,18 +32,17 @@ const difficultyStyles = {
     text: "text-emerald-400",
   },
   medium: {
-    border: "hover:border-orange-500/50",
-    bg: "hover:bg-orange-500/5",
-    text: "text-orange-400",
+    border: "hover:border-yellow-500/50",
+    bg: "hover:bg-yellow-500/5",
+    text: "text-yellow-400",
   },
   hard: {
-    border: "hover:border-red-500/50",
-    bg: "hover:bg-red-500/5",
-    text: "text-red-400",
+    border: "hover:border-red-600/50",
+    bg: "hover:bg-red-600/5",
+    text: "text-red-500",
   },
 };
 
-// Sub-componente para las métricas
 const Metric = ({
   label,
   value,

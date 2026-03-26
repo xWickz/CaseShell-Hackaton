@@ -75,7 +75,7 @@ export const TerminalMockup = () => {
         <div className="w-3 h-3 rounded-full bg-orange-400/80"></div>
         <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
         <span className="text-slate-500 text-xs flex-1 text-center pr-10">
-          CaseShell Terminal v0.1
+          Terminal
         </span>
       </div>
 
@@ -90,8 +90,8 @@ export const TerminalMockup = () => {
               {!prefersReducedMotion &&
                 isLastLine &&
                 currentLineIndex === terminalText.length - 1 && (
-                <span className="w-2 h-4 bg-emerald-400 animate-pulse mt-0.5" />
-              )}
+                  <span className="w-2 h-4 bg-emerald-400 animate-pulse mt-0.5" />
+                )}
             </p>
           );
         })}

@@ -1,8 +1,8 @@
 "use client";
 
-import GlowButton from "@/components/game/ui/glowingButton";
 import { CanvasTxt } from "@/components/landing/CanvasText";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const MatrixRain = dynamic(
   () =>
@@ -56,23 +56,29 @@ export default function Hero() {
           </div>
 
           <span className="flex items-center tracking-tighter">
-            <h1 className="text-2xl font-bold md:text-4xl lg:text-6xl text-white">
+            <h1 className="text-7xl font-bold md:text-4xl lg:text-6xl text-white">
               Case
             </h1>
             <CanvasTxt
               text="Shell"
-              className="text-2xl font-bold md:text-4xl lg:text-6xl"
+              className="text-7xl font-bold md:text-4xl lg:text-6xl"
             />
           </span>
 
-          <p className="text-base md:text-lg text-slate-400 max-w-md text-center lg:text-justify">
+          <p className="text-base md:text-lg text-slate-400 max-w-75 lg:max-w-md text-center lg:text-justify">
             <strong className="text-slate-300">Investiga</strong> incidentes
             técnicos dentro de un entorno virtual, explora archivos, usa la{" "}
             <strong className="text-slate-300">terminal</strong> y resuelve el{" "}
             <strong className="text-slate-300">caso</strong> como si estuvieras
             dentro del sistema.
           </p>
-          <GlowButton href="/game">Jugar ahora</GlowButton>
+          <Link
+            href="/game"
+            type="button"
+            className="bg-red-600 hover:bg-red-700 text-white text-md md:text-md font-semibold px-8 py-2 rounded-md transition-all active:scale-95 shadow-[0_0_15px_rgba(220,38,38,0.3)] font-sans border-2 border-red-500 hover:border-red-600"
+          >
+            Jugar ahora
+          </Link>
         </section>
 
         <aside className="relative hidden shrink-0 lg:block w-full max-w-137.5 z-10">
