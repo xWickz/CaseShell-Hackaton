@@ -45,7 +45,7 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 
 ## 📸 Capturas & GIFs
 
-![GIF](./public/demogif.avif)
+![GIF](./public/demo_gif_02.gif)
 
 ![CAP 1](https://i.imgur.com/5ro0Kmv.png)
 ![CAP 2](https://i.imgur.com/ytcD8Wk.png)
