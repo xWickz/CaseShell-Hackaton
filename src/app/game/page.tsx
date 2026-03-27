@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { difficulties } from "@/data/mock/difficulties";
-import Navbar from "@/components/game/ui/navbar";
-import Footer from "@/components/game/ui/footer";
+import Navbar from "@/components/landing/components/Navbar";
+import Footer from "@/components/landing/components/Footer";
 import PendingSessionBanner from "@/components/game/ui/PendingSessionBanner";
 
 export default function GameSelectPage() {

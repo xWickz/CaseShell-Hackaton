@@ -29,7 +29,7 @@ export default function About() {
             <div className="relative group w-full max-w-2xl mx-auto">
               <div className="relative overflow-hidden rounded-md border border-white/10 bg-black/40 backdrop-blur-sm shadow-2xl">
                 <Image
-                  src="/demogif.avif"
+                  src="/demo_gif_02.gif"
                   width={700}
                   height={550}
                   alt="Gameplay CaseShell"
