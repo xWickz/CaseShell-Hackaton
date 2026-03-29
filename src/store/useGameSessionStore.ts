@@ -83,9 +83,9 @@ const CASE_CODES: Record<Difficulty, string> = {
 };
 
 const DIFFICULTY_TIME_LIMITS: Record<Difficulty, number> = {
-  easy: 8 * 60 * 1000,
-  medium: 5 * 60 * 1000,
-  hard: 3 * 60 * 1000,
+  easy: 30 * 60 * 1000,
+  medium: 20 * 60 * 1000,
+  hard: 10 * 60 * 1000,
 };
 
 const MAX_COMMAND_HISTORY = 50;
