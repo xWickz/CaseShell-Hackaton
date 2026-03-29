@@ -6,7 +6,7 @@ Gracias por las sugerencias!
 - ~~Tooltip de Tiempo y Precisión + Cuadre~~
 - Scroll en CubePath OPS Chat
 - ~~Al terminar el nivel, botón de ir al siguiente~~
-- Auto-completado terminal comandos básicos
+- ~~Auto-completado terminal comandos básicos~~
 - Maneras de fallar
 - ~~Objetivos de Caso mayor dopamina (microinteracciones)~~
 - Primera vez sonido de virus modal indicando que se puede apagar

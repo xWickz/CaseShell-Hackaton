@@ -14,6 +14,7 @@ import {
   getRandomAlert,
   toActiveAlert,
 } from "@/data/game/random-alerts";
+import { getTerminalCommandsForDifficulty } from "@/lib/game/terminal-commands";
 
 const ALERT_PROBABILITY = 0.25;
 const MIN_COMMANDS_BETWEEN_ALERTS = 3;
@@ -191,6 +192,39 @@ export default function TerminalWindow() {
 
   const prompt = useMemo(() => "agent@cubepath:~$", []);
 
+  const availableCommands = useMemo(() => {
+    const baseCommands = getTerminalCommandsForDifficulty(currentDifficulty);
+
+    const historyScore = new Map<string, number>();
+    commandHistory.forEach((cmd, index) => {
+      historyScore.set(cmd.toLowerCase(), index + 1);
+    });
+
+    return [...baseCommands].sort((a, b) => {
+      const scoreA = historyScore.get(a.toLowerCase()) ?? 0;
+      const scoreB = historyScore.get(b.toLowerCase()) ?? 0;
+      return scoreB - scoreA || a.localeCompare(b);
+    });
+  }, [currentDifficulty, commandHistory]);
+
+  const normalizedInput = currentInput.trim().toLowerCase();
+
+  const suggestions = useMemo(() => {
+    if (!normalizedInput) return [];
+
+    return availableCommands.filter((command) =>
+      command.toLowerCase().startsWith(normalizedInput),
+    );
+  }, [availableCommands, normalizedInput]);
+
+  const topSuggestion = suggestions[0] ?? null;
+
+  const ghostText = useMemo(() => {
+    if (!topSuggestion) return "";
+    if (topSuggestion.toLowerCase() === normalizedInput) return "";
+    return topSuggestion;
+  }, [topSuggestion, normalizedInput]);
+
   function resetHistoryNavigation() {
     historyIndexRef.current = null;
     draftInputRef.current = "";
@@ -222,6 +256,11 @@ export default function TerminalWindow() {
       historyIndexRef.current = null;
       setCurrentInput(draftInputRef.current);
     }
+  }
+
+  function applyAutocomplete() {
+    if (!suggestions.length) return;
+    setCurrentInput(topSuggestion ?? currentInput);
   }
 
   function maybeTriggerRandomAlert(commandsExecuted: number) {
@@ -369,52 +408,94 @@ export default function TerminalWindow() {
         </div>
       </div>
 
-      <div className="mt-3 flex min-w-0 items-center gap-2 rounded-md border border-green-500/20 bg-black/70 px-3 py-2">
-        <span className="shrink-0 text-cyan-300">{prompt}</span>
-        <input
-          ref={inputRef}
-          value={currentInput}
-          onChange={(e) => {
-            if (historyIndexRef.current !== null) {
-              resetHistoryNavigation();
-            }
-            setCurrentInput(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (isInputDisabled) return;
+      <div className="relative mt-3 min-w-0 rounded-md border border-green-500/20 bg-black/70 px-3 py-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="shrink-0 text-cyan-300">{prompt}</span>
 
-            if (e.key === "ArrowUp") {
-              e.preventDefault();
-              navigateHistory("up");
-              return;
-            }
+          <div className="relative min-w-0 w-full">
+            {!isInputDisabled && ghostText ? (
+              <div className="pointer-events-none absolute inset-0 overflow-hidden whitespace-nowrap text-green-700">
+                <span className="invisible">{currentInput}</span>
+                <span>{ghostText.slice(currentInput.length)}</span>
+              </div>
+            ) : null}
 
-            if (e.key === "ArrowDown") {
-              e.preventDefault();
-              navigateHistory("down");
-              return;
-            }
+            <input
+              ref={inputRef}
+              value={currentInput}
+              onChange={(e) => {
+                if (historyIndexRef.current !== null) {
+                  resetHistoryNavigation();
+                }
+                setCurrentInput(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (isInputDisabled) return;
 
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
-          disabled={isInputDisabled}
-          className="min-w-0 w-full bg-transparent text-green-300 outline-none placeholder:text-green-700 disabled:cursor-not-allowed disabled:text-green-700"
-          placeholder={
-            caseState.progress.completed
-              ? "Caso completado."
-              : hasTimedOut
-                ? "Tiempo agotado. Caso fallido."
-                : isPaused
-                  ? "Partida pausada. Reanudando..."
-                  : "Escribe un comando..."
-          }
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-        />
+                if (e.key === "Tab") {
+                  if (suggestions.length > 0) {
+                    e.preventDefault();
+                    applyAutocomplete();
+                  }
+                  return;
+                }
+
+                if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  navigateHistory("up");
+                  return;
+                }
+
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  navigateHistory("down");
+                  return;
+                }
+
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+              disabled={isInputDisabled}
+              className="relative z-10 min-w-0 w-full bg-transparent text-green-300 outline-none placeholder:text-green-700 disabled:cursor-not-allowed disabled:text-green-700"
+              placeholder={
+                caseState.progress.completed
+                  ? "Caso completado."
+                  : hasTimedOut
+                    ? "Tiempo agotado. Caso fallido."
+                    : isPaused
+                      ? "Partida pausada. Reanudando..."
+                      : "Escribe un comando..."
+              }
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+          </div>
+        </div>
+
+        {/*  {!isInputDisabled && suggestions.length > 1 && currentInput.trim() ? (
+          <div className="mt-2 rounded-xl border border-green-500/20 bg-black/90 p-2">
+            <p className="mb-1 text-[0.65rem] uppercase tracking-wider text-green-700">
+              Sugerencias
+            </p>
+            <ul className="space-y-1">
+              {suggestions.slice(0, 5).map((suggestion) => (
+                <li
+                  key={suggestion}
+                  className={`rounded-md px-2 py-1 ${
+                    suggestion === topSuggestion
+                      ? "bg-green-500/10 text-green-200"
+                      : "text-green-400/80"
+                  }`}
+                >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null} */}
       </div>
     </div>
   );
