@@ -147,6 +147,7 @@ export function executeEasyCommand(
             wifiFixed: true,
           },
         },
+        completedObjectiveKey: "wifiFixed",
       };
 
     case "fix firewall":
@@ -180,6 +181,7 @@ export function executeEasyCommand(
             firewallFixed: true,
           },
         },
+        completedObjectiveKey: "firewallFixed",
       };
 
     case "kill malware":
@@ -210,6 +212,7 @@ export function executeEasyCommand(
             malwareKilled: true,
           },
         },
+        completedObjectiveKey: "malwareKilled",
       };
 
     case "status": {

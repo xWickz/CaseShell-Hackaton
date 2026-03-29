@@ -23,6 +23,36 @@ const ALERT_SFX_FILES = [
   "/game/audio/audio3.mp3",
 ] as const;
 
+const REQUIRED_PROGRESS_KEYS = {
+  easy: ["wifiFixed", "firewallFixed", "malwareKilled"],
+  medium: [
+    "wifiFixed",
+    "firewallFixed",
+    "malwareKilled",
+    "dnsDiagnosticsComplete",
+    "overrideValidated",
+    "dnsFixed",
+    "servicesVerified",
+    "servicesRestarted",
+    "incidentReportFiled",
+  ],
+  hard: [
+    "wifiFixed",
+    "firewallFixed",
+    "malwareKilled",
+    "dnsDiagnosticsComplete",
+    "overrideValidated",
+    "dnsFixed",
+    "servicesVerified",
+    "servicesRestarted",
+    "perimeterScanComplete",
+    "watchdogDeployed",
+    "switchAuditComplete",
+    "switchPortEnabled",
+    "incidentReportFiled",
+  ],
+} as const;
+
 export default function TerminalWindow() {
   const terminalHistory = useGameSessionStore((state) => state.terminalHistory);
   const currentInput = useGameSessionStore((state) => state.currentInput);
@@ -51,6 +81,10 @@ export default function TerminalWindow() {
   const clearActiveAlert = useGameSessionStore(
     (state) => state.clearActiveAlert,
   );
+  const markObjectiveCompleted = useGameSessionStore(
+    (state) => state.markObjectiveCompleted,
+  );
+
   const alertSoundsEnabled = useGameUIStore(
     (state) => state.alertSoundsEnabled,
   );
@@ -63,22 +97,29 @@ export default function TerminalWindow() {
   const draftInputRef = useRef("");
   const lastAlertCommandRef = useRef(0);
   const alertAudioPoolRef = useRef<HTMLAudioElement[]>([]);
-  const getRandom = useStableRandom();
+  const submitHintShownRef = useRef(false);
 
+  const getRandom = useStableRandom();
   const { playOutcome, playCompletion } = useTerminalAudio();
 
   useEffect(() => {
+    if (!caseState.progress.completed && !hasTimedOut && !isPaused) {
+      startSession();
+    }
+
     inputRef.current?.focus();
-  }, []);
+  }, [startSession, caseState.progress.completed, hasTimedOut, isPaused]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
     const pool = ALERT_SFX_FILES.map((src) => {
       const audio = new Audio(src);
       audio.preload = "auto";
       audio.volume = 0.45;
       return audio;
     });
+
     alertAudioPoolRef.current = pool;
 
     return () => {
@@ -95,6 +136,7 @@ export default function TerminalWindow() {
   useEffect(() => {
     if (!commandLog.length) return;
     if (commandLog.length === lastCountRef.current) return;
+
     const lastCommand = commandLog[commandLog.length - 1];
     playOutcome(lastCommand.outcome);
     lastCountRef.current = commandLog.length;
@@ -117,6 +159,35 @@ export default function TerminalWindow() {
       completionRef.current = false;
     }
   }, [caseState.progress.completed, playCompletion]);
+
+  const allObjectivesCompleted = useMemo(() => {
+    const requiredKeys = REQUIRED_PROGRESS_KEYS[currentDifficulty];
+    return requiredKeys.every((key) => Boolean(caseState.progress[key]));
+  }, [currentDifficulty, caseState.progress]);
+
+  useEffect(() => {
+    if (!allObjectivesCompleted) {
+      submitHintShownRef.current = false;
+      return;
+    }
+
+    if (caseState.progress.completed || submitHintShownRef.current) return;
+
+    addTerminalLines([
+      {
+        id: crypto.randomUUID(),
+        type: "system",
+        text: "Todos los objetivos han sido completados.",
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "hint",
+        text: "Puedes finalizar el caso usando 'submit'.",
+      },
+    ]);
+
+    submitHintShownRef.current = true;
+  }, [allObjectivesCompleted, caseState.progress.completed, addTerminalLines]);
 
   const prompt = useMemo(() => "agent@cubepath:~$", []);
 
@@ -159,8 +230,9 @@ export default function TerminalWindow() {
     if (
       commandsExecuted - lastAlertCommandRef.current <
       MIN_COMMANDS_BETWEEN_ALERTS
-    )
+    ) {
       return;
+    }
     if (getRandom() > ALERT_PROBABILITY) return;
 
     const definition = getRandomAlert();
@@ -172,11 +244,14 @@ export default function TerminalWindow() {
 
   function playAlertSfx() {
     if (!alertSoundsEnabled) return;
+
     const pool = alertAudioPoolRef.current;
     if (!pool.length) return;
+
     const index = Math.floor(getRandom() * pool.length);
     const audio = pool[index];
     if (!audio) return;
+
     audio.currentTime = 0;
     audio.play().catch(() => {
       // Autoplay restrictions may block playback until user interacts.
@@ -187,8 +262,6 @@ export default function TerminalWindow() {
     const rawInput = currentInput.trim();
 
     if (!rawInput || caseState.progress.completed || hasTimedOut) return;
-
-    startSession();
 
     addTerminalLines([
       {
@@ -244,6 +317,10 @@ export default function TerminalWindow() {
 
     if (result.nextState) {
       setCaseState(result.nextState);
+    }
+
+    if (result.completedObjectiveKey) {
+      markObjectiveCompleted(result.completedObjectiveKey);
     }
 
     if (result.completed && !caseState.progress.completed) {

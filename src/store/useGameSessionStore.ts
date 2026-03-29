@@ -9,6 +9,7 @@ import type {
   ActiveTerminalAlert,
   AlertEffectState,
   AlertEffectId,
+  CaseProgress,
 } from "@/types/game-engine";
 import type { Difficulty } from "@/types/game";
 
@@ -39,6 +40,9 @@ type GameSessionState = {
   isPaused: boolean;
   pausedAt: number | null;
 
+  lastCompletedKey: keyof CaseProgress | null;
+  completionStreak: number;
+
   isVictoryOpen: boolean;
 
   activeAlert: ActiveTerminalAlert | null;
@@ -51,16 +55,23 @@ type GameSessionState = {
   initializeSession: (difficulty: Difficulty) => void;
   setCaseState: (updater: Partial<CaseState>) => void;
   discoverKnowledge: (key: keyof CaseKnowledge) => void;
+
   startSession: () => void;
   updateTimeRemaining: (now: number) => void;
   pauseSession: () => void;
   resumeSession: () => void;
+
+  markObjectiveCompleted: (key: keyof CaseProgress) => void;
+  clearLastCompletedKey: () => void;
+
   failSession: () => void;
   closeFailedModal: () => void;
   completeSession: () => void;
   resetSession: () => void;
   closeVictoryModal: () => void;
+
   logCommand: (input: string, outcome: CommandOutcome) => void;
+
   setActiveAlert: (alert: ActiveTerminalAlert) => void;
   clearActiveAlert: () => void;
 };
@@ -83,9 +94,9 @@ const CASE_CODES: Record<Difficulty, string> = {
 };
 
 const DIFFICULTY_TIME_LIMITS: Record<Difficulty, number> = {
-  easy: 30 * 60 * 1000,
-  medium: 20 * 60 * 1000,
-  hard: 10 * 60 * 1000,
+  easy: 8 * 60 * 1000,
+  medium: 5 * 60 * 1000,
+  hard: 3 * 60 * 1000,
 };
 
 const MAX_COMMAND_HISTORY = 50;
@@ -167,6 +178,9 @@ export const useGameSessionStore = create<GameSessionState>()(
       isPaused: false,
       pausedAt: null,
 
+      lastCompletedKey: null,
+      completionStreak: 0,
+
       isVictoryOpen: false,
 
       activeAlert: null,
@@ -193,6 +207,9 @@ export const useGameSessionStore = create<GameSessionState>()(
 
               isPaused: false,
               pausedAt: null,
+
+              lastCompletedKey: null,
+              completionStreak: 0,
 
               isVictoryOpen: false,
               commandLog: [],
@@ -337,7 +354,7 @@ export const useGameSessionStore = create<GameSessionState>()(
           }
 
           const now = Date.now();
-          const pauseDuration = Math.max(0, now - state.pausedAt);
+          const pauseDuration = now - state.pausedAt;
 
           return {
             isPaused: false,
@@ -346,6 +363,17 @@ export const useGameSessionStore = create<GameSessionState>()(
             timerEndsAt: state.timerEndsAt + pauseDuration,
           };
         }),
+
+      markObjectiveCompleted: (key) =>
+        set((state) => ({
+          lastCompletedKey: key,
+          completionStreak:
+            state.lastCompletedKey === key
+              ? state.completionStreak
+              : state.completionStreak + 1,
+        })),
+
+      clearLastCompletedKey: () => set({ lastCompletedKey: null }),
 
       failSession: () =>
         set((state) => {
@@ -406,6 +434,9 @@ export const useGameSessionStore = create<GameSessionState>()(
 
             isPaused: false,
             pausedAt: null,
+
+            lastCompletedKey: null,
+            completionStreak: 0,
 
             isVictoryOpen: false,
             commandLog: [],
@@ -472,6 +503,8 @@ export const useGameSessionStore = create<GameSessionState>()(
         isFailedOpen: state.isFailedOpen,
         isPaused: state.isPaused,
         pausedAt: state.pausedAt,
+        lastCompletedKey: state.lastCompletedKey,
+        completionStreak: state.completionStreak,
         isVictoryOpen: state.isVictoryOpen,
         activeAlert: state.activeAlert,
         alertEffectState: state.alertEffectState,

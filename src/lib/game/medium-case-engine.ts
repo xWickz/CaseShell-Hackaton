@@ -60,6 +60,7 @@ export function executeMediumCommand(
           line("- incident-template.txt"),
         ],
       };
+
     case "cat ops-note.txt":
       return {
         lines: [
@@ -243,6 +244,7 @@ export function executeMediumCommand(
             wifiFixed: true,
           },
         },
+        completedObjectiveKey: "wifiFixed",
       };
 
     case "fix firewall":
@@ -271,6 +273,7 @@ export function executeMediumCommand(
             firewallFixed: true,
           },
         },
+        completedObjectiveKey: "firewallFixed",
       };
 
     case "kill malware":
@@ -299,6 +302,7 @@ export function executeMediumCommand(
             malwareKilled: true,
           },
         },
+        completedObjectiveKey: "malwareKilled",
       };
 
     case "diag dns":
@@ -332,6 +336,7 @@ export function executeMediumCommand(
             dnsDiagnosticsComplete: true,
           },
         },
+        completedObjectiveKey: "dnsDiagnosticsComplete",
       };
 
     case "fix dns":
@@ -382,6 +387,7 @@ export function executeMediumCommand(
             dnsFixed: true,
           },
         },
+        completedObjectiveKey: "dnsFixed",
       };
 
     case "verify services":
@@ -426,6 +432,7 @@ export function executeMediumCommand(
             servicesVerified: true,
           },
         },
+        completedObjectiveKey: "servicesVerified",
       };
 
     case "restart services":
@@ -466,6 +473,7 @@ export function executeMediumCommand(
             servicesRestarted: true,
           },
         },
+        completedObjectiveKey: "servicesRestarted",
       };
 
     case "file report":
@@ -502,6 +510,7 @@ export function executeMediumCommand(
             incidentReportFiled: true,
           },
         },
+        completedObjectiveKey: "incidentReportFiled",
       };
 
     case "status": {
@@ -639,6 +648,7 @@ export function executeMediumCommand(
               overrideValidated: true,
             },
           },
+          completedObjectiveKey: "overrideValidated",
         };
       }
 

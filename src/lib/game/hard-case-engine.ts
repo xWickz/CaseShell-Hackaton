@@ -318,6 +318,7 @@ export function executeHardCommand(
             wifiFixed: true,
           },
         },
+        completedObjectiveKey: "wifiFixed",
       };
 
     case "fix firewall":
@@ -344,6 +345,7 @@ export function executeHardCommand(
             firewallFixed: true,
           },
         },
+        completedObjectiveKey: "firewallFixed",
       };
 
     case "kill malware":
@@ -370,6 +372,7 @@ export function executeHardCommand(
             malwareKilled: true,
           },
         },
+        completedObjectiveKey: "malwareKilled",
       };
 
     case "diag dns":
@@ -398,6 +401,7 @@ export function executeHardCommand(
             dnsDiagnosticsComplete: true,
           },
         },
+        completedObjectiveKey: "dnsDiagnosticsComplete",
       };
 
     case "fix dns":
@@ -454,6 +458,7 @@ export function executeHardCommand(
             dnsFixed: true,
           },
         },
+        completedObjectiveKey: "dnsFixed",
       };
 
     case "verify services":
@@ -498,6 +503,7 @@ export function executeHardCommand(
             servicesVerified: true,
           },
         },
+        completedObjectiveKey: "servicesVerified",
       };
 
     case "restart services":
@@ -537,6 +543,7 @@ export function executeHardCommand(
             servicesRestarted: true,
           },
         },
+        completedObjectiveKey: "servicesRestarted",
       };
 
     case "scan perimeter":
@@ -576,6 +583,7 @@ export function executeHardCommand(
             perimeterScanComplete: true,
           },
         },
+        completedObjectiveKey: "perimeterScanComplete",
       };
 
     case "audit switch":
@@ -615,6 +623,7 @@ export function executeHardCommand(
             switchAuditComplete: true,
           },
         },
+        completedObjectiveKey: "switchAuditComplete",
       };
 
     case "deploy watchdog":
@@ -654,6 +663,7 @@ export function executeHardCommand(
             watchdogDeployed: true,
           },
         },
+        completedObjectiveKey: "watchdogDeployed",
       };
 
     case "file report":
@@ -698,6 +708,7 @@ export function executeHardCommand(
             incidentReportFiled: true,
           },
         },
+        completedObjectiveKey: "incidentReportFiled",
       };
 
     case "enable port":
@@ -737,6 +748,7 @@ export function executeHardCommand(
             switchPortEnabled: true,
           },
         },
+        completedObjectiveKey: "switchPortEnabled",
       };
 
     case "status": {
@@ -885,6 +897,7 @@ export function executeHardCommand(
               overrideValidated: true,
             },
           },
+          completedObjectiveKey: "overrideValidated",
         };
       }
 

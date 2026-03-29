@@ -53,6 +53,7 @@ export type CommandExecutionResult = {
   lines: TerminalLine[];
   nextState?: DeepPartial<CaseState>;
   completed?: boolean;
+  completedObjectiveKey?: keyof CaseProgress;
 };
 
 type DeepPartial<T> = {

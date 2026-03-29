@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DesktopIcon from "@/components/game/desktop/DesktopIcon";
 import Taskbar from "@/components/game/desktop/Taskbar";
 import BriefingModal from "@/components/game/modals/BriefingModal";
@@ -15,11 +15,11 @@ import VictoryModal from "@/components/game/modals/VictoryModal";
 import OnboardingOverlay from "@/components/game/modals/OnboardingOverlay";
 import ExitModal from "@/components/game/modals/ExitModal";
 import ResetModal from "@/components/game/modals/ResetModal";
+import FailureModal from "@/components/game/modals/FailureModal";
+import GameTimerController from "@/components/game/system/GameTimerController";
 import Link from "next/link";
 import ObjectiveTracker from "@/components/game/desktop/ObjectiveTracker";
 import OpsChatWindow from "@/components/game/chat/OpsChatWindow";
-import FailureModal from "@/components/game/modals/FailureModal";
-import GameTimerController from "@/components/game/system/GameTimerController";
 
 type DesktopProps = {
   items: DesktopItem[];
@@ -29,6 +29,9 @@ type DesktopProps = {
 
 export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
+
+  const previousCompletedRef = useRef(false);
 
   const openWindows = useGameUIStore((state) => state.openWindows);
   const openWindow = useGameUIStore((state) => state.openWindow);
@@ -62,6 +65,9 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     (state) => state.alertEffectState,
   );
   const activeAlert = useGameSessionStore((state) => state.activeAlert);
+  const isCaseCompleted = useGameSessionStore(
+    (state) => state.caseState.progress.completed,
+  );
 
   const wallpaperClasses = useMemo(() => {
     switch (wallpaperTheme) {
@@ -111,6 +117,25 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [openWindow]);
 
+  useEffect(() => {
+    if (isCaseCompleted && !previousCompletedRef.current) {
+      setShowCompletionBanner(true);
+
+      const timeoutId = window.setTimeout(() => {
+        setShowCompletionBanner(false);
+      }, 2600);
+
+      previousCompletedRef.current = true;
+
+      return () => window.clearTimeout(timeoutId);
+    }
+
+    if (!isCaseCompleted) {
+      previousCompletedRef.current = false;
+      setShowCompletionBanner(false);
+    }
+  }, [isCaseCompleted]);
+
   if (!isMounted) {
     return (
       <main
@@ -123,8 +148,24 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     <main
       className={`relative h-screen w-full overflow-hidden bg-linear-to-br ${wallpaperClasses}`}
     >
+      <GameTimerController />
+
       {/* Wallpaper overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.15),transparent_30%)]" />
+
+      {/* Banner de objetivos completados */}
+      {showCompletionBanner && (
+        <div className="pointer-events-none absolute left-1/2 top-6 z-[1400] -translate-x-1/2 animate-in fade-in zoom-in-95 duration-300">
+          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/15 px-5 py-3 text-center shadow-[0_12px_40px_rgba(16,185,129,0.18)] backdrop-blur-xl">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-emerald-200/80">
+              Objetivos
+            </p>
+            <p className="mt-1 text-sm font-semibold text-white">
+              Todos los objetivos listos
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Desktop icons */}
       <div className="relative z-10 h-[calc(100vh-140px)] w-full">
@@ -174,19 +215,20 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         </div>
       )}
 
-      <GameTimerController />
       <BriefingModal briefing={briefing} />
       <VictoryModal />
       <FailureModal />
       <ExitModal />
       <ResetModal />
+
       {!hasSeenOnboarding && (
         <OnboardingOverlay onDismiss={completeOnboarding} />
       )}
+
       <Taskbar />
 
       {alertEffectState.screenObscured && (
-        <div className="pointer-events-none absolute inset-0 z-1500 flex flex-col items-center justify-center bg-black/70 text-center font-mono text-emerald-200 backdrop-blur-md">
+        <div className="pointer-events-none absolute inset-0 z-[1500] flex flex-col items-center justify-center bg-black/70 text-center font-mono text-emerald-200 backdrop-blur-md">
           <p className="text-xl font-semibold tracking-wider">Visor cegado</p>
           <p className="mt-2 max-w-sm text-sm text-emerald-100">
             {activeAlert?.reminder ??
@@ -201,13 +243,12 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       )}
 
       {crtOverlayEnabled && (
-        <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay"></div>
+        <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay" />
       )}
 
       {/* Mobile Blocker Overlay */}
-      <div className="md:hidden fixed inset-0 z-10000 bg-zinc-950 flex flex-col items-center justify-center p-8 text-center font-mono">
-        <div className="text-red-500 mb-4">
-          {/* Ícono de Computadora/Monitor */}
+      <div className="fixed inset-0 z-10000 flex flex-col items-center justify-center bg-zinc-950 p-8 text-center font-mono md:hidden">
+        <div className="mb-4 text-red-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="64"
@@ -224,15 +265,15 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
             <line x1="12" x2="12" y1="17" y2="21" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Acceso Denegado</h2>
-        <p className="text-zinc-400 mb-6 max-w-sm">
+        <h2 className="mb-2 text-2xl font-bold text-white">Acceso Denegado</h2>
+        <p className="mb-6 max-w-sm text-zinc-400">
           Este entorno de investigación requiere teclado físico y una pantalla
           amplia. Por favor, <strong>accede desde un ordenador</strong>.
         </p>
         <Link
           href="/"
           title="Volver al Inicio"
-          className="text-white text-md border border-white/30 px-6 py-2 rounded-full font-bold hover:bg-white/10 transition-colors"
+          className="rounded-full border border-white/30 px-6 py-2 text-md font-bold text-white transition-colors hover:bg-white/10"
         >
           Volver al Inicio
         </Link>
