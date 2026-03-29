@@ -64,6 +64,8 @@ export default function Taskbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isStartMenuOpen]);
 
+  const endTime = useGameSessionStore((state) => state.endTime);
+
   const { timeLabel, dateLabel, elapsedSeconds } = useMemo(() => {
     const timeLabel = now.toLocaleTimeString(undefined, {
       hour: "2-digit",
@@ -76,13 +78,14 @@ export default function Taskbar() {
       year: "numeric",
     });
 
+    const referenceTime = endTime ?? now.getTime();
+
     const elapsedSeconds = startTime
-      ? Math.max(0, Math.floor((now.getTime() - startTime) / 1000))
+      ? Math.max(0, Math.floor((referenceTime - startTime) / 1000))
       : 0;
 
     return { timeLabel, dateLabel, elapsedSeconds };
-  }, [now, startTime]);
-
+  }, [now, startTime, endTime]);
   const accuracyPercent = useMemo(() => {
     if (commandStats.total === 0) return null;
     return Math.round((commandStats.success / commandStats.total) * 100);
