@@ -18,6 +18,8 @@ import ResetModal from "@/components/game/modals/ResetModal";
 import Link from "next/link";
 import ObjectiveTracker from "@/components/game/desktop/ObjectiveTracker";
 import OpsChatWindow from "@/components/game/chat/OpsChatWindow";
+import FailureModal from "@/components/game/modals/FailureModal";
+import GameTimerController from "@/components/game/system/GameTimerController";
 
 type DesktopProps = {
   items: DesktopItem[];
@@ -48,9 +50,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const toggleObjectivePanelCollapsed = useGameUIStore(
     (state) => state.toggleObjectivePanelCollapsed,
   );
-  const crtOverlayEnabled = useGameUIStore(
-    (state) => state.crtOverlayEnabled,
-  );
+  const crtOverlayEnabled = useGameUIStore((state) => state.crtOverlayEnabled);
 
   const initializeSession = useGameSessionStore(
     (state) => state.initializeSession,
@@ -174,8 +174,10 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         </div>
       )}
 
+      <GameTimerController />
       <BriefingModal briefing={briefing} />
       <VictoryModal />
+      <FailureModal />
       <ExitModal />
       <ResetModal />
       {!hasSeenOnboarding && (
@@ -184,7 +186,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       <Taskbar />
 
       {alertEffectState.screenObscured && (
-        <div className="pointer-events-none absolute inset-0 z-[1500] flex flex-col items-center justify-center bg-black/70 text-center font-mono text-emerald-200 backdrop-blur-md">
+        <div className="pointer-events-none absolute inset-0 z-1500 flex flex-col items-center justify-center bg-black/70 text-center font-mono text-emerald-200 backdrop-blur-md">
           <p className="text-xl font-semibold tracking-wider">Visor cegado</p>
           <p className="mt-2 max-w-sm text-sm text-emerald-100">
             {activeAlert?.reminder ??

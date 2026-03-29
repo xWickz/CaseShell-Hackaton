@@ -21,6 +21,10 @@ export default function Taskbar() {
 
   const commandStats = useGameSessionStore((state) => state.commandStats);
   const startTime = useGameSessionStore((state) => state.startTime);
+  const timeLimitMs = useGameSessionStore((state) => state.timeLimitMs);
+  const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
+  const isPaused = useGameSessionStore((state) => state.isPaused);
+
   const cycleWallpaperTheme = useGameUIStore(
     (state) => state.cycleWallpaperTheme,
   );
@@ -90,6 +94,23 @@ export default function Taskbar() {
     if (minutes === 0) return `${seconds}s`;
     return `${minutes}m ${seconds}s`;
   };
+
+  const countdownLabel = useMemo(() => {
+    const totalSeconds = Math.max(0, Math.ceil(timeRemainingMs / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }, [timeRemainingMs]);
+
+  const timeLimitTone = useMemo<"default" | "warning" | "danger">(() => {
+    if (timeLimitMs <= 0) return "default";
+
+    const ratio = timeRemainingMs / timeLimitMs;
+
+    if (ratio <= 0.2) return "danger";
+    if (ratio <= 0.5) return "warning";
+    return "default";
+  }, [timeRemainingMs, timeLimitMs]);
 
   return (
     <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
@@ -185,6 +206,20 @@ export default function Taskbar() {
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Badge label="Tiempo" value={formatElapsed()} />
           <Badge
+            label="Límite"
+            value={countdownLabel}
+            tone={timeLimitTone}
+            title="Tiempo restante del caso según la dificultad actual. El cronómetro comienza con el primer comando ejecutado."
+          />
+          {isPaused && (
+            <Badge
+              label="Estado"
+              value="Pausado"
+              tone="warning"
+              title="La sesión quedó congelada al salir del juego. Se reanuda al volver."
+            />
+          )}
+          <Badge
             label="Precisión"
             value={accuracyPercent === null ? "—" : `${accuracyPercent}%`}
             tone={
@@ -192,6 +227,7 @@ export default function Taskbar() {
                 ? "warning"
                 : "default"
             }
+            title="Porcentaje de comandos exitosos sobre el total ejecutado."
           />
         </div>
       </div>
@@ -209,18 +245,22 @@ export default function Taskbar() {
 type BadgeProps = {
   label: string;
   value: string;
-  tone?: "default" | "warning";
+  tone?: "default" | "warning" | "danger";
+  title?: string;
 };
 
-function Badge({ label, value, tone = "default" }: BadgeProps) {
+function Badge({ label, value, tone = "default", title }: BadgeProps) {
   const toneClasses =
-    tone === "warning"
-      ? "border-amber-400/30 bg-amber-400/10 text-amber-200"
-      : "border-white/15 bg-white/5 text-white";
+    tone === "danger"
+      ? "border-red-400/30 bg-red-400/10 text-red-200"
+      : tone === "warning"
+        ? "border-amber-400/30 bg-amber-400/10 text-amber-200"
+        : "border-white/15 bg-white/5 text-white";
 
   return (
     <div
       className={`rounded-xl border px-3 py-1 text-[0.65rem] ${toneClasses}`}
+      title={title}
     >
       <span className="uppercase tracking-wider text-white/60">{label}</span>
       <span className="ml-2 font-semibold text-white">{value}</span>

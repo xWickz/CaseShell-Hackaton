@@ -30,6 +30,8 @@ export default function TerminalWindow() {
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
+  const hasTimedOut = useGameSessionStore((state) => state.hasTimedOut);
+  const isPaused = useGameSessionStore((state) => state.isPaused);
 
   const setCurrentInput = useGameSessionStore((state) => state.setCurrentInput);
   const addTerminalLines = useGameSessionStore(
@@ -66,12 +68,8 @@ export default function TerminalWindow() {
   const { playOutcome, playCompletion } = useTerminalAudio();
 
   useEffect(() => {
-    if (!caseState.progress.completed) {
-      startSession();
-    }
-
     inputRef.current?.focus();
-  }, [startSession, caseState.progress.completed]);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -157,6 +155,7 @@ export default function TerminalWindow() {
 
   function maybeTriggerRandomAlert(commandsExecuted: number) {
     if (activeAlert) return;
+    if (hasTimedOut) return;
     if (
       commandsExecuted - lastAlertCommandRef.current <
       MIN_COMMANDS_BETWEEN_ALERTS
@@ -187,7 +186,9 @@ export default function TerminalWindow() {
   function handleSubmit() {
     const rawInput = currentInput.trim();
 
-    if (!rawInput || caseState.progress.completed) return;
+    if (!rawInput || caseState.progress.completed || hasTimedOut) return;
+
+    startSession();
 
     addTerminalLines([
       {
@@ -257,6 +258,9 @@ export default function TerminalWindow() {
     maybeTriggerRandomAlert(commandLog.length + 1);
   }
 
+  const isInputDisabled =
+    caseState.progress.completed || hasTimedOut || isPaused;
+
   return (
     <div
       className="flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden bg-black/95 p-3 font-mono text-sm text-green-400"
@@ -300,6 +304,8 @@ export default function TerminalWindow() {
             setCurrentInput(e.target.value);
           }}
           onKeyDown={(e) => {
+            if (isInputDisabled) return;
+
             if (e.key === "ArrowUp") {
               e.preventDefault();
               navigateHistory("up");
@@ -317,12 +323,16 @@ export default function TerminalWindow() {
               handleSubmit();
             }
           }}
-          disabled={caseState.progress.completed}
+          disabled={isInputDisabled}
           className="min-w-0 w-full bg-transparent text-green-300 outline-none placeholder:text-green-700 disabled:cursor-not-allowed disabled:text-green-700"
           placeholder={
             caseState.progress.completed
               ? "Caso completado."
-              : "Escribe un comando..."
+              : hasTimedOut
+                ? "Tiempo agotado. Caso fallido."
+                : isPaused
+                  ? "Partida pausada. Reanudando..."
+                  : "Escribe un comando..."
           }
           autoCapitalize="off"
           autoCorrect="off"

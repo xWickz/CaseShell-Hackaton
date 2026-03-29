@@ -30,6 +30,15 @@ type GameSessionState = {
   startTime: number | null;
   endTime: number | null;
 
+  timeLimitMs: number;
+  timeRemainingMs: number;
+  timerEndsAt: number | null;
+  hasTimedOut: boolean;
+  isFailedOpen: boolean;
+
+  isPaused: boolean;
+  pausedAt: number | null;
+
   isVictoryOpen: boolean;
 
   activeAlert: ActiveTerminalAlert | null;
@@ -43,6 +52,11 @@ type GameSessionState = {
   setCaseState: (updater: Partial<CaseState>) => void;
   discoverKnowledge: (key: keyof CaseKnowledge) => void;
   startSession: () => void;
+  updateTimeRemaining: (now: number) => void;
+  pauseSession: () => void;
+  resumeSession: () => void;
+  failSession: () => void;
+  closeFailedModal: () => void;
   completeSession: () => void;
   resetSession: () => void;
   closeVictoryModal: () => void;
@@ -66,6 +80,12 @@ const CASE_CODES: Record<Difficulty, string> = {
   easy: "EASY-001-ACCESS-NOT-GRANTED",
   medium: "MED-002-DATA-LEAK",
   hard: "HARD-003-CRITICAL-COLLAPSE",
+};
+
+const DIFFICULTY_TIME_LIMITS: Record<Difficulty, number> = {
+  easy: 8 * 60 * 1000,
+  medium: 5 * 60 * 1000,
+  hard: 3 * 60 * 1000,
 };
 
 const MAX_COMMAND_HISTORY = 50;
@@ -138,6 +158,15 @@ export const useGameSessionStore = create<GameSessionState>()(
       startTime: null,
       endTime: null,
 
+      timeLimitMs: DIFFICULTY_TIME_LIMITS[DEFAULT_DIFFICULTY],
+      timeRemainingMs: DIFFICULTY_TIME_LIMITS[DEFAULT_DIFFICULTY],
+      timerEndsAt: null,
+      hasTimedOut: false,
+      isFailedOpen: false,
+
+      isPaused: false,
+      pausedAt: null,
+
       isVictoryOpen: false,
 
       activeAlert: null,
@@ -146,6 +175,8 @@ export const useGameSessionStore = create<GameSessionState>()(
       initializeSession: (difficulty) =>
         set((state) => {
           if (state.currentDifficulty !== difficulty) {
+            const nextTimeLimit = DIFFICULTY_TIME_LIMITS[difficulty];
+
             return {
               currentDifficulty: difficulty,
               terminalHistory: createInitialTerminalHistory(difficulty),
@@ -153,6 +184,16 @@ export const useGameSessionStore = create<GameSessionState>()(
               caseState: createInitialCaseState(),
               startTime: null,
               endTime: null,
+
+              timeLimitMs: nextTimeLimit,
+              timeRemainingMs: nextTimeLimit,
+              timerEndsAt: null,
+              hasTimedOut: false,
+              isFailedOpen: false,
+
+              isPaused: false,
+              pausedAt: null,
+
               isVictoryOpen: false,
               commandLog: [],
               commandHistory: [],
@@ -210,9 +251,122 @@ export const useGameSessionStore = create<GameSessionState>()(
         })),
 
       startSession: () =>
-        set((state) => ({
-          startTime: state.startTime ?? Date.now(),
-        })),
+        set((state) => {
+          if (
+            state.startTime ||
+            state.caseState.progress.completed ||
+            state.hasTimedOut
+          ) {
+            return {};
+          }
+
+          const now = Date.now();
+          return {
+            startTime: now,
+            timerEndsAt: now + state.timeLimitMs,
+            timeRemainingMs: state.timeLimitMs,
+            isPaused: false,
+            pausedAt: null,
+          };
+        }),
+
+      updateTimeRemaining: (now) =>
+        set((state) => {
+          if (
+            !state.startTime ||
+            !state.timerEndsAt ||
+            state.caseState.progress.completed ||
+            state.hasTimedOut ||
+            state.isPaused
+          ) {
+            return {};
+          }
+
+          const remaining = Math.max(0, state.timerEndsAt - now);
+
+          if (remaining <= 0) {
+            return {
+              timeRemainingMs: 0,
+              hasTimedOut: true,
+              isFailedOpen: true,
+              endTime: state.endTime ?? now,
+              activeAlert: null,
+              alertEffectState: createAlertEffectState(null),
+              isPaused: false,
+              pausedAt: null,
+            };
+          }
+
+          if (remaining === state.timeRemainingMs) {
+            return {};
+          }
+
+          return {
+            timeRemainingMs: remaining,
+          };
+        }),
+
+      pauseSession: () =>
+        set((state) => {
+          if (
+            !state.startTime ||
+            state.caseState.progress.completed ||
+            state.hasTimedOut ||
+            state.isPaused
+          ) {
+            return {};
+          }
+
+          return {
+            isPaused: true,
+            pausedAt: Date.now(),
+          };
+        }),
+
+      resumeSession: () =>
+        set((state) => {
+          if (
+            !state.isPaused ||
+            !state.pausedAt ||
+            !state.startTime ||
+            !state.timerEndsAt ||
+            state.caseState.progress.completed ||
+            state.hasTimedOut
+          ) {
+            return {};
+          }
+
+          const now = Date.now();
+          const pauseDuration = Math.max(0, now - state.pausedAt);
+
+          return {
+            isPaused: false,
+            pausedAt: null,
+            startTime: state.startTime + pauseDuration,
+            timerEndsAt: state.timerEndsAt + pauseDuration,
+          };
+        }),
+
+      failSession: () =>
+        set((state) => {
+          if (state.caseState.progress.completed || state.hasTimedOut)
+            return {};
+
+          const now = Date.now();
+
+          return {
+            timeRemainingMs: 0,
+            hasTimedOut: true,
+            isFailedOpen: true,
+            endTime: state.endTime ?? now,
+            activeAlert: null,
+            alertEffectState: createAlertEffectState(null),
+            isPaused: false,
+            pausedAt: null,
+          };
+        }),
+
+      closeFailedModal: () => set({ isFailedOpen: false }),
 
       completeSession: () =>
         set((state) => ({
@@ -225,24 +379,42 @@ export const useGameSessionStore = create<GameSessionState>()(
               completed: true,
             },
           },
+          activeAlert: null,
+          alertEffectState: createAlertEffectState(null),
+          isPaused: false,
+          pausedAt: null,
         })),
 
       resetSession: () =>
-        set((state) => ({
-          terminalHistory: createInitialTerminalHistory(
-            state.currentDifficulty,
-          ),
-          currentInput: "",
-          caseState: createInitialCaseState(),
-          startTime: null,
-          endTime: null,
-          isVictoryOpen: false,
-          commandLog: [],
-          commandHistory: [],
-          commandStats: { total: 0, success: 0, error: 0 },
-          activeAlert: null,
-          alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
-        })),
+        set((state) => {
+          const nextTimeLimit = DIFFICULTY_TIME_LIMITS[state.currentDifficulty];
+
+          return {
+            terminalHistory: createInitialTerminalHistory(
+              state.currentDifficulty,
+            ),
+            currentInput: "",
+            caseState: createInitialCaseState(),
+            startTime: null,
+            endTime: null,
+
+            timeLimitMs: nextTimeLimit,
+            timeRemainingMs: nextTimeLimit,
+            timerEndsAt: null,
+            hasTimedOut: false,
+            isFailedOpen: false,
+
+            isPaused: false,
+            pausedAt: null,
+
+            isVictoryOpen: false,
+            commandLog: [],
+            commandHistory: [],
+            commandStats: { total: 0, success: 0, error: 0 },
+            activeAlert: null,
+            alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
+          };
+        }),
 
       closeVictoryModal: () => set({ isVictoryOpen: false }),
 
@@ -273,6 +445,7 @@ export const useGameSessionStore = create<GameSessionState>()(
           activeAlert: alert,
           alertEffectState: createAlertEffectState(alert?.effect ?? null),
         }),
+
       clearActiveAlert: () =>
         set({
           activeAlert: null,
@@ -282,6 +455,27 @@ export const useGameSessionStore = create<GameSessionState>()(
     {
       name: "caseshell-session-storage",
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        terminalHistory: state.terminalHistory,
+        currentInput: state.currentInput,
+        commandLog: state.commandLog,
+        commandHistory: state.commandHistory,
+        commandStats: state.commandStats,
+        caseState: state.caseState,
+        currentDifficulty: state.currentDifficulty,
+        startTime: state.startTime,
+        endTime: state.endTime,
+        timeLimitMs: state.timeLimitMs,
+        timeRemainingMs: state.timeRemainingMs,
+        timerEndsAt: state.timerEndsAt,
+        hasTimedOut: state.hasTimedOut,
+        isFailedOpen: state.isFailedOpen,
+        isPaused: state.isPaused,
+        pausedAt: state.pausedAt,
+        isVictoryOpen: state.isVictoryOpen,
+        activeAlert: state.activeAlert,
+        alertEffectState: state.alertEffectState,
+      }),
     },
   ),
 );
