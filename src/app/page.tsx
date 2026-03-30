@@ -1,4 +1,3 @@
-import Navbar from "@/components/landing/components/Navbar";
 import Footer from "@/components/landing/components/Footer";
 import Hero from "@/components/landing/components/Hero";
 import About from "@/components/landing/components/About";
@@ -9,9 +8,6 @@ import Ready from "@/components/landing/components/Ready";
 export default function HomePage() {
   return (
     <>
-      <header>
-        <Navbar />
-      </header>
       <main className="min-h-screen bg-black font-sans pb-20 overflow-hidden">
         <Hero />
         <About />

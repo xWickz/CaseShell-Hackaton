@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tailwind-animations";
+@import "@toolwind/anchors";
+@source inline("anchor/[--anchor-nav-inicio] anchor/[--anchor-nav-jugar] anchor/[--anchor-nav-clasificacion] anchored/[--anchor-nav-inicio] anchored/[--anchor-nav-jugar] anchored/[--anchor-nav-clasificacion]");
 
 :root {
   --background: #ffffff;
