@@ -257,7 +257,7 @@ export default function ObjectiveTracker({
 
       <header className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-[0.65rem] uppercase tracking-[0.4em] text-white/40">
+          <p className="text-[0.65rem] uppercase text-white/40">
             Objetivos del caso
           </p>
           <div className="mt-2 flex items-baseline gap-2">

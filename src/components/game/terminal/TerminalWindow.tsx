@@ -453,7 +453,7 @@ export default function TerminalWindow() {
     >
       <div
         ref={scrollRef}
-        className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden rounded-md border border-green-500/20 bg-black/70 p-3"
+        className="min-h-0 min-w-0 flex-1 chat-scroll overflow-y-auto overflow-x-hidden rounded-md border border-green-500/20 bg-black/70 p-3"
       >
         <div className="min-w-0 space-y-1.5">
           {terminalHistory.map((line) => (
