@@ -238,7 +238,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         </div>
       )}
 
-      {failureState.isLockedOut && failureState.failureType === "command" && (
+      {/* {failureState.isLockedOut && failureState.failureType === "command" && (
         <div className="pointer-events-none absolute inset-0 z-[1600] flex flex-col items-center justify-center bg-red-950/35 text-center font-mono text-red-100 backdrop-blur-sm">
           <div className="max-w-lg rounded-2xl border border-red-500/30 bg-black/40 px-6 py-5 shadow-[0_0_50px_rgba(239,68,68,0.18)]">
             <p className="text-lg font-semibold uppercase tracking-[0.25em] text-red-300">
@@ -253,7 +253,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
             </p>
           </div>
         </div>
-      )}
+      )} */}
 
       {crtOverlayEnabled && (
         <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay" />

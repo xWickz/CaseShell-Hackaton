@@ -25,7 +25,7 @@ function NavbarContent() {
   // Estilos para los links centrales
   const linkStyles = (path: string) =>
     cn(
-      "transition-all duration-200 text-sm font-medium hover:text-red-500",
+      "transition-all duration-200 text-sm font-medium hover:text-red-500 text-md max-w-sm:text-xl",
       pathname === path ? "text-red-600 font-bold" : "text-white/90",
     );
 
@@ -145,7 +145,7 @@ function NavbarContent() {
       {isOpen && (
         <div
           id="primary-navigation"
-          className="absolute top-16 left-0 w-full bg-black border-b border-white/10 md:hidden flex flex-col p-4 space-y-4 shadow-2xl"
+          className="absolute top-16 left-0 w-full bg-black border-b border-white/10 md:hidden flex flex-col p-4 space-y-4 shadow-2xl text-center"
         >
           <Link
             href="/"

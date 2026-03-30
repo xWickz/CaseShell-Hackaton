@@ -12,6 +12,7 @@ export default function GameTimerController() {
     (state) => state.caseState.progress.completed,
   );
   const isPaused = useGameSessionStore((state) => state.isPaused);
+  const failureState = useGameSessionStore((state) => state.failureState);
 
   const updateTimeRemaining = useGameSessionStore(
     (state) => state.updateTimeRemaining,
@@ -26,7 +27,8 @@ export default function GameTimerController() {
       isCompleted ||
       isVictoryOpen ||
       hasTimedOut ||
-      isPaused
+      isPaused ||
+      failureState.isLockedOut
     ) {
       return;
     }
@@ -47,22 +49,26 @@ export default function GameTimerController() {
     isVictoryOpen,
     hasTimedOut,
     isPaused,
+    failureState.isLockedOut,
     updateTimeRemaining,
   ]);
 
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
+    const syncVisibilityState = () => {
+      if (document.visibilityState === "hidden") {
         pauseSession();
       } else {
         resumeSession();
       }
     };
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Sincroniza inmediatamente al montar
+    syncVisibilityState();
+
+    document.addEventListener("visibilitychange", syncVisibilityState);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", syncVisibilityState);
     };
   }, [pauseSession, resumeSession]);
 

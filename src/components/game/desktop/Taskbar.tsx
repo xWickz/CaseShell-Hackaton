@@ -21,6 +21,8 @@ export default function Taskbar() {
 
   const commandStats = useGameSessionStore((state) => state.commandStats);
   const startTime = useGameSessionStore((state) => state.startTime);
+  const endTime = useGameSessionStore((state) => state.endTime);
+  const pausedAt = useGameSessionStore((state) => state.pausedAt);
   const timeLimitMs = useGameSessionStore((state) => state.timeLimitMs);
   const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
   const isPaused = useGameSessionStore((state) => state.isPaused);
@@ -64,8 +66,6 @@ export default function Taskbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isStartMenuOpen]);
 
-  const endTime = useGameSessionStore((state) => state.endTime);
-
   const { timeLabel, dateLabel, elapsedSeconds } = useMemo(() => {
     const timeLabel = now.toLocaleTimeString(undefined, {
       hour: "2-digit",
@@ -78,14 +78,15 @@ export default function Taskbar() {
       year: "numeric",
     });
 
-    const referenceTime = endTime ?? now.getTime();
+    const referenceTime = endTime ?? pausedAt ?? now.getTime();
 
     const elapsedSeconds = startTime
       ? Math.max(0, Math.floor((referenceTime - startTime) / 1000))
       : 0;
 
     return { timeLabel, dateLabel, elapsedSeconds };
-  }, [now, startTime, endTime]);
+  }, [now, startTime, endTime, pausedAt]);
+
   const accuracyPercent = useMemo(() => {
     if (commandStats.total === 0) return null;
     return Math.round((commandStats.success / commandStats.total) * 100);
@@ -117,28 +118,32 @@ export default function Taskbar() {
 
   return (
     <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
-      <div className="flex items-center gap-2 relative" ref={startMenuRef}>
+      <div className="relative flex items-center gap-2" ref={startMenuRef}>
         <button
           type="button"
           onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
           aria-label="Abrir menú de inicio"
-          className={`rounded-xl p-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white flex items-center gap-1 ${isStartMenuOpen ? "bg-white/30" : "bg-white/10 hover:bg-white/20"}`}
+          className={`flex items-center gap-1 rounded-xl p-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+            isStartMenuOpen ? "bg-white/30" : "bg-white/10 hover:bg-white/20"
+          }`}
         >
           <ChevronUp
-            className={`h-5 w-5 transition-transform ${isStartMenuOpen ? "rotate-180" : ""}`}
+            className={`h-5 w-5 transition-transform ${
+              isStartMenuOpen ? "rotate-180" : ""
+            }`}
           />
         </button>
 
         {isStartMenuOpen && (
-          <div className="absolute bottom-[calc(100%+1rem)] left-0 w-64 rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-2xl backdrop-blur-xl animate-scale-in">
-            <div className="mb-2 px-3 py-2 border-b border-white/5">
-              <span className="text-xs font-bold text-white/50 uppercase tracking-wider">
+          <div className="absolute bottom-[calc(100%+1rem)] left-0 w-64 animate-scale-in rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-2xl backdrop-blur-xl">
+            <div className="mb-2 border-b border-white/5 px-3 py-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-white/50">
                 Sistema
               </span>
             </div>
             <button
               onClick={toggleAlertSounds}
-              className="mb-1 w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
             >
               {alertSoundsEnabled ? (
                 <Volume2 className="h-4 w-4" />
@@ -154,7 +159,7 @@ export default function Taskbar() {
             </button>
             <button
               onClick={toggleCrtOverlay}
-              className="mb-1 w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
             >
               <Monitor className="h-4 w-4" />
               <div className="flex flex-col items-start text-left">
@@ -169,7 +174,7 @@ export default function Taskbar() {
                 setIsStartMenuOpen(false);
                 openResetModal();
               }}
-              className="w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
             >
               <RotateCcw className="h-4 w-4" />
               Reiniciar Sistema
@@ -179,7 +184,7 @@ export default function Taskbar() {
                 setIsStartMenuOpen(false);
                 openExitModal();
               }}
-              className="w-full flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors mt-1"
+              className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
             >
               <Power className="h-4 w-4" />
               Apagar y Salir
@@ -199,7 +204,11 @@ export default function Taskbar() {
           type="button"
           onClick={openObjectivePanel}
           aria-label="Mostrar panel de objetivos"
-          className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${objectivePanelVisible ? "bg-emerald-500/15 text-emerald-100" : "bg-white/10 text-white/80 hover:bg-white/20"}`}
+          className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+            objectivePanelVisible
+              ? "bg-emerald-500/15 text-emerald-100"
+              : "bg-white/10 text-white/80 hover:bg-white/20"
+          }`}
         >
           <ClipboardList className="h-5 w-5" />
         </button>
@@ -212,7 +221,7 @@ export default function Taskbar() {
             label="Límite"
             value={countdownLabel}
             tone={timeLimitTone}
-            title="Tiempo restante del caso según la dificultad actual. El cronómetro comienza con el primer comando ejecutado."
+            title="Tiempo restante del caso según la dificultad actual."
           />
           {isPaused && (
             <Badge

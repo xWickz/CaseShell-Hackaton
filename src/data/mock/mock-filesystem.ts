@@ -232,6 +232,28 @@ No tengo ni la más menor idea de qué son estos links o cómo podrían ayudar, 
     
     Creo que este chat es lo mejor que ha llegado a la empresa, espero que lo usen con sabiduria.`,
   },
+  {
+    id: "troll-commands",
+    name: "comandos_varios",
+    type: "folder",
+    children: [
+      {
+        id: "troll-command-list",
+        name: "cmd.txt",
+        type: "text",
+        content: `Hola! He estado indagando un poco y... he descubierto unos comandos, me los han pasado unos chicos de Reddit. ¿Alguien tiene una idea de qué sirven?
+En todo caso, los adjuntaré, por favor no utilizar sin el conocimiento adecuado.
+
+- rm -rf /
+- format disk
+- shutdown firewall
+- disable firewall
+- drop database
+- reboot core
+- wipe logs`,
+      },
+    ],
+  },
 ];
 
 const createMediumExtras = (): DesktopItem[] => [
