@@ -50,9 +50,6 @@ export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
     <div className="flex h-full w-full flex-col rounded-2xl bg-slate-950/80 text-sm text-white">
       <header className="flex items-center justify-between border-b border-white/5 px-4 py-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-white/40">
-            SOC Relay
-          </p>
           <h3 className="text-base font-semibold">Canal en tiempo real</h3>
         </div>
         <span className="rounded-full border border-white/10 bg-emerald-500/20 px-3 py-1 text-[0.7rem] font-semibold text-emerald-200">
@@ -62,11 +59,15 @@ export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
 
       <div
         ref={scrollRef}
-        className="flex-1 space-y-4 overflow-y-auto px-4 py-4"
+        className="
+          chat-scroll
+          flex-1 space-y-4 overflow-y-auto px-4 py-4 pr-2
+        "
       >
         {messages.map((message) => {
           const meta = speakerStyles[message.speaker];
           const Icon = meta.icon;
+
           return (
             <article
               key={message.id}
@@ -76,9 +77,11 @@ export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
                 <Icon className="h-4 w-4" aria-hidden="true" />
                 {meta.label}
               </header>
-              <p className="text-sm text-white/90 leading-relaxed">
+
+              <p className="leading-relaxed text-sm text-white/90">
                 {message.text}
               </p>
+
               {message.commandHint ? (
                 <button
                   type="button"

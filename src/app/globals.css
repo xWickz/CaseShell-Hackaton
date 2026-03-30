@@ -28,7 +28,6 @@ body {
   font-family: "Segoe UI", "Segoe UI Variable", system-ui, sans-serif;
 }
 
-/* --- CRT Effect --- */
 .crt-overlay {
   position: absolute;
   top: 0;
@@ -52,7 +51,7 @@ body {
     rgba(18, 16, 16, 0) 50%,
     rgba(0, 0, 0, 0.1) 50%
   );
-  background-size: 100% 4px; /* scanline size */
+  background-size: 100% 4px;
   pointer-events: none;
 }
 
@@ -64,8 +63,8 @@ body {
   left: 0;
   bottom: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.05); /* very light dim */
-  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.7); /* vignette */
+  background: rgba(0, 0, 0, 0.05); 
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.7);
   pointer-events: none;
 }
 
@@ -116,4 +115,29 @@ body {
 
 .animate-objective-confetti {
   animation: objective-confetti 0.85s ease-out forwards;
+}
+
+.chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+  background-clip: content-box;
 }

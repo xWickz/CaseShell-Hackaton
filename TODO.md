@@ -4,7 +4,7 @@ Gracias por las sugerencias!
 - ~~Tiempo Limite~~
 - ~~Hacerlo claro cuando se completen todo los objetivos~~
 - ~~Tooltip de Tiempo y Precisión + Cuadre~~
-- Scroll en CubePath OPS Chat
+- ~~Scroll en CubePath OPS Chat~~
 - ~~Al terminar el nivel, botón de ir al siguiente~~
 - ~~Auto-completado terminal comandos básicos~~
 - ~~Maneras de fallar~~
