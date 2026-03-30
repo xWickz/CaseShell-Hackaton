@@ -13,6 +13,18 @@ function line(text: string, type: TerminalLineType = "system"): TerminalLine {
   };
 }
 
+function isDestructiveCommand(input: string) {
+  return [
+    "rm -rf /",
+    "format disk",
+    "shutdown firewall",
+    "disable firewall",
+    "drop database",
+    "reboot core",
+    "wipe logs",
+  ].includes(input);
+}
+
 export function executeEasyCommand(
   rawInput: string,
   state: CaseState,
@@ -21,6 +33,23 @@ export function executeEasyCommand(
 
   if (!input) {
     return { lines: [] };
+  }
+
+  if (isDestructiveCommand(input)) {
+    return {
+      lines: [
+        line("Comando destructivo detectado y bloqueado.", "error"),
+        line(
+          "La consola registró un intento inseguro. El SOC ha emitido una advertencia.",
+          "hint",
+        ),
+      ],
+      failure: {
+        reason:
+          "Intentaste ejecutar un comando destructivo en un entorno de investigación activo.",
+        strike: true,
+      },
+    };
   }
 
   switch (input) {

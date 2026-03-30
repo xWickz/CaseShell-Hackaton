@@ -13,6 +13,18 @@ function line(text: string, type: TerminalLineType = "system"): TerminalLine {
   };
 }
 
+function isDestructiveCommand(input: string) {
+  return [
+    "rm -rf /",
+    "format disk",
+    "shutdown firewall",
+    "disable firewall",
+    "drop database",
+    "reboot core",
+    "wipe logs",
+  ].includes(input);
+}
+
 export function executeMediumCommand(
   rawInput: string,
   state: CaseState,
@@ -21,6 +33,24 @@ export function executeMediumCommand(
 
   if (!input) {
     return { lines: [] };
+  }
+
+  if (isDestructiveCommand(input)) {
+    return {
+      lines: [
+        line("Comando destructivo detectado y rechazado.", "error"),
+        line(
+          "El incidente escaló por una acción insegura en producción simulada.",
+          "hint",
+        ),
+      ],
+      failure: {
+        reason:
+          "Intentaste ejecutar un comando destructivo en una infraestructura sensible.",
+        strike: true,
+        effect: "scramble-labels",
+      },
+    };
   }
 
   switch (input) {
@@ -449,11 +479,17 @@ export function executeMediumCommand(
         return {
           lines: [
             line(
-              "Debes ejecutar 'verify services' antes de reiniciar.",
+              "Reiniciar servicios sin verificación previa habría comprometido la recuperación.",
               "error",
             ),
-            line("Sigue el playbook del SRE.", "hint"),
+            line("La acción quedó auditada como operación indebida.", "hint"),
           ],
+          failure: {
+            reason:
+              "Intentaste reiniciar servicios críticos sin ejecutar 'verify services'.",
+            strike: true,
+            effect: "screen-obscure",
+          },
         };
       }
 
@@ -632,10 +668,16 @@ export function executeMediumCommand(
           return {
             lines: [
               line(
-                "Código incorrecto. Revisa dns-lock.png nuevamente.",
+                "Código incorrecto. Se registró un intento no autorizado sobre la consola DNS.",
                 "error",
               ),
             ],
+            failure: {
+              reason:
+                "Ingresaste un código de override incorrecto en la consola DNS.",
+              strike: true,
+              effect: "scramble-labels",
+            },
           };
         }
 

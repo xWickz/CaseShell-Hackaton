@@ -10,6 +10,8 @@ import type {
   AlertEffectState,
   AlertEffectId,
   CaseProgress,
+  FailurePayload,
+  FailureState,
 } from "@/types/game-engine";
 import type { Difficulty } from "@/types/game";
 
@@ -48,6 +50,8 @@ type GameSessionState = {
   activeAlert: ActiveTerminalAlert | null;
   alertEffectState: AlertEffectState;
 
+  failureState: FailureState;
+
   setCurrentInput: (value: string) => void;
   addTerminalLines: (lines: TerminalLine[]) => void;
   clearTerminalHistory: () => void;
@@ -63,6 +67,9 @@ type GameSessionState = {
 
   markObjectiveCompleted: (key: keyof CaseProgress) => void;
   clearLastCompletedKey: () => void;
+
+  registerFailure: (failure: FailurePayload) => void;
+  clearFailureState: () => void;
 
   failSession: () => void;
   closeFailedModal: () => void;
@@ -99,6 +106,12 @@ const DIFFICULTY_TIME_LIMITS: Record<Difficulty, number> = {
   hard: 3 * 60 * 1000,
 };
 
+const DIFFICULTY_MAX_STRIKES: Record<Difficulty, number> = {
+  easy: 3,
+  medium: 3,
+  hard: 2,
+};
+
 const MAX_COMMAND_HISTORY = 50;
 
 const INITIAL_ALERT_EFFECT_STATE: AlertEffectState = {
@@ -133,6 +146,14 @@ const createAlertEffectState = (effect?: AlertEffectId | null) => {
 const createInitialCaseState = (): CaseState => ({
   knowledge: {},
   progress: { completed: false },
+});
+
+const createInitialFailureState = (difficulty: Difficulty): FailureState => ({
+  strikes: 0,
+  maxStrikes: DIFFICULTY_MAX_STRIKES[difficulty],
+  reason: null,
+  isLockedOut: false,
+  failureType: null,
 });
 
 const createInitialTerminalHistory = (
@@ -186,6 +207,8 @@ export const useGameSessionStore = create<GameSessionState>()(
       activeAlert: null,
       alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
 
+      failureState: createInitialFailureState(DEFAULT_DIFFICULTY),
+
       initializeSession: (difficulty) =>
         set((state) => {
           if (state.currentDifficulty !== difficulty) {
@@ -217,6 +240,7 @@ export const useGameSessionStore = create<GameSessionState>()(
               commandStats: { total: 0, success: 0, error: 0 },
               activeAlert: null,
               alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
+              failureState: createInitialFailureState(difficulty),
             };
           }
           return {};
@@ -272,7 +296,8 @@ export const useGameSessionStore = create<GameSessionState>()(
           if (
             state.startTime ||
             state.caseState.progress.completed ||
-            state.hasTimedOut
+            state.hasTimedOut ||
+            state.failureState.isLockedOut
           ) {
             return {};
           }
@@ -294,7 +319,8 @@ export const useGameSessionStore = create<GameSessionState>()(
             !state.timerEndsAt ||
             state.caseState.progress.completed ||
             state.hasTimedOut ||
-            state.isPaused
+            state.isPaused ||
+            state.failureState.isLockedOut
           ) {
             return {};
           }
@@ -311,6 +337,13 @@ export const useGameSessionStore = create<GameSessionState>()(
               alertEffectState: createAlertEffectState(null),
               isPaused: false,
               pausedAt: null,
+              failureState: {
+                ...state.failureState,
+                reason:
+                  "No lograste contener el incidente dentro del tiempo asignado.",
+                isLockedOut: true,
+                failureType: "timeout",
+              },
             };
           }
 
@@ -329,7 +362,8 @@ export const useGameSessionStore = create<GameSessionState>()(
             !state.startTime ||
             state.caseState.progress.completed ||
             state.hasTimedOut ||
-            state.isPaused
+            state.isPaused ||
+            state.failureState.isLockedOut
           ) {
             return {};
           }
@@ -348,7 +382,8 @@ export const useGameSessionStore = create<GameSessionState>()(
             !state.startTime ||
             !state.timerEndsAt ||
             state.caseState.progress.completed ||
-            state.hasTimedOut
+            state.hasTimedOut ||
+            state.failureState.isLockedOut
           ) {
             return {};
           }
@@ -375,10 +410,60 @@ export const useGameSessionStore = create<GameSessionState>()(
 
       clearLastCompletedKey: () => set({ lastCompletedKey: null }),
 
+      registerFailure: (failure) =>
+        set((state) => {
+          if (
+            state.caseState.progress.completed ||
+            state.hasTimedOut ||
+            state.failureState.isLockedOut
+          ) {
+            return {};
+          }
+
+          const nextStrikes = failure.strike
+            ? state.failureState.strikes + 1
+            : state.failureState.strikes;
+
+          const reachedMaxStrikes =
+            failure.strike && nextStrikes >= state.failureState.maxStrikes;
+
+          const shouldLockout = Boolean(failure.lockout || reachedMaxStrikes);
+          const now = Date.now();
+
+          return {
+            endTime: shouldLockout && !state.endTime ? now : state.endTime,
+            isFailedOpen: shouldLockout ? true : state.isFailedOpen,
+            hasTimedOut: shouldLockout ? true : state.hasTimedOut,
+            activeAlert: shouldLockout ? null : state.activeAlert,
+            alertEffectState: createAlertEffectState(
+              failure.effect ?? (shouldLockout ? "screen-obscure" : null),
+            ),
+            failureState: {
+              ...state.failureState,
+              strikes: nextStrikes,
+              reason: failure.reason,
+              isLockedOut: shouldLockout,
+              failureType: "command",
+            },
+            isPaused: false,
+            pausedAt: null,
+          };
+        }),
+
+      clearFailureState: () =>
+        set((state) => ({
+          failureState: createInitialFailureState(state.currentDifficulty),
+        })),
+
       failSession: () =>
         set((state) => {
-          if (state.caseState.progress.completed || state.hasTimedOut)
+          if (
+            state.caseState.progress.completed ||
+            state.hasTimedOut ||
+            state.failureState.isLockedOut
+          ) {
             return {};
+          }
 
           const now = Date.now();
 
@@ -391,6 +476,12 @@ export const useGameSessionStore = create<GameSessionState>()(
             alertEffectState: createAlertEffectState(null),
             isPaused: false,
             pausedAt: null,
+            failureState: {
+              ...state.failureState,
+              reason: "La sesión terminó por una condición de fallo.",
+              isLockedOut: true,
+              failureType: "command",
+            },
           };
         }),
 
@@ -444,6 +535,7 @@ export const useGameSessionStore = create<GameSessionState>()(
             commandStats: { total: 0, success: 0, error: 0 },
             activeAlert: null,
             alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
+            failureState: createInitialFailureState(state.currentDifficulty),
           };
         }),
 
@@ -508,6 +600,7 @@ export const useGameSessionStore = create<GameSessionState>()(
         isVictoryOpen: state.isVictoryOpen,
         activeAlert: state.activeAlert,
         alertEffectState: state.alertEffectState,
+        failureState: state.failureState,
       }),
     },
   ),

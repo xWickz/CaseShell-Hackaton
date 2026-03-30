@@ -13,6 +13,18 @@ function line(text: string, type: TerminalLineType = "system"): TerminalLine {
   };
 }
 
+function isDestructiveCommand(input: string) {
+  return [
+    "rm -rf /",
+    "format disk",
+    "shutdown firewall",
+    "disable firewall",
+    "drop database",
+    "reboot core",
+    "wipe logs",
+  ].includes(input);
+}
+
 export function executeHardCommand(
   rawInput: string,
   state: CaseState,
@@ -21,6 +33,24 @@ export function executeHardCommand(
 
   if (!input) {
     return { lines: [] };
+  }
+
+  if (isDestructiveCommand(input)) {
+    return {
+      lines: [
+        line("Comando destructivo detectado.", "error"),
+        line(
+          "La infraestructura respondió con lockout inmediato por sabotaje operativo.",
+          "error",
+        ),
+      ],
+      failure: {
+        reason:
+          "Ejecutaste un comando destructivo en un entorno crítico de alta sensibilidad.",
+        lockout: true,
+        effect: "screen-obscure",
+      },
+    };
   }
 
   switch (input) {
@@ -520,10 +550,20 @@ export function executeHardCommand(
         return {
           lines: [
             line(
-              "Debes ejecutar 'verify services' antes de reiniciar.",
+              "Intentaste reiniciar servicios críticos sin verificación previa.",
               "error",
             ),
+            line(
+              "El sistema registró la acción como operación insegura.",
+              "hint",
+            ),
           ],
+          failure: {
+            reason:
+              "Intentaste ejecutar 'restart services' sin pasar antes por 'verify services'.",
+            strike: true,
+            effect: "screen-obscure",
+          },
         };
       }
 
@@ -727,10 +767,17 @@ export function executeHardCommand(
         return {
           lines: [
             line(
-              "Ejecuta 'audit switch' (tras el reinicio) antes de habilitar el puerto.",
+              "Intentaste habilitar un puerto crítico sin completar la auditoría previa.",
               "error",
             ),
+            line("La acción fue marcada como sabotaje operativo.", "hint"),
           ],
+          failure: {
+            reason:
+              "Intentaste ejecutar 'enable port' sin realizar antes 'audit switch'.",
+            strike: true,
+            effect: "screen-obscure",
+          },
         };
       }
 
@@ -883,8 +930,17 @@ export function executeHardCommand(
         if (code !== "884") {
           return {
             lines: [
-              line("Código incorrecto. Vuelve a revisar el candado.", "error"),
+              line(
+                "Código incorrecto. La consola DNS registró un intento inválido.",
+                "error",
+              ),
             ],
+            failure: {
+              reason:
+                "Ingresaste un código de override inválido en una consola crítica.",
+              strike: true,
+              effect: "scramble-labels",
+            },
           };
         }
 

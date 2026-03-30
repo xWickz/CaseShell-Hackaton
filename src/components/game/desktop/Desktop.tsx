@@ -68,6 +68,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const isCaseCompleted = useGameSessionStore(
     (state) => state.caseState.progress.completed,
   );
+  const failureState = useGameSessionStore((state) => state.failureState);
 
   const wallpaperClasses = useMemo(() => {
     switch (wallpaperTheme) {
@@ -97,7 +98,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       title: "Terminal",
       type: "terminal",
     });
-    // Solo al montar la pantalla
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -150,10 +150,8 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     >
       <GameTimerController />
 
-      {/* Wallpaper overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.15),transparent_30%)]" />
 
-      {/* Banner de objetivos completados */}
       {showCompletionBanner && (
         <div className="pointer-events-none absolute left-1/2 top-6 z-[1400] -translate-x-1/2 animate-in fade-in zoom-in-95 duration-300">
           <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/15 px-5 py-3 text-center shadow-[0_12px_40px_rgba(16,185,129,0.18)] backdrop-blur-xl">
@@ -167,7 +165,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         </div>
       )}
 
-      {/* Desktop icons */}
       <div className="relative z-10 h-[calc(100vh-140px)] w-full">
         {items.map((item, index) => (
           <DesktopIcon
@@ -179,7 +176,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         ))}
       </div>
 
-      {/* Open windows */}
       {openWindows.map((window) => (
         <WindowFrame
           key={window.id}
@@ -242,11 +238,27 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
         </div>
       )}
 
+      {failureState.isLockedOut && failureState.failureType === "command" && (
+        <div className="pointer-events-none absolute inset-0 z-[1600] flex flex-col items-center justify-center bg-red-950/35 text-center font-mono text-red-100 backdrop-blur-sm">
+          <div className="max-w-lg rounded-2xl border border-red-500/30 bg-black/40 px-6 py-5 shadow-[0_0_50px_rgba(239,68,68,0.18)]">
+            <p className="text-lg font-semibold uppercase tracking-[0.25em] text-red-300">
+              Sistema comprometido
+            </p>
+            <p className="mt-3 text-sm text-red-100/85">
+              {failureState.reason ??
+                "Una acción indebida ha forzado el bloqueo del entorno de investigación."}
+            </p>
+            <p className="mt-4 text-xs uppercase tracking-[0.3em] text-red-400/80">
+              Lockout activo
+            </p>
+          </div>
+        </div>
+      )}
+
       {crtOverlayEnabled && (
         <div className="crt-overlay crt-flicker pointer-events-none fixed inset-0 z-9999 mix-blend-overlay" />
       )}
 
-      {/* Mobile Blocker Overlay */}
       <div className="fixed inset-0 z-10000 flex flex-col items-center justify-center bg-zinc-950 p-8 text-center font-mono md:hidden">
         <div className="mb-4 text-red-500">
           <svg

@@ -49,11 +49,19 @@ export type CaseState = {
   progress: CaseProgress;
 };
 
+export type FailurePayload = {
+  reason: string;
+  lockout?: boolean;
+  strike?: boolean;
+  effect?: AlertEffectId;
+};
+
 export type CommandExecutionResult = {
   lines: TerminalLine[];
   nextState?: DeepPartial<CaseState>;
   completed?: boolean;
   completedObjectiveKey?: keyof CaseProgress;
+  failure?: FailurePayload;
 };
 
 type DeepPartial<T> = {
@@ -77,4 +85,14 @@ export type ActiveTerminalAlert = {
   reminder: string;
   resolveLines: string[];
   effect?: AlertEffectId;
+};
+
+export type FailureType = "timeout" | "command";
+
+export type FailureState = {
+  strikes: number;
+  maxStrikes: number;
+  reason: string | null;
+  isLockedOut: boolean;
+  failureType: FailureType | null;
 };

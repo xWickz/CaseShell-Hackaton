@@ -63,6 +63,7 @@ export default function TerminalWindow() {
   );
   const hasTimedOut = useGameSessionStore((state) => state.hasTimedOut);
   const isPaused = useGameSessionStore((state) => state.isPaused);
+  const failureState = useGameSessionStore((state) => state.failureState);
 
   const setCurrentInput = useGameSessionStore((state) => state.setCurrentInput);
   const addTerminalLines = useGameSessionStore(
@@ -85,6 +86,7 @@ export default function TerminalWindow() {
   const markObjectiveCompleted = useGameSessionStore(
     (state) => state.markObjectiveCompleted,
   );
+  const registerFailure = useGameSessionStore((state) => state.registerFailure);
 
   const alertSoundsEnabled = useGameUIStore(
     (state) => state.alertSoundsEnabled,
@@ -104,12 +106,23 @@ export default function TerminalWindow() {
   const { playOutcome, playCompletion } = useTerminalAudio();
 
   useEffect(() => {
-    if (!caseState.progress.completed && !hasTimedOut && !isPaused) {
+    if (
+      !caseState.progress.completed &&
+      !hasTimedOut &&
+      !isPaused &&
+      !failureState.isLockedOut
+    ) {
       startSession();
     }
 
     inputRef.current?.focus();
-  }, [startSession, caseState.progress.completed, hasTimedOut, isPaused]);
+  }, [
+    startSession,
+    caseState.progress.completed,
+    hasTimedOut,
+    isPaused,
+    failureState.isLockedOut,
+  ]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -266,6 +279,7 @@ export default function TerminalWindow() {
   function maybeTriggerRandomAlert(commandsExecuted: number) {
     if (activeAlert) return;
     if (hasTimedOut) return;
+    if (failureState.isLockedOut) return;
     if (
       commandsExecuted - lastAlertCommandRef.current <
       MIN_COMMANDS_BETWEEN_ALERTS
@@ -300,7 +314,14 @@ export default function TerminalWindow() {
   function handleSubmit() {
     const rawInput = currentInput.trim();
 
-    if (!rawInput || caseState.progress.completed || hasTimedOut) return;
+    if (
+      !rawInput ||
+      caseState.progress.completed ||
+      hasTimedOut ||
+      failureState.isLockedOut
+    ) {
+      return;
+    }
 
     addTerminalLines([
       {
@@ -362,6 +383,38 @@ export default function TerminalWindow() {
       markObjectiveCompleted(result.completedObjectiveKey);
     }
 
+    if (result.failure) {
+      registerFailure(result.failure);
+
+      addTerminalLines([
+        {
+          id: crypto.randomUUID(),
+          type: "error",
+          text: `Fallo de seguridad: ${result.failure.reason}`,
+        },
+      ]);
+
+      if (result.failure.strike && !result.failure.lockout) {
+        addTerminalLines([
+          {
+            id: crypto.randomUUID(),
+            type: "hint",
+            text: `Advertencia crítica. Strikes: ${failureState.strikes + 1}/${failureState.maxStrikes}.`,
+          },
+        ]);
+      }
+
+      if (result.failure.lockout) {
+        addTerminalLines([
+          {
+            id: crypto.randomUUID(),
+            type: "error",
+            text: "El sistema ha bloqueado la sesión por una acción indebida.",
+          },
+        ]);
+      }
+    }
+
     if (result.completed && !caseState.progress.completed) {
       completeSession();
     }
@@ -375,7 +428,10 @@ export default function TerminalWindow() {
   }
 
   const isInputDisabled =
-    caseState.progress.completed || hasTimedOut || isPaused;
+    caseState.progress.completed ||
+    hasTimedOut ||
+    isPaused ||
+    failureState.isLockedOut;
 
   return (
     <div
@@ -464,9 +520,11 @@ export default function TerminalWindow() {
                   ? "Caso completado."
                   : hasTimedOut
                     ? "Tiempo agotado. Caso fallido."
-                    : isPaused
-                      ? "Partida pausada. Reanudando..."
-                      : "Escribe un comando..."
+                    : failureState.isLockedOut
+                      ? "Sesión bloqueada por sabotaje."
+                      : isPaused
+                        ? "Partida pausada. Reanudando..."
+                        : "Escribe un comando..."
               }
               autoCapitalize="off"
               autoCorrect="off"
@@ -474,28 +532,6 @@ export default function TerminalWindow() {
             />
           </div>
         </div>
-
-        {/*  {!isInputDisabled && suggestions.length > 1 && currentInput.trim() ? (
-          <div className="mt-2 rounded-xl border border-green-500/20 bg-black/90 p-2">
-            <p className="mb-1 text-[0.65rem] uppercase tracking-wider text-green-700">
-              Sugerencias
-            </p>
-            <ul className="space-y-1">
-              {suggestions.slice(0, 5).map((suggestion) => (
-                <li
-                  key={suggestion}
-                  className={`rounded-md px-2 py-1 ${
-                    suggestion === topSuggestion
-                      ? "bg-green-500/10 text-green-200"
-                      : "text-green-400/80"
-                  }`}
-                >
-                  {suggestion}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null} */}
       </div>
     </div>
   );

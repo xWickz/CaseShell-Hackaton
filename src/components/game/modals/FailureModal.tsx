@@ -29,6 +29,7 @@ export default function FailureModal() {
   );
   const commandStats = useGameSessionStore((state) => state.commandStats);
   const timeLimitMs = useGameSessionStore((state) => state.timeLimitMs);
+  const failureState = useGameSessionStore((state) => state.failureState);
 
   const handleRetry = useCallback(() => {
     resetSession();
@@ -44,6 +45,27 @@ export default function FailureModal() {
     if (commandStats.total === 0) return "—";
     return `${Math.round((commandStats.success / commandStats.total) * 100)}%`;
   }, [commandStats]);
+
+  const title = useMemo(() => {
+    if (failureState.failureType === "command") {
+      return failureState.isLockedOut ? "Sesión bloqueada" : "Fallo operativo";
+    }
+    return "Tiempo agotado";
+  }, [failureState.failureType, failureState.isLockedOut]);
+
+  const description = useMemo(() => {
+    if (failureState.failureType === "command") {
+      return (
+        failureState.reason ??
+        "Una acción indebida comprometió la simulación y el caso fue cerrado."
+      );
+    }
+
+    return (
+      failureState.reason ??
+      "No lograste contener el incidente dentro del tiempo asignado. El caso se ha cerrado automáticamente y el terminal quedó bloqueado."
+    );
+  }, [failureState.reason, failureState.failureType]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -77,12 +99,13 @@ export default function FailureModal() {
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-red-400/80">
           Caso fallido
         </p>
+
         <h2 id={headingId} className="mt-2 text-3xl font-bold text-white">
-          Tiempo agotado
+          {title}
         </h2>
+
         <p id={descriptionId} className="mt-3 text-sm text-white/80">
-          No lograste contener el incidente dentro del tiempo asignado. El caso
-          se ha cerrado automáticamente y el terminal quedó bloqueado.
+          {description}
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -121,6 +144,15 @@ export default function FailureModal() {
               {commandStats.total}
             </p>
           </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:col-span-2">
+            <p className="text-xs uppercase tracking-wide text-white/60">
+              Strikes
+            </p>
+            <p className="mt-1 text-lg font-semibold text-white">
+              {failureState.strikes}/{failureState.maxStrikes}
+            </p>
+          </div>
         </div>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -131,6 +163,7 @@ export default function FailureModal() {
           >
             Cerrar
           </button>
+
           <button
             type="button"
             onClick={handleRetry}
