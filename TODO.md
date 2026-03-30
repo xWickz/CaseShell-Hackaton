@@ -9,5 +9,5 @@ Gracias por las sugerencias!
 - ~~Auto-completado terminal comandos básicos~~
 - ~~Maneras de fallar~~
 - ~~Objetivos de Caso mayor dopamina (microinteracciones)~~
-- Primera vez sonido de virus modal indicando que se puede apagar
-- Sonidos mas cortos de meme
+- ~~Primera vez sonido de virus modal indicando que se puede apagar~~
+- ~~Sonidos mas cortos de meme~~

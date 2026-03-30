@@ -4,10 +4,12 @@ import About from "@/components/landing/components/About";
 import Mechanics from "@/components/landing/components/Mechanics";
 import Difficulties from "@/components/landing/components/Difficulties";
 import Ready from "@/components/landing/components/Ready";
+import Navbar from "@/components/landing/components/Navbar";
 
 export default function HomePage() {
   return (
     <>
+      <Navbar />
       <main className="min-h-screen bg-black font-sans pb-20 overflow-hidden">
         <Hero />
         <About />

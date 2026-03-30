@@ -14,6 +14,7 @@ import type {
   FailureState,
 } from "@/types/game-engine";
 import type { Difficulty } from "@/types/game";
+import { useGameUIStore } from "@/store/useGameUIStore";
 
 type GameSessionState = {
   terminalHistory: TerminalLine[];
@@ -212,6 +213,8 @@ export const useGameSessionStore = create<GameSessionState>()(
       initializeSession: (difficulty) =>
         set((state) => {
           if (state.currentDifficulty !== difficulty) {
+            useGameUIStore.getState().resetVirusAlertHint();
+
             const nextTimeLimit = DIFFICULTY_TIME_LIMITS[difficulty];
 
             return {
@@ -328,6 +331,8 @@ export const useGameSessionStore = create<GameSessionState>()(
           const remaining = Math.max(0, state.timerEndsAt - now);
 
           if (remaining <= 0) {
+            useGameUIStore.getState().resetVirusAlertHint();
+
             return {
               timeRemainingMs: 0,
               hasTimedOut: true,
@@ -430,6 +435,10 @@ export const useGameSessionStore = create<GameSessionState>()(
           const shouldLockout = Boolean(failure.lockout || reachedMaxStrikes);
           const now = Date.now();
 
+          if (shouldLockout) {
+            useGameUIStore.getState().resetVirusAlertHint();
+          }
+
           return {
             endTime: shouldLockout && !state.endTime ? now : state.endTime,
             isFailedOpen: shouldLockout ? true : state.isFailedOpen,
@@ -465,6 +474,8 @@ export const useGameSessionStore = create<GameSessionState>()(
             return {};
           }
 
+          useGameUIStore.getState().resetVirusAlertHint();
+
           const now = Date.now();
 
           return {
@@ -488,24 +499,30 @@ export const useGameSessionStore = create<GameSessionState>()(
       closeFailedModal: () => set({ isFailedOpen: false }),
 
       completeSession: () =>
-        set((state) => ({
-          endTime: state.endTime ?? Date.now(),
-          isVictoryOpen: true,
-          caseState: {
-            ...state.caseState,
-            progress: {
-              ...state.caseState.progress,
-              completed: true,
+        set((state) => {
+          useGameUIStore.getState().resetVirusAlertHint();
+
+          return {
+            endTime: state.endTime ?? Date.now(),
+            isVictoryOpen: true,
+            caseState: {
+              ...state.caseState,
+              progress: {
+                ...state.caseState.progress,
+                completed: true,
+              },
             },
-          },
-          activeAlert: null,
-          alertEffectState: createAlertEffectState(null),
-          isPaused: false,
-          pausedAt: null,
-        })),
+            activeAlert: null,
+            alertEffectState: createAlertEffectState(null),
+            isPaused: false,
+            pausedAt: null,
+          };
+        }),
 
       resetSession: () =>
         set((state) => {
+          useGameUIStore.getState().resetVirusAlertHint();
+
           const nextTimeLimit = DIFFICULTY_TIME_LIMITS[state.currentDifficulty];
 
           return {

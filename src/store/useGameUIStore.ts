@@ -20,6 +20,8 @@ type GameUIState = {
   objectivePanelVisible: boolean;
   objectivePanelCollapsed: boolean;
   alertSoundsEnabled: boolean;
+  hasAcknowledgedVirusAlert: boolean;
+  virusAlertTooltipOpen: boolean;
   exitModalOpen: boolean;
   resetModalOpen: boolean;
   crtOverlayEnabled: boolean;
@@ -36,6 +38,9 @@ type GameUIState = {
   setObjectivePanelCollapsed: (collapsed: boolean) => void;
   setAlertSoundsEnabled: (enabled: boolean) => void;
   toggleAlertSounds: () => void;
+  showVirusAlertTooltip: () => void;
+  acknowledgeVirusAlert: () => void;
+  resetVirusAlertHint: () => void;
   openExitModal: () => void;
   closeExitModal: () => void;
   openResetModal: () => void;
@@ -78,6 +83,8 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   objectivePanelVisible: true,
   objectivePanelCollapsed: false,
   alertSoundsEnabled: true,
+  hasAcknowledgedVirusAlert: false,
+  virusAlertTooltipOpen: false,
   exitModalOpen: false,
   resetModalOpen: false,
   crtOverlayEnabled: true,
@@ -86,7 +93,12 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
 
   setDifficulty: (difficulty) =>
-    set({ selectedDifficulty: difficulty, iconPositions: {} }),
+    set({
+      selectedDifficulty: difficulty,
+      iconPositions: {},
+      hasAcknowledgedVirusAlert: false,
+      virusAlertTooltipOpen: false,
+    }),
 
   setWallpaperTheme: (theme) => set({ wallpaperTheme: theme }),
   cycleWallpaperTheme: () =>
@@ -115,9 +127,29 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
     })),
   setObjectivePanelCollapsed: (collapsed) =>
     set({ objectivePanelCollapsed: collapsed }),
+
   setAlertSoundsEnabled: (enabled) => set({ alertSoundsEnabled: enabled }),
   toggleAlertSounds: () =>
     set((state) => ({ alertSoundsEnabled: !state.alertSoundsEnabled })),
+
+  showVirusAlertTooltip: () =>
+    set((state) => {
+      if (state.hasAcknowledgedVirusAlert) return {};
+      return { virusAlertTooltipOpen: true };
+    }),
+
+  acknowledgeVirusAlert: () =>
+    set({
+      hasAcknowledgedVirusAlert: true,
+      virusAlertTooltipOpen: false,
+    }),
+
+  resetVirusAlertHint: () =>
+    set({
+      hasAcknowledgedVirusAlert: false,
+      virusAlertTooltipOpen: false,
+    }),
+
   openExitModal: () => set({ exitModalOpen: true }),
   closeExitModal: () => set({ exitModalOpen: false }),
   openResetModal: () => set({ resetModalOpen: true }),

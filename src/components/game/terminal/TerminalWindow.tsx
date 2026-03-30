@@ -91,6 +91,12 @@ export default function TerminalWindow() {
   const alertSoundsEnabled = useGameUIStore(
     (state) => state.alertSoundsEnabled,
   );
+  const hasAcknowledgedVirusAlert = useGameUIStore(
+    (state) => state.hasAcknowledgedVirusAlert,
+  );
+  const showVirusAlertTooltip = useGameUIStore(
+    (state) => state.showVirusAlertTooltip,
+  );
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -292,23 +298,30 @@ export default function TerminalWindow() {
     addTerminalLines(createIntroLines(definition));
     setActiveAlert(toActiveAlert(definition));
     lastAlertCommandRef.current = commandsExecuted;
-    playAlertSfx();
+
+    const played = playAlertSfx();
+
+    if (played && !hasAcknowledgedVirusAlert) {
+      showVirusAlertTooltip();
+    }
   }
 
   function playAlertSfx() {
-    if (!alertSoundsEnabled) return;
+    if (!alertSoundsEnabled) return false;
 
     const pool = alertAudioPoolRef.current;
-    if (!pool.length) return;
+    if (!pool.length) return false;
 
     const index = Math.floor(getRandom() * pool.length);
     const audio = pool[index];
-    if (!audio) return;
+    if (!audio) return false;
 
     audio.currentTime = 0;
     audio.play().catch(() => {
       // Autoplay restrictions may block playback until user interacts.
     });
+
+    return true;
   }
 
   function handleSubmit() {

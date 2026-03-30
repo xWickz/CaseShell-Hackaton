@@ -40,10 +40,18 @@ export default function Taskbar() {
     (state) => state.alertSoundsEnabled,
   );
   const toggleAlertSounds = useGameUIStore((state) => state.toggleAlertSounds);
+  const virusAlertTooltipOpen = useGameUIStore(
+    (state) => state.virusAlertTooltipOpen,
+  );
+  const acknowledgeVirusAlert = useGameUIStore(
+    (state) => state.acknowledgeVirusAlert,
+  );
   const openExitModal = useGameUIStore((state) => state.openExitModal);
   const openResetModal = useGameUIStore((state) => state.openResetModal);
   const crtOverlayEnabled = useGameUIStore((state) => state.crtOverlayEnabled);
   const toggleCrtOverlay = useGameUIStore((state) => state.toggleCrtOverlay);
+
+  const isStartMenuVisible = isStartMenuOpen || virusAlertTooltipOpen;
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -60,11 +68,14 @@ export default function Taskbar() {
       }
     };
 
-    if (isStartMenuOpen) {
+    if (isStartMenuVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isStartMenuOpen]);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isStartMenuVisible]);
 
   const { timeLabel, dateLabel, elapsedSeconds } = useMemo(() => {
     const timeLabel = now.toLocaleTimeString(undefined, {
@@ -116,47 +127,81 @@ export default function Taskbar() {
     return "default";
   }, [timeRemainingMs, timeLimitMs]);
 
+  const handleSoundButtonClick = () => {
+    if (virusAlertTooltipOpen) {
+      acknowledgeVirusAlert();
+    }
+    toggleAlertSounds();
+  };
+
+  const handleAcknowledgeTooltip = () => {
+    acknowledgeVirusAlert();
+  };
+
   return (
     <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
       <div className="relative flex items-center gap-2" ref={startMenuRef}>
         <button
           type="button"
-          onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
+          onClick={() => setIsStartMenuOpen((prev) => !prev)}
           aria-label="Abrir menú de inicio"
           className={`flex items-center gap-1 rounded-xl p-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
-            isStartMenuOpen ? "bg-white/30" : "bg-white/10 hover:bg-white/20"
+            isStartMenuVisible ? "bg-white/30" : "bg-white/10 hover:bg-white/20"
           }`}
         >
           <ChevronUp
             className={`h-5 w-5 transition-transform ${
-              isStartMenuOpen ? "rotate-180" : ""
+              isStartMenuVisible ? "rotate-180" : ""
             }`}
           />
         </button>
 
-        {isStartMenuOpen && (
+        {isStartMenuVisible && (
           <div className="absolute bottom-[calc(100%+1rem)] left-0 w-64 animate-scale-in rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-2xl backdrop-blur-xl">
             <div className="mb-2 border-b border-white/5 px-3 py-2">
               <span className="text-xs font-bold uppercase tracking-wider text-white/50">
                 Sistema
               </span>
             </div>
-            <button
-              onClick={toggleAlertSounds}
-              className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              {alertSoundsEnabled ? (
-                <Volume2 className="h-4 w-4" />
-              ) : (
-                <VolumeX className="h-4 w-4" />
+
+            <div className="relative">
+              <button
+                onClick={handleSoundButtonClick}
+                className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                {alertSoundsEnabled ? (
+                  <Volume2 className="h-4 w-4" />
+                ) : (
+                  <VolumeX className="h-4 w-4" />
+                )}
+                <div className="flex flex-col items-start text-left">
+                  <span className="font-medium">Sonidos de virus</span>
+                  <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
+                    {alertSoundsEnabled ? "Activados" : "Silenciados"}
+                  </span>
+                </div>
+              </button>
+
+              {virusAlertTooltipOpen && (
+                <div className="absolute left-[calc(100%+0.75rem)] top-0 z-20 w-64 rounded-2xl border border-cyan-400/20 bg-slate-950/95 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)]">
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-cyan-300/80">
+                    Consejo
+                  </p>
+                  <p className="mt-2 text-sm text-white/85">
+                    Si te molestan los sonidos de alerta, puedes silenciarlos
+                    aquí.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAcknowledgeTooltip}
+                    className="mt-3 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-200 transition hover:bg-cyan-400/20"
+                  >
+                    Entendido
+                  </button>
+                </div>
               )}
-              <div className="flex flex-col items-start text-left">
-                <span className="font-medium">Sonidos de virus</span>
-                <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
-                  {alertSoundsEnabled ? "Activados" : "Silenciados"}
-                </span>
-              </div>
-            </button>
+            </div>
+
             <button
               onClick={toggleCrtOverlay}
               className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
@@ -169,6 +214,7 @@ export default function Taskbar() {
                 </span>
               </div>
             </button>
+
             <button
               onClick={() => {
                 setIsStartMenuOpen(false);
@@ -179,6 +225,7 @@ export default function Taskbar() {
               <RotateCcw className="h-4 w-4" />
               Reiniciar Sistema
             </button>
+
             <button
               onClick={() => {
                 setIsStartMenuOpen(false);
@@ -200,6 +247,7 @@ export default function Taskbar() {
         >
           <Palette className="h-5 w-5" />
         </button>
+
         <button
           type="button"
           onClick={openObjectivePanel}
