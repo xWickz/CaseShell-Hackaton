@@ -103,8 +103,8 @@ La experiencia gira alrededor de:
 - **Experiencia temática:** Toda la narrativa del juego recrea incidentes dentro de la red CubePath (nombres de hosts, dominios, comandos internos)
 
 **CubePath VPS**
-![CAP 7](https://i.imgur.com/AWFEcN5.png)
+![CAP 7](https://i.imgur.com/5VyRXXi.png)
 
 **Dokploy**
-![CAP 8](https://i.imgur.com/OWggXAO.png)
-![CAP 9](https://i.imgur.com/49CaCeR.png)
+![CAP 8](https://i.imgur.com/V7dUxPK.png)
+![CAP 9](https://i.imgur.com/nmumEdI.png)
