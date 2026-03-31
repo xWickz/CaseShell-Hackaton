@@ -5,6 +5,7 @@ import { MENU_ITEMS } from "@/config/menus";
 import Menu from "@/components/landing/Menu";
 import Login from "@/components/landing/Login";
 import MenuClient from "@/components/landing/MenuClient";
+import { SessionProvider } from "next-auth/react";
 
 export default function Navbar() {
   const menuList = MENU_ITEMS.map((item) => {
@@ -23,7 +24,9 @@ export default function Navbar() {
         </div>
 
         <div className="justify-self-end">
-          <Login />
+          <SessionProvider>
+            <Login />
+          </SessionProvider>
         </div>
       </nav>
     </header>
