@@ -17,7 +17,7 @@ El jugador toma el rol de un analista SOC y debe inspeccionar archivos, ejecutar
 
 ## ⚡ Demo
 
-**Live demo:** [CaseShell | The Ultimate Terminal Puzzle](https://caseshell-app-nq12gl-38b126-194-26-100-34.traefik.me/)
+**Live demo:** [CaseShell | The Ultimate Terminal Puzzle](https://case-shell-app-xjvxbi-1c69b9-45-90-237-156.traefik.me/)
 
 > Nota: el dominio de demo puede mostrar una advertencia de certificado al estar servido con un dominio gratuito de infraestructura. Eso no implica por sí solo que la app sea maliciosa; simplemente es una limitación del entorno de despliegue usado para la hackathon.
 
