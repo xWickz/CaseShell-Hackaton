@@ -19,9 +19,9 @@ import { getTerminalCommandsForDifficulty } from "@/lib/game/terminal-commands";
 const ALERT_PROBABILITY = 0.25;
 const MIN_COMMANDS_BETWEEN_ALERTS = 3;
 const ALERT_SFX_FILES = [
-  "/game/audio/audio1.mp3",
-  "/game/audio/audio2.mp3",
-  "/game/audio/audio3.mp3",
+  "/game/audio/audio1_fix.mp3",
+  "/game/audio/audio2_fix.mp3",
+  "/game/audio/audio3_fix.mp3",
 ] as const;
 
 const REQUIRED_PROGRESS_KEYS = {
