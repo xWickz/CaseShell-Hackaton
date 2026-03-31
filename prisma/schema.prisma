@@ -7,8 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --- TABLAS PARA NEXTAUTH (LOGIN CON GITHUB) ---
-
 model Account {
   id                 String  @id @default(cuid())
   userId             String
@@ -54,8 +52,6 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
-
-// --- TABLAS DE TU JUEGO ---
 
 model Ranking {
   id          String   @id @default(cuid())
