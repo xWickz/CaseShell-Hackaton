@@ -9,7 +9,8 @@ const terminalText = [
   "> [OK] Database synced",
   "> [OK] Firewall active",
   "> [WARN] Integrity check failed in: /var/log/syslog.4",
-  "> Use 'submit' to report findings.",
+  "> [CRITICAL] Unauthorized access detected",
+  "> [ACTION] Investigate and contain the incident",
   "agent@cubepath:~$ _",
 ];
 
@@ -21,10 +22,13 @@ export const TerminalMockup = () => {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+
     updatePreference();
     mediaQuery.addEventListener("change", updatePreference);
+
     return () => mediaQuery.removeEventListener("change", updatePreference);
   }, []);
 
@@ -36,65 +40,87 @@ export const TerminalMockup = () => {
   useEffect(() => {
     if (prefersReducedMotion) return;
 
-    if (currentLineIndex < terminalText.length) {
-      const currentLine = terminalText[currentLineIndex];
+    if (currentLineIndex >= terminalText.length) return;
 
-      if (currentTextIndex < currentLine.length) {
-        const timeout = setTimeout(() => {
-          setDisplayedLines((prev) => {
-            const nextLines = [...prev];
-            if (currentTextIndex === 0) nextLines[currentLineIndex] = "";
-            nextLines[currentLineIndex] = currentLine.substring(
-              0,
-              currentTextIndex + 1,
-            );
-            return nextLines;
-          });
-          setCurrentTextIndex((prev) => prev + 1);
-        }, TYPING_SPEED);
+    const currentLine = terminalText[currentLineIndex];
 
-        return () => clearTimeout(timeout);
-      }
+    if (currentTextIndex < currentLine.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedLines((prev) => {
+          const next = [...prev];
+          if (currentTextIndex === 0) next[currentLineIndex] = "";
+          next[currentLineIndex] = currentLine.slice(0, currentTextIndex + 1);
+          return next;
+        });
 
-      if (currentLineIndex < terminalText.length - 1) {
-        const timeout = setTimeout(() => {
-          setCurrentLineIndex((prev) => prev + 1);
-          setCurrentTextIndex(0);
-        }, 400);
-        return () => clearTimeout(timeout);
-      }
+        setCurrentTextIndex((prev) => prev + 1);
+      }, TYPING_SPEED);
+
+      return () => clearTimeout(timeout);
+    }
+
+    if (currentLineIndex < terminalText.length - 1) {
+      const timeout = setTimeout(() => {
+        setCurrentLineIndex((prev) => prev + 1);
+        setCurrentTextIndex(0);
+      }, 350);
+
+      return () => clearTimeout(timeout);
     }
   }, [currentLineIndex, currentTextIndex, prefersReducedMotion]);
 
   const linesToRender = prefersReducedMotion ? staticLines : displayedLines;
 
   return (
-    <div className="w-full max-w-137.5 aspect-[5/4] bg-black/70 rounded-2xl border border-white/10 shadow-2xl p-6 font-mono text-emerald-400 text-sm overflow-hidden relative">
-      <div className="absolute top-0 left-0 w-full h-8 bg-black/40 border-b border-white/10 flex items-center px-4 gap-2">
-        <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-        <div className="w-3 h-3 rounded-full bg-orange-400/80"></div>
-        <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-        <span className="text-slate-500 text-xs flex-1 text-center pr-10">
+    <div className="hover:shadow-emerald-500/10 relative w-full max-w-[550px] aspect-[5/4] overflow-hidden rounded-2xl border border-emerald-500/10 bg-black/75 shadow-2xl">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.06),transparent_45%)] pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.06] [background-image:linear-gradient(to_bottom,transparent,transparent_3px,rgba(255,255,255,0.3)_4px)] [background-size:100%_6px]" />
+
+      <div className="absolute top-0 left-0 z-10 flex h-10 w-full items-center gap-2 border-b border-white/10 bg-black/50 px-4 backdrop-blur-sm">
+        <div className="h-3 w-3 rounded-full bg-red-500/80" />
+        <div className="h-3 w-3 rounded-full bg-orange-400/80" />
+        <div className="h-3 w-3 rounded-full bg-green-500/80" />
+        <span className="flex-1 pr-10 text-center text-xs text-slate-500">
           Terminal
         </span>
       </div>
 
-      <div className="pt-8 space-y-2.5">
-        {linesToRender.map((line, index) => {
-          const isLastLine = index === terminalText.length - 1;
-          const textToDisplay = isLastLine ? line.slice(0, -1) : line;
+      <div className="relative z-0 h-full px-6 pb-6 pt-14 font-mono text-sm text-emerald-400">
+        <div className="space-y-2 [text-shadow:0_0_8px_rgba(16,185,129,0.22)]">
+          {linesToRender.map((line, index) => {
+            const isLastLine = index === terminalText.length - 1;
+            const textToDisplay = isLastLine ? line.replace(/_$/, "") : line;
 
-          return (
-            <p key={index} className="flex items-start gap-1">
-              <span className="leading-relaxed">{textToDisplay}</span>
-              {!prefersReducedMotion &&
-                isLastLine &&
-                currentLineIndex === terminalText.length - 1 && (
-                  <span className="w-2 h-4 bg-emerald-400 animate-pulse mt-0.5" />
-                )}
-            </p>
-          );
-        })}
+            const isWarning = textToDisplay.includes("[WARN]");
+            const isCritical = textToDisplay.includes("[CRITICAL]");
+            const isAction = textToDisplay.includes("[ACTION]");
+
+            return (
+              <p
+                key={index}
+                className={`flex items-start gap-1 leading-relaxed ${
+                  isCritical
+                    ? "text-red-400"
+                    : isWarning
+                      ? "text-yellow-400"
+                      : isAction
+                        ? "text-cyan-400"
+                        : "text-emerald-400"
+                }`}
+              >
+                <span>{textToDisplay}</span>
+
+                {!prefersReducedMotion &&
+                  isLastLine &&
+                  currentLineIndex === terminalText.length - 1 && (
+                    <span className="mt-0.5 inline-block h-4 w-2 bg-emerald-400 animate-pulse" />
+                  )}
+              </p>
+            );
+          })}
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black via-black/70 to-transparent" />
       </div>
     </div>
   );

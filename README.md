@@ -4,9 +4,12 @@
 
 # CaseShell
 
-**THE ULTIMATE TERMINAL PUZZLE**
+> The Ultimate Terminal Puzzle  
+> Hackea el sistema. Resuelve el caso.
 
-_Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde la terminal es la escena del crimen~_
+CaseShell es un juego narrativo-investigativo que simula un sistema operativo corporativo minimalista dentro de una experiencia web interactiva.
+
+El jugador toma el rol de un analista SOC y debe inspeccionar archivos, ejecutar comandos en la terminal, descubrir pistas ocultas y remediar incidentes antes de que escalen.
 
 </div>
 
@@ -14,26 +17,34 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 
 ## ⚡ Demo
 
-> [CaseShell | The Ultimate Terminal Puzzle](https://caseshell-app-nq12gl-38b126-194-26-100-34.traefik.me/)
+**Live demo:** [CaseShell | The Ultimate Terminal Puzzle](https://caseshell-app-nq12gl-38b126-194-26-100-34.traefik.me/)
 
-⚠️ A la hora de entrar a la página te saldrá **La conexión no es privada**, esto se debe a que es un **dominio gratis** proporcionado por **Dokploy**, por lo tanto no tiene certificado SSL. Esto NO significa que la página no es segura. Debes darle en Más Información (o parecido) y en continuar a la página.
+> Nota: el dominio de demo puede mostrar una advertencia de certificado al estar servido con un dominio gratuito de infraestructura. Eso no implica por sí solo que la app sea maliciosa; simplemente es una limitación del entorno de despliegue usado para la hackathon.
 
 > Issue: [Issue #68](https://github.com/midudev/hackaton-cubepath-2026/issues/68)
 
 ## 💡 ¿De qué trata?
 
-**CaseShell** es un juego narrativo-investigativo que simula un OS corporativo ultra minimalista. Combina UI de escritorio interactiva + terminal real para recrear un incidente en la infraestructura de CubePath. El jugador actúa como analista SOC: debe inspeccionar archivos, ejecutar comandos, desbloquear pistas ocultas y cerrar el incidente antes de que escale.
+CaseShell mezcla una interfaz tipo escritorio con una terminal funcional para recrear un incidente técnico dentro de una infraestructura ficticia inspirada en CubePath.
+
+La experiencia gira alrededor de:
+
+- exploración de archivos y ventanas
+- análisis de pistas visuales y textuales
+- ejecución de comandos en terminal
+- resolución progresiva de incidentes según dificultad
+- envío de tiempos a un ranking global **opcional**
 
 ## ✨ Características
 
-- **🖥️ Escritorio:** Simulación de un sistema operativo con archivos, textos, imágenes, terminal y temas personalizables
-- **🪟 Ventanas redimensionables:** Cada app (terminal, chat, visor de archivos) tiene marco arrastrable y handle de resize estilo OS antiguo
-- **⌨️ Terminal con motor de casos:** Ejecuta comandos reales (`diag`, `fix`, `kill`...) y escucha audio feedback instantáneo
-- **📡 OPS Chat con hints:** Conversaciones guionadas reaccionan al progreso y permiten pegar comandos con un click
-- **🎯 Panel de objetivos:** Tracker colapsable con checklist por dificultad y acceso rápido desde la barra.
-- **🔐 Integración CubePath:** Desplegado 100% en CubePath con Dokploy (Next.js + PostgreSQL para ranking global)
-- **🧠 Narrativa progresiva:** Cada dificultad añade archivos, puzzles visuales y cadenas de remediación más largas
-- **⚙️ Autosave & Pending Scores:** Guarda tu sesión y sincroniza el tiempo final al ranking aunque cierres la pestaña
+- **Simulación de escritorio:** ventanas, archivos, textos, imágenes y terminal dentro de una UI estilo OS.
+- **Ventanas arrastrables y redimensionables:** experiencia más inmersiva tipo sistema operativo clásico.
+- **Terminal con motor de casos:** comandos como `diag`, `fix`, `kill` y otros disparan progresión real del caso.
+- **OPS Chat contextual:** hints dinámicos que reaccionan al avance del jugador.
+- **Panel de objetivos:** seguimiento de progreso por dificultad.
+- **Ranking global:** guarda tiempos de partida para usuarios autenticados.
+- **Autosave local:** persistencia de sesión y sincronización posterior de score.
+- **Narrativa progresiva:** cada dificultad agrega más pasos, pistas y cadenas de remediación.
 
 ## 🎮 Gameplay
 
@@ -45,7 +56,11 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 
 ## 📸 Capturas & GIFs
 
+## Preview
+
 ![GIF](./public/demo_gif_02.gif)
+
+### Capturas
 
 ![CAP 1](https://i.imgur.com/5ro0Kmv.png)
 ![CAP 2](https://i.imgur.com/ytcD8Wk.png)
@@ -54,16 +69,32 @@ _Hackea el sistema. Resuelve el caso. Un simulador inmersivo de escritorio donde
 ![CAP 5](https://i.imgur.com/gLsJKeS.png)
 ![CAP 6](https://i.imgur.com/rwJsrnU.png)
 
-## 🧱 Stack Tecnológico
+## Stack tecnológico
 
-- **Frontend:** Next.js 15 (App Router) + TypeScript + Tailwind + Zustand
-- **Auth:** NextAuth v5 (Auth.js) con GitHub OAuth
+### Frontend
 
-> ⚠️ La autenticación es totalmente **opcional** no necesitas autenticarte para jugar, esto es solamente si deseas guardar tu tiempo en la tabla de clasificación
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Zustand
+- Framer Motion
+- Lucide React
 
-- **DB:** PostgreSQL administrado en Dokploy (CubePath) + Prisma ORM
-- **Infra:** Build & deploy automatizado desde Dokploy
-- **Integraciones adicionales:** Server Actions para ranking, RSC para briefing/desktop, localStorage pending scores
+### Backend / Data
+
+- Prisma ORM
+- PostgreSQL
+
+### Auth
+
+- Auth.js / NextAuth
+- GitHub OAuth
+
+### Infraestructura
+
+- Dokploy
+- CubePath VPS
 
 ## 🧩 Uso de CubePath
 

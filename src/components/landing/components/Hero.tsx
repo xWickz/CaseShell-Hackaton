@@ -75,9 +75,9 @@ export default function Hero() {
           <Link
             href="/game"
             type="button"
-            className="bg-red-600 hover:bg-red-700 text-white text-md md:text-md font-semibold px-8 py-2 rounded-md transition-all active:scale-95 shadow-[0_0_15px_rgba(220,38,38,0.3)] font-sans border-2 border-red-500 hover:border-red-600"
+            className="bg-red-600 hover:bg-red-700 hover:scale-105 active:scale-95 transition text-white text-md md:text-md font-bold px-8 py-2 rounded-md transition-all active:scale-95 shadow-[0_0_15px_rgba(220,38,38,0.3)] font-sans border-2 border-red-500 hover:border-red-600"
           >
-            Jugar ahora
+            Acceder al sistema
           </Link>
         </section>
 
