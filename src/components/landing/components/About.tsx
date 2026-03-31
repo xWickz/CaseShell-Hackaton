@@ -12,14 +12,14 @@ export default function About() {
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 lg:px-20 py-24 md:py-32">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="space-y-8 text-center lg:text-left">
-              <h2 className="text-3xl md:text-5xl text-white font-bold tracking-tighter font-mono flex flex-wrap justify-center lg:justify-start items-center gap-2">
+              <h2 className="text-3xl md:text-5xl text-snow-white font-bold tracking-tighter font-mono flex flex-wrap justify-center lg:justify-start items-center gap-2">
                 ¿Qué es Case <CanvasTxt text="Shell" />?
               </h2>
 
               <p className="text-md md:text-md text-slate-300 leading-relaxed max-w-lg mx-auto lg:mx-0 text-justify">
                 CaseShell es un mini-juego de investigación donde se simulará un
                 sistema operativo en el cual podrás interactuar con:{" "}
-                <strong className="text-white border-b border-emerald-500/30">
+                <strong className="text-snow-white border-b border-emerald-500/30">
                   carpetas, imágenes, documentos y una terminal de comandos
                 </strong>
                 . El objetivo es resolver el caso según las pistas que

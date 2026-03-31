@@ -7,7 +7,7 @@ import Link from "next/link";
 const MatrixRain = dynamic(
   () =>
     import("@/components/landing/MatrixRain").then((mod) => ({
-      default: mod.MatrixRain,
+      default: mod.MatrixBackground,
     })),
   {
     ssr: false,
@@ -49,14 +49,14 @@ export default function Hero() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+              <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-300/10 hover:border-emerald-600/20 hover:text-emerald-300 text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                 Hackatón de CubePath
               </span>
             </a>
           </div>
 
           <span className="flex items-center tracking-tighter">
-            <h1 className="text-7xl font-bold md:text-4xl lg:text-6xl text-white">
+            <h1 className="text-7xl font-bold md:text-4xl lg:text-6xl text-snow-white">
               Case
             </h1>
             <CanvasTxt
@@ -75,7 +75,7 @@ export default function Hero() {
           <Link
             href="/game"
             type="button"
-            className="bg-red-600 hover:bg-red-700 hover:scale-105 active:scale-95 transition text-white text-md md:text-md font-bold px-8 py-2 rounded-md transition-all active:scale-95 shadow-[0_0_15px_rgba(220,38,38,0.3)] font-sans border-2 border-red-500 hover:border-red-600"
+            className="bg-scarlet-red hover:bg-scarlet-red/90 hover:scale-105 active:scale-95 transition text-snow-white text-md md:text-md font-bold px-8 py-2 rounded-md transition-all active:scale-95 shadow-[0_0_15px_rgba(220,38,38,0.3)] font-sans border-2 border-scarlet-red hover:border-scarlet-red/90"
           >
             Acceder al sistema
           </Link>

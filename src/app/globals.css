@@ -6,9 +6,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --background-void-eclipse: #0b0b0b;
+  --background-midnight-abyss: #0b1215;
+  --background-scarlet-red: #fb1616;
+  --background-snow-white: #f2f6fc; 
+  --background-egg-shell: #f9feff;
 }
 
 @theme inline {
+  --color-void-eclipse: var(--background-void-eclipse);
+  --color-midnight-abyss: var(--background-midnight-abyss);
+  --color-scarlet-red: var(--background-scarlet-red);
+  --color-snow-white: var(--background-snow-white);
+  --color-egg-shell: var(--background-egg-shell);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

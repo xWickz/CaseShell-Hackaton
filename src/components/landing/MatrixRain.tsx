@@ -1,14 +1,29 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-export const MatrixRain = () => {
+interface MatrixBackgroundProps {
+  color?: string; // Por defecto usa el verde esmeralda que tenías
+  fontSize?: number;
+  className?: string;
+  speed?: number;
+  opacity?: number;
+}
+
+export const MatrixBackground: React.FC<MatrixBackgroundProps> = ({
+  color = "#10b981",
+  fontSize = 14,
+  className = "",
+  speed = 1,
+  opacity = 0.4,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isActive, setIsActive] = useState(false);
 
+  // Lógica de optimización del primer código
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
     const desktopQuery = window.matchMedia("(min-width: 1024px)");
 
     const updateState = () => {
@@ -26,18 +41,10 @@ export const MatrixRain = () => {
   }, []);
 
   useEffect(() => {
-    if (!isActive) {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        ctx?.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      return;
-    }
+    if (!isActive) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -52,47 +59,62 @@ export const MatrixRain = () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    const characters = "01";
-    const fontSize = 14;
-    const columns = Math.max(1, Math.floor(canvas.width / fontSize));
-    const drops: number[] = Array(columns).fill(1);
+    // Mantenemos la esencia: Solo 0 y 1
+    const chars = "01";
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops: number[] = new Array(columns).fill(1);
 
-    const draw = () => {
+    let animationFrameId: number;
+    let lastTime = 0;
+    const interval = 50; // Ajustado para un balance entre suavidad y estética retro
+
+    const draw = (currentTime: number) => {
+      animationFrameId = requestAnimationFrame(draw);
+
+      if (currentTime - lastTime < interval) return;
+      lastTime = currentTime;
+
+      // Fondo semi-transparente para el rastro (mantenemos el 0.08 del original)
       ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#10b981";
+      ctx.fillStyle = color;
       ctx.font = `${fontSize}px monospace`;
 
       for (let i = 0; i < drops.length; i++) {
-        const text = characters.charAt(
-          Math.floor(Math.random() * characters.length),
-        );
+        const text = chars[Math.floor(Math.random() * chars.length)];
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.985) {
           drops[i] = 0;
         }
-        drops[i]++;
+        drops[i] += speed;
       }
     };
 
-    const interval = setInterval(draw, 90);
+    animationFrameId = requestAnimationFrame(draw);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener("resize", resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
     };
-  }, [isActive]);
+  }, [isActive, color, fontSize, speed]);
+
+  if (!isActive) return null;
 
   return (
-    <>
+    <div
+      className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}
+    >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full -z-10 opacity-40 pointer-events-none"
-        aria-hidden="true"
+        className="w-full h-full"
+        style={{ opacity: opacity }}
       />
+      {/* Mantenemos el degradado inferior del primer código */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-    </>
+    </div>
   );
 };
+
+export default MatrixBackground;

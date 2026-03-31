@@ -6,13 +6,13 @@ export function DitherMatrix() {
     <div className="w-full h-full overflow-hidden pointer-events-none">
       <DitherShader
         src="/matrix-bg.webp"
-        gridSize={2}
+        gridSize={1}
         ditherMode="noise"
         colorMode="duotone"
         primaryColor="#03170c"
         secondaryColor="#4ade80"
         objectFit="cover"
-        className="w-full h-full opacity-30"
+        className="w-full h-full opacity-50"
       />
     </div>
   );
