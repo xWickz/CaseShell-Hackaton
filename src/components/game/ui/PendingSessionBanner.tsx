@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import type { Difficulty } from "@/types/game";
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -31,16 +31,33 @@ export default function PendingSessionBanner() {
       if (!currentDifficulty || !(currentDifficulty in DIFFICULTY_LABELS))
         return;
 
-      const startTime = state.startTime as number | null;
       const knowledge = state.caseState?.knowledge ?? {};
       const progress = state.caseState?.progress ?? {};
       const completed = Boolean(progress.completed);
+      const hasTimedOut = Boolean(state.hasTimedOut);
+      const isLockedOut = Boolean(state.failureState?.isLockedOut);
 
-      const hasProgress =
-        Boolean(startTime) || Object.keys(progress).length > 1;
+      const timeLimitMs = Number(state.timeLimitMs ?? 0);
+      const timeRemainingMs = Number(state.timeRemainingMs ?? timeLimitMs);
+      const hasTimerProgress =
+        Number.isFinite(timeLimitMs) &&
+        Number.isFinite(timeRemainingMs) &&
+        timeLimitMs > 0 &&
+        timeRemainingMs < timeLimitMs;
+
+      const hasObjectiveProgress = Object.entries(progress).some(
+        ([key, value]) => key !== "completed" && Boolean(value),
+      );
+
+      const hasProgress = hasTimerProgress || hasObjectiveProgress;
       const hasKnowledge = Object.keys(knowledge).length > 0;
 
-      if ((hasProgress || hasKnowledge) && !completed) {
+      if (
+        (hasProgress || hasKnowledge) &&
+        !completed &&
+        !hasTimedOut &&
+        !isLockedOut
+      ) {
         window.requestAnimationFrame(() => {
           setPendingSession({ difficulty: currentDifficulty });
         });

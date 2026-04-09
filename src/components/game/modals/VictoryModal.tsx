@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type { Session } from "next-auth";
+import { getSession, signIn } from "next-auth/react";
+import { useEffect, useMemo, useState } from "react";
+import type { SubmitRankingResult } from "@/app/actions/ranking";
+import { submitRankingAction } from "@/app/actions/ranking";
+import { GitHub } from "@/components/game/ui/github";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { Difficulty } from "@/types/game";
-import { signIn, getSession } from "next-auth/react";
-import type { Session } from "next-auth";
-import { submitRankingAction } from "@/app/actions/ranking";
-import type { SubmitRankingResult } from "@/app/actions/ranking";
-import { GitHub } from "@/components/game/ui/github";
 
 const CASE_IDS: Record<Difficulty, string> = {
   easy: "ACCESS-NOT-GRANTED",
@@ -65,8 +65,8 @@ export default function VictoryModal() {
   const router = useRouter();
 
   const isVictoryOpen = useGameSessionStore((state) => state.isVictoryOpen);
-  const startTime = useGameSessionStore((state) => state.startTime);
-  const endTime = useGameSessionStore((state) => state.endTime);
+  const timeLimitMs = useGameSessionStore((state) => state.timeLimitMs);
+  const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
   const resetSession = useGameSessionStore((state) => state.resetSession);
   const initializeSession = useGameSessionStore(
     (state) => state.initializeSession,
@@ -127,9 +127,13 @@ export default function VictoryModal() {
   }, [resetCountdown]);
 
   const elapsedSeconds = useMemo(() => {
-    if (!startTime || !endTime) return 0;
-    return Math.max(0, Math.floor((endTime - startTime) / 1000));
-  }, [startTime, endTime]);
+    if (!Number.isFinite(timeLimitMs) || !Number.isFinite(timeRemainingMs)) {
+      return 0;
+    }
+
+    const elapsedMs = Math.max(0, timeLimitMs - timeRemainingMs);
+    return Math.floor(elapsedMs / 1000);
+  }, [timeLimitMs, timeRemainingMs]);
 
   const caseId = CASE_IDS[currentDifficulty];
   const difficultyLabel = DIFFICULTY_LABELS[currentDifficulty];
@@ -158,27 +162,23 @@ export default function VictoryModal() {
   }, [submissionFeedback]);
 
   const handleLogin = async () => {
-    localStorage.setItem(
-      "pendingScore",
-      JSON.stringify({
-        difficulty: currentDifficulty,
-        timeElapsed: elapsedSeconds,
-      }),
-    );
     await signIn("github", {
       callbackUrl: window.location.origin + "/ranking",
     });
   };
 
   const submitScore = async () => {
-    if (!user || submitted || elapsedSeconds <= 0) return;
+    if (!user || submitted || elapsedSeconds <= 0 || !isVictoryOpen) return;
+
     setIsSubmiting(true);
     setSubmissionFeedback(null);
+
     try {
       const result = await submitRankingAction(
         currentDifficulty,
         elapsedSeconds,
       );
+
       setSubmissionFeedback({
         kind: result.status,
         currentTime: result.currentTime,
@@ -191,14 +191,17 @@ export default function VictoryModal() {
 
       setSubmitted(true);
       setResetCountdown(AUTO_RESET_DELAY_SECONDS);
+
       if (autoResetTimeoutId !== null) {
         window.clearTimeout(autoResetTimeoutId);
       }
+
       const timeoutId = window.setTimeout(() => {
         resetSession();
         setResetCountdown(null);
         setAutoResetTimeoutId(null);
       }, AUTO_RESET_DELAY_MS);
+
       setAutoResetTimeoutId(timeoutId);
     } catch (error) {
       console.error("Error al guardar ranking", error);
@@ -284,6 +287,7 @@ export default function VictoryModal() {
                   Ingresa para guardar tu mejor récord global de la hackathon.
                 </p>
                 <button
+                  type="button"
                   onClick={handleLogin}
                   className="flex items-center gap-2 rounded-xl bg-[#24292e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2f363d]"
                 >
@@ -297,6 +301,7 @@ export default function VictoryModal() {
                   Conectado como <span className="text-white">{user.name}</span>
                 </p>
                 <button
+                  type="button"
                   onClick={submitScore}
                   disabled={isSubmiting || submitted}
                   className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition ${
@@ -335,6 +340,7 @@ export default function VictoryModal() {
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <button
+              type="button"
               onClick={() => {
                 resetSession();
               }}
@@ -345,6 +351,7 @@ export default function VictoryModal() {
 
             {nextDifficulty ? (
               <button
+                type="button"
                 onClick={handleNextLevel}
                 className="rounded-xl bg-cyan-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400"
               >
@@ -352,6 +359,7 @@ export default function VictoryModal() {
               </button>
             ) : (
               <button
+                type="button"
                 onClick={handleExploreRanking}
                 className="rounded-xl bg-violet-500 px-5 py-3 font-semibold text-white transition hover:bg-violet-400"
               >

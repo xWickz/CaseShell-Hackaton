@@ -17,6 +17,7 @@ import type { Difficulty } from "@/types/game";
 import { useGameUIStore } from "@/store/useGameUIStore";
 
 type GameSessionState = {
+  hasHydrated: boolean;
   terminalHistory: TerminalLine[];
   currentInput: string;
 
@@ -82,6 +83,9 @@ type GameSessionState = {
 
   setActiveAlert: (alert: ActiveTerminalAlert) => void;
   clearActiveAlert: () => void;
+
+  rehydrateRuntimeTimer: () => void;
+  setHasHydrated: (value: boolean) => void;
 };
 
 export type CommandOutcome = "success" | "error";
@@ -180,6 +184,39 @@ const createInitialTerminalHistory = (
 export const useGameSessionStore = create<GameSessionState>()(
   persist(
     (set) => ({
+      hasHydrated: false,
+
+      setHasHydrated: (value) => set({ hasHydrated: value }),
+
+      rehydrateRuntimeTimer: () =>
+        set((state) => {
+          const isCompleted = state.caseState.progress.completed;
+          const isLockedOut = state.failureState.isLockedOut;
+
+          if (
+            isCompleted ||
+            state.hasTimedOut ||
+            isLockedOut ||
+            state.timeRemainingMs <= 0
+          ) {
+            return {
+              startTime: null,
+              endTime: null,
+              timerEndsAt: null,
+              isVictoryOpen: false,
+            };
+          }
+
+          const now = Date.now();
+
+          return {
+            startTime: now,
+            endTime: null,
+            timerEndsAt: state.isPaused ? null : now + state.timeRemainingMs,
+            isVictoryOpen: false,
+          };
+        }),
+
       terminalHistory: createInitialTerminalHistory(DEFAULT_DIFFICULTY),
       currentInput: "",
       commandLog: [],
@@ -211,42 +248,39 @@ export const useGameSessionStore = create<GameSessionState>()(
       failureState: createInitialFailureState(DEFAULT_DIFFICULTY),
 
       initializeSession: (difficulty) =>
-        set((state) => {
-          if (state.currentDifficulty !== difficulty) {
-            useGameUIStore.getState().resetVirusAlertHint();
+        set(() => {
+          useGameUIStore.getState().resetVirusAlertHint();
 
-            const nextTimeLimit = DIFFICULTY_TIME_LIMITS[difficulty];
+          const nextTimeLimit = DIFFICULTY_TIME_LIMITS[difficulty];
 
-            return {
-              currentDifficulty: difficulty,
-              terminalHistory: createInitialTerminalHistory(difficulty),
-              currentInput: "",
-              caseState: createInitialCaseState(),
-              startTime: null,
-              endTime: null,
+          return {
+            currentDifficulty: difficulty,
+            terminalHistory: createInitialTerminalHistory(difficulty),
+            currentInput: "",
+            caseState: createInitialCaseState(),
+            startTime: null,
+            endTime: null,
 
-              timeLimitMs: nextTimeLimit,
-              timeRemainingMs: nextTimeLimit,
-              timerEndsAt: null,
-              hasTimedOut: false,
-              isFailedOpen: false,
+            timeLimitMs: nextTimeLimit,
+            timeRemainingMs: nextTimeLimit,
+            timerEndsAt: null,
+            hasTimedOut: false,
+            isFailedOpen: false,
 
-              isPaused: false,
-              pausedAt: null,
+            isPaused: false,
+            pausedAt: null,
 
-              lastCompletedKey: null,
-              completionStreak: 0,
+            lastCompletedKey: null,
+            completionStreak: 0,
 
-              isVictoryOpen: false,
-              commandLog: [],
-              commandHistory: [],
-              commandStats: { total: 0, success: 0, error: 0 },
-              activeAlert: null,
-              alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
-              failureState: createInitialFailureState(difficulty),
-            };
-          }
-          return {};
+            isVictoryOpen: false,
+            commandLog: [],
+            commandHistory: [],
+            commandStats: { total: 0, success: 0, error: 0 },
+            activeAlert: null,
+            alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
+            failureState: createInitialFailureState(difficulty),
+          };
         }),
 
       setCurrentInput: (value) => set({ currentInput: value }),
@@ -306,12 +340,19 @@ export const useGameSessionStore = create<GameSessionState>()(
           }
 
           const now = Date.now();
+          const remaining =
+            state.timeRemainingMs > 0
+              ? state.timeRemainingMs
+              : state.timeLimitMs;
+
           return {
             startTime: now,
-            timerEndsAt: now + state.timeLimitMs,
-            timeRemainingMs: state.timeLimitMs,
+            endTime: null,
+            timerEndsAt: now + remaining,
+            timeRemainingMs: remaining,
             isPaused: false,
             pausedAt: null,
+            isVictoryOpen: false,
           };
         }),
 
@@ -373,9 +414,16 @@ export const useGameSessionStore = create<GameSessionState>()(
             return {};
           }
 
+          const now = Date.now();
+          const remaining = state.timerEndsAt
+            ? Math.max(0, state.timerEndsAt - now)
+            : state.timeRemainingMs;
+
           return {
             isPaused: true,
-            pausedAt: Date.now(),
+            pausedAt: now,
+            timeRemainingMs: remaining,
+            timerEndsAt: null,
           };
         }),
 
@@ -383,24 +431,20 @@ export const useGameSessionStore = create<GameSessionState>()(
         set((state) => {
           if (
             !state.isPaused ||
-            !state.pausedAt ||
-            !state.startTime ||
-            !state.timerEndsAt ||
             state.caseState.progress.completed ||
             state.hasTimedOut ||
-            state.failureState.isLockedOut
+            state.failureState.isLockedOut ||
+            state.timeRemainingMs <= 0
           ) {
             return {};
           }
 
           const now = Date.now();
-          const pauseDuration = now - state.pausedAt;
 
           return {
             isPaused: false,
             pausedAt: null,
-            startTime: state.startTime + pauseDuration,
-            timerEndsAt: state.timerEndsAt + pauseDuration,
+            timerEndsAt: now + state.timeRemainingMs,
           };
         }),
 
@@ -595,28 +639,41 @@ export const useGameSessionStore = create<GameSessionState>()(
     {
       name: "caseshell-session-storage",
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
       partialize: (state) => ({
         terminalHistory: state.terminalHistory,
         currentInput: state.currentInput,
         commandLog: state.commandLog,
         commandHistory: state.commandHistory,
         commandStats: state.commandStats,
-        caseState: state.caseState,
+
+        caseState: {
+          knowledge: state.caseState.knowledge,
+          progress: {
+            ...state.caseState.progress,
+            completed: false,
+          },
+        },
+
         currentDifficulty: state.currentDifficulty,
-        startTime: state.startTime,
-        endTime: state.endTime,
+
         timeLimitMs: state.timeLimitMs,
         timeRemainingMs: state.timeRemainingMs,
-        timerEndsAt: state.timerEndsAt,
+
         hasTimedOut: state.hasTimedOut,
         isFailedOpen: state.isFailedOpen,
+
         isPaused: state.isPaused,
-        pausedAt: state.pausedAt,
+        pausedAt: null,
+
         lastCompletedKey: state.lastCompletedKey,
         completionStreak: state.completionStreak,
-        isVictoryOpen: state.isVictoryOpen,
+
         activeAlert: state.activeAlert,
         alertEffectState: state.alertEffectState,
+
         failureState: state.failureState,
       }),
     },

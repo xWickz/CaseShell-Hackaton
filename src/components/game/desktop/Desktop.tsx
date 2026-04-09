@@ -1,25 +1,26 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import OpsChatWindow from "@/components/game/chat/OpsChatWindow";
 import DesktopIcon from "@/components/game/desktop/DesktopIcon";
+import ObjectiveTracker from "@/components/game/desktop/ObjectiveTracker";
 import Taskbar from "@/components/game/desktop/Taskbar";
-import BriefingModal from "@/components/game/modals/BriefingModal";
-import TerminalWindow from "@/components/game/terminal/TerminalWindow";
 import WindowFrame from "@/components/game/desktop/WindowFrame";
 import FileViewer from "@/components/game/files/FileViewer";
 import FolderViewer from "@/components/game/files/FolderViewer";
-import { useGameUIStore } from "@/store/useGameUIStore";
-import { useGameSessionStore } from "@/store/useGameSessionStore";
-import type { DesktopItem, Briefing, Difficulty } from "@/types/game";
-import VictoryModal from "@/components/game/modals/VictoryModal";
-import OnboardingOverlay from "@/components/game/modals/OnboardingOverlay";
+import BriefingModal from "@/components/game/modals/BriefingModal";
 import ExitModal from "@/components/game/modals/ExitModal";
-import ResetModal from "@/components/game/modals/ResetModal";
 import FailureModal from "@/components/game/modals/FailureModal";
+import OnboardingOverlay from "@/components/game/modals/OnboardingOverlay";
+import ResetModal from "@/components/game/modals/ResetModal";
+import VictoryModal from "@/components/game/modals/VictoryModal";
+import GameSessionHydrator from "@/components/game/system/GameSessionHydrator";
 import GameTimerController from "@/components/game/system/GameTimerController";
-import Link from "next/link";
-import ObjectiveTracker from "@/components/game/desktop/ObjectiveTracker";
-import OpsChatWindow from "@/components/game/chat/OpsChatWindow";
+import TerminalWindow from "@/components/game/terminal/TerminalWindow";
+import { useGameSessionStore } from "@/store/useGameSessionStore";
+import { useGameUIStore } from "@/store/useGameUIStore";
+import type { Briefing, DesktopItem, Difficulty } from "@/types/game";
 
 type DesktopProps = {
   items: DesktopItem[];
@@ -58,6 +59,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const initializeSession = useGameSessionStore(
     (state) => state.initializeSession,
   );
+  const hasHydrated = useGameSessionStore((state) => state.hasHydrated);
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
@@ -86,11 +88,19 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   }, []);
 
   useEffect(() => {
+    if (!hasHydrated) return;
+
     setDifficulty(difficulty);
     if (currentDifficulty !== difficulty) {
       initializeSession(difficulty);
     }
-  }, [difficulty, currentDifficulty, setDifficulty, initializeSession]);
+  }, [
+    hasHydrated,
+    difficulty,
+    currentDifficulty,
+    setDifficulty,
+    initializeSession,
+  ]);
 
   useEffect(() => {
     openWindow({
@@ -148,6 +158,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     <main
       className={`relative h-screen w-full overflow-hidden bg-linear-to-br ${wallpaperClasses}`}
     >
+      <GameSessionHydrator />
       <GameTimerController />
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.15),transparent_30%)]" />
@@ -272,6 +283,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
             strokeLinecap="round"
             strokeLinejoin="round"
           >
+            <title>Acceso Denegado</title>
             <rect width="20" height="14" x="2" y="3" rx="2" ry="2" />
             <line x1="8" x2="16" y1="21" y2="21" />
             <line x1="12" x2="12" y1="17" y2="21" />

@@ -5,6 +5,12 @@ import { prisma } from "@/lib/prisma";
 
 const allowedDifficulties = new Set(["easy", "medium", "hard"]);
 
+const MIN_SECONDS_BY_DIFFICULTY: Record<string, number> = {
+  easy: 30, //30 segundos si, pausible
+  medium: 60, // 1 minuto? bueno, a ver
+  hard: 120, // 2 minutos si ya se sabe todo pero igual
+};
+
 export type SubmitRankingResult = {
   status: "created" | "improved" | "slower";
   previousTime?: number;
@@ -23,6 +29,11 @@ export async function submitRankingAction(
     throw new Error("Tiempo inválido");
   }
 
+  const minSeconds = MIN_SECONDS_BY_DIFFICULTY[difficulty];
+  if (timeSeconds < minSeconds) {
+    throw new Error("Tiempo no válido para ranking");
+  }
+
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -30,7 +41,9 @@ export async function submitRankingAction(
   }
 
   const user = await prisma.user.findFirst({
-    where: { OR: [{ id: session.user.id }, { email: session.user.email ?? "" }] },
+    where: {
+      OR: [{ id: session.user.id }, { email: session.user.email ?? "" }],
+    },
   });
 
   if (!user) {
@@ -94,5 +107,6 @@ export async function getRankingsAction(difficulty: string) {
       },
     },
   });
+
   return rankings;
 }
