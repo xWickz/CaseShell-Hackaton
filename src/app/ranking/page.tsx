@@ -1,7 +1,14 @@
-import Navbar from "@/components/landing/components/Navbar";
-import Footer from "@/components/landing/components/Footer";
-import RankingTable from "@/components/game/ranking/RankingTable";
+import type { Metadata } from "next";
 import { PendingScoreSync } from "@/components/game/ranking/PendingScoreSync";
+import RankingTable from "@/components/game/ranking/RankingTable";
+import Footer from "@/components/landing/components/Footer";
+import Navbar from "@/components/landing/components/Navbar";
+
+export const metadata: Metadata = {
+  title: "Tabla de clasificación",
+  description:
+    "Consulta la tabla de clasificación de CaseShell. Compara tus tiempos con otros jugadores y demuestra tus habilidades en la terminal. ¡Sube en el ranking y conviértete en el mejor investigador digital!",
+};
 
 export default function RankingPage() {
   return (

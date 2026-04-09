@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { difficulties } from "@/data/mock/difficulties";
-import Navbar from "@/components/landing/components/Navbar";
-import Footer from "@/components/landing/components/Footer";
 import PendingSessionBanner from "@/components/game/ui/PendingSessionBanner";
+import Footer from "@/components/landing/components/Footer";
+import Navbar from "@/components/landing/components/Navbar";
+import { difficulties } from "@/data/mock/difficulties";
+
+export const metadata: Metadata = {
+  title: "Elige tu caso",
+  description: "Elige tu caso y comienza a investigar en CaseShell.",
+};
 
 export default function GameSelectPage() {
   const difficultyStyles: Record<
