@@ -6,9 +6,6 @@
 
 **The Ultimate Terminal Puzzle**
 
-> [!NOTE]
-> ¡Gracias por jugar! El proyecto quedó de **4to lugar**! 🏆
-
 Hackea el sistema. Resuelve el caso.
 
 CaseShell es un juego narrativo-investigativo que simula un sistema operativo corporativo minimalista dentro de una experiencia web interactiva.
@@ -19,12 +16,17 @@ El jugador toma el rol de un analista SOC y debe inspeccionar archivos, ejecutar
 
 ---
 
+> [!TIP]
+> ¡Gracias por jugar! El proyecto quedó de **4to lugar**! 🏆
+
 ## ⚡ Demo
 
 **Live demo:** [CaseShell | The Ultimate Terminal Puzzle](https://case-shell-app-xjvxbi-1c69b9-45-90-237-156.traefik.me/)
 
-> Nota: el dominio de demo puede mostrar una advertencia de certificado al estar servido con un dominio gratuito de infraestructura. Eso no implica por sí solo que la app sea maliciosa; simplemente es una limitación del entorno de despliegue usado para la hackathon.
+> [!IMPORTANT]
+> El dominio de demo puede mostrar una advertencia de certificado al estar servido con un dominio gratuito de infraestructura. Eso no implica por sí solo que la app sea maliciosa; simplemente es una limitación del entorno de despliegue usado para la hackathon.
 
+> [!TIP]
 > Issue: [Issue #68](https://github.com/midudev/hackaton-cubepath-2026/issues/68)
 
 ## 💡 ¿De qué trata?
