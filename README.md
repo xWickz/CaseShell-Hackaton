@@ -16,7 +16,7 @@ El jugador toma el rol de un analista SOC y debe inspeccionar archivos, ejecutar
 
 ---
 
-> [!TIP]
+> [!NOTE]
 > ¡Gracias por jugar! El proyecto quedó de **4to lugar**! 🏆
 
 ## ⚡ Demo
