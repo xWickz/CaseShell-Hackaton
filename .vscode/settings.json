@@ -1,0 +1,41 @@
+{
+  // Configure Biome as the default formatter
+  "editor.defaultFormatter": "biomejs.biome",
+  "biome.lsp.bin": "node_modules/biome",
+  // Format on save
+  "editor.formatOnSave": true,
+
+  // Format on paste
+  "editor.formatOnPaste": true,
+
+  // Organize imports and apply quick fixes on save
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "explicit"
+  },
+
+  // Disable other formatters to avoid conflicts
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+
+  // Disable ESLint if installed to avoid conflicts
+  "eslint.enable": false
+
+  // Biome validation
+}
