@@ -1,8 +1,8 @@
 "use client";
 
-import type { DesktopItem } from "@/types/game";
 import DesktopIcon from "@/components/game/desktop/DesktopIcon";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
+import type { DesktopItem } from "@/types/game";
 
 type FolderViewerProps = {
   items: DesktopItem[];

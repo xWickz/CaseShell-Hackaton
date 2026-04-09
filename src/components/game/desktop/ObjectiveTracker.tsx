@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useId, type CSSProperties } from "react";
-import { CheckCircle2, CircleDot, Circle, ChevronDown, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Circle, CircleDot, X } from "lucide-react";
+import { type CSSProperties, useEffect, useId, useMemo } from "react";
+import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { Difficulty } from "@/types/game";
 import type { CaseProgress } from "@/types/game-engine";
-import { useGameSessionStore } from "@/store/useGameSessionStore";
 
 type StepStatus = "done" | "ready" | "locked";
 

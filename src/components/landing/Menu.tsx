@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { cn } from "@/components/game/ui/lib/utils";
 import type { MenuItem } from "@/config/menus";
 import { MENU_ANCHORS } from "@/config/menus";
-import { cn } from "@/components/game/ui/lib/utils";
 
 export default function Menu({
   label,

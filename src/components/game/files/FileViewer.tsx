@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import type { FileType } from "@/types/game";
 

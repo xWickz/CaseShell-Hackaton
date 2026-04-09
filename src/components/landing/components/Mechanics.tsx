@@ -1,9 +1,9 @@
 "use client";
 
-import { WobbleCard } from "@/components/game/ui/wobble-card";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import Image from "next/image";
+import { useRef } from "react";
+import { WobbleCard } from "@/components/game/ui/wobble-card";
 
 export default function Mechanics() {
   const sectionRef = useRef<HTMLElement | null>(null);

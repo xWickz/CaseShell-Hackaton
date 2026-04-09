@@ -1,5 +1,5 @@
-import { FlipWords } from "@/components/game/ui/flip-words";
 import Link from "next/link";
+import { FlipWords } from "@/components/game/ui/flip-words";
 
 export default function Ready() {
   const words = ["descifrar", "analizar", "resolver"];

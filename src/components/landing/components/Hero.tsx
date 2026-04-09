@@ -1,8 +1,8 @@
 "use client";
 
-import { CanvasTxt } from "@/components/landing/CanvasText";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { CanvasTxt } from "@/components/landing/CanvasText";
 
 const MatrixRain = dynamic(
   () =>

@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
 import { usePathname } from "next/navigation";
-import { MENU_ITEMS, MENU_ANCHORS } from "@/config/menus";
+import React from "react";
 import { cn } from "@/components/game/ui/lib/utils";
+import { MENU_ANCHORS, MENU_ITEMS } from "@/config/menus";
 
 const ANCHOR_CLASSES: Record<string, string> = {
   "/": "anchored/[--anchor-nav-inicio]",

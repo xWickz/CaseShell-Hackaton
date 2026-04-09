@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import type { PanInfo } from "framer-motion";
 import { motion, useAnimation } from "framer-motion";
 import {
   FileText,
   Folder,
   ImageIcon,
-  TerminalSquare,
   MessageSquareText,
+  TerminalSquare,
 } from "lucide-react";
-import { useGameUIStore } from "@/store/useGameUIStore";
+import { useEffect } from "react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
+import { useGameUIStore } from "@/store/useGameUIStore";
 import type { DesktopItem } from "@/types/game";
-import type { PanInfo } from "framer-motion";
 
 type DesktopIconProps = {
   item: DesktopItem;

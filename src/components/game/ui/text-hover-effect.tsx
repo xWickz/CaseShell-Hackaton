@@ -1,6 +1,6 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
 import { motion, useInView } from "motion/react"; // Importamos useInView
+import React, { useEffect, useRef, useState } from "react";
 
 export const TextHoverEffect = ({
   text,

@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/components/game/ui/lib/utils";
 
 type DitheringMode = "bayer" | "halftone" | "noise" | "crosshatch";

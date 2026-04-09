@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useGameUIStore } from "@/store/useGameUIStore";
+import { useCallback, useEffect, useMemo } from "react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
+import { useGameUIStore } from "@/store/useGameUIStore";
 import type { Difficulty } from "@/types/game";
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -11,12 +11,7 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   hard: "Difícil",
 };
 
-const formatElapsed = (startTime: number | null, reference: number) => {
-  if (!startTime) return "—";
-  const elapsedSeconds = Math.max(
-    0,
-    Math.floor((reference - startTime) / 1000),
-  );
+const formatElapsed = (elapsedSeconds: number) => {
   const minutes = Math.floor(elapsedSeconds / 60);
   const seconds = elapsedSeconds % 60;
   if (minutes === 0) return `${seconds}s`;
@@ -27,12 +22,12 @@ export default function ResetModal() {
   const isOpen = useGameUIStore((state) => state.resetModalOpen);
   const closeModal = useGameUIStore((state) => state.closeResetModal);
   const resetSession = useGameSessionStore((state) => state.resetSession);
-  const [now, setNow] = useState(() => Date.now());
 
   const currentDifficulty = useGameSessionStore(
     (state) => state.currentDifficulty,
   );
-  const startTime = useGameSessionStore((state) => state.startTime);
+  const timeLimitMs = useGameSessionStore((state) => state.timeLimitMs);
+  const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
   const commandStats = useGameSessionStore((state) => state.commandStats);
 
   const handleCancel = useCallback(() => {
@@ -50,12 +45,17 @@ export default function ResetModal() {
     return `${Math.round((commandStats.success / commandStats.total) * 100)}%`;
   }, [commandStats]);
 
+  const elapsedSeconds = useMemo(() => {
+    if (!Number.isFinite(timeLimitMs) || !Number.isFinite(timeRemainingMs)) {
+      return 0;
+    }
+
+    const elapsedMs = Math.max(0, timeLimitMs - timeRemainingMs);
+    return Math.floor(elapsedMs / 1000);
+  }, [timeLimitMs, timeRemainingMs]);
+
   useEffect(() => {
     if (!isOpen) return;
-    const intervalId = window.setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         closeModal();
@@ -65,7 +65,6 @@ export default function ResetModal() {
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.clearInterval(intervalId);
     };
   }, [isOpen, closeModal]);
 
@@ -108,7 +107,7 @@ export default function ResetModal() {
               Tiempo activo
             </p>
             <p className="mt-1 text-lg font-semibold text-white">
-              {formatElapsed(startTime, now)}
+              {formatElapsed(elapsedSeconds)}
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:col-span-2">

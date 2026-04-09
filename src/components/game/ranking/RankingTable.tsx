@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import { Clock, Target } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { getRankingsAction } from "@/app/actions/ranking";
 
 type Ranking = {

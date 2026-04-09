@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { motion } from "motion/react";
+import type React from "react";
 import { cn } from "@/components/game/ui/lib/utils";
 
 export const WobbleCard = ({

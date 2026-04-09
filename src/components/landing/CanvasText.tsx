@@ -1,6 +1,6 @@
 "use client";
-import { cn } from "@/components/game/ui/lib/utils";
 import { CanvasText } from "@/components/game/ui/canvas-text";
+import { cn } from "@/components/game/ui/lib/utils";
 
 interface TextProps {
   className?: string;

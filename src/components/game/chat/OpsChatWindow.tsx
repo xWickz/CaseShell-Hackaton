@@ -1,10 +1,10 @@
 "use client";
 
+import { Bot, MessageSquareMore, Radio } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
-import { MessageSquareMore, Radio, Bot } from "lucide-react";
 import { chatScripts, isConditionMet } from "@/data/game/chat-script";
-import type { Difficulty } from "@/types/game";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
+import type { Difficulty } from "@/types/game";
 
 const speakerStyles = {
   ops: {

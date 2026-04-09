@@ -1,6 +1,6 @@
 "use client";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef, useState, useCallback } from "react";
 
 interface CanvasTextProps {
   text: string;

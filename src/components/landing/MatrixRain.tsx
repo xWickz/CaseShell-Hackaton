@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface MatrixBackgroundProps {
   color?: string; // Por defecto usa el verde esmeralda que tenías

@@ -1,7 +1,7 @@
 "use client";
-import { ReactNode } from "react";
-import { HoverBorderGradient } from "@/components/game/ui/hover-border-gradient";
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { HoverBorderGradient } from "@/components/game/ui/hover-border-gradient";
 
 type HoverBorderProps = {
   href: string;

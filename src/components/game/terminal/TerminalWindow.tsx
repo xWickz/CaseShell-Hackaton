@@ -2,19 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  useGameSessionStore,
-  type CommandOutcome,
-} from "@/store/useGameSessionStore";
-import { executeCaseCommand } from "@/lib/game/case-engine";
-import { useTerminalAudio } from "@/hooks/useTerminalAudio";
-import { useGameUIStore } from "@/store/useGameUIStore";
-import {
   createIntroLines,
   createResolveLines,
   getRandomAlert,
   toActiveAlert,
 } from "@/data/game/random-alerts";
+import { useTerminalAudio } from "@/hooks/useTerminalAudio";
+import { executeCaseCommand } from "@/lib/game/case-engine";
 import { getTerminalCommandsForDifficulty } from "@/lib/game/terminal-commands";
+import {
+  type CommandOutcome,
+  useGameSessionStore,
+} from "@/store/useGameSessionStore";
+import { useGameUIStore } from "@/store/useGameUIStore";
 
 const ALERT_PROBABILITY = 0.25;
 const MIN_COMMANDS_BETWEEN_ALERTS = 3;

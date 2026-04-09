@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, MousePointer2, Keyboard, PanelsTopLeft } from "lucide-react";
+import { Keyboard, MousePointer2, PanelsTopLeft, Sparkles } from "lucide-react";
 
 type OnboardingOverlayProps = {
   onDismiss: () => void;

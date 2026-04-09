@@ -1,12 +1,12 @@
 "use client";
 
-import { GitHub } from "@/components/game/ui/github";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react"; // Importamos para el tooltip
 import Image from "next/image";
-import { TextHoverEffect } from "@/components/game/ui/text-hover-effect";
-import { motion, AnimatePresence } from "motion/react"; // Importamos para el tooltip
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { GitHub } from "@/components/game/ui/github";
+import { TextHoverEffect } from "@/components/game/ui/text-hover-effect";
 
 const ContributorAvatar = ({ src, name }: { src: string; name: string }) => {
   const [isHovered, setIsHovered] = useState(false);

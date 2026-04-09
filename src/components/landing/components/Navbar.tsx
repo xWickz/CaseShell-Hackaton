@@ -1,11 +1,11 @@
 "use client";
 
-import Logo from "@/components/landing/Logo";
-import { MENU_ITEMS } from "@/config/menus";
-import Menu from "@/components/landing/Menu";
-import Login from "@/components/landing/Login";
-import MenuClient from "@/components/landing/MenuClient";
 import { SessionProvider } from "next-auth/react";
+import Login from "@/components/landing/Login";
+import Logo from "@/components/landing/Logo";
+import Menu from "@/components/landing/Menu";
+import MenuClient from "@/components/landing/MenuClient";
+import { MENU_ITEMS } from "@/config/menus";
 
 export default function Navbar() {
   const menuList = MENU_ITEMS.map((item) => {

@@ -1,5 +1,8 @@
-import type { TerminalLine, AlertEffectId } from "@/types/game-engine";
-import { ActiveTerminalAlert } from "@/types/game-engine";
+import type {
+  ActiveTerminalAlert,
+  AlertEffectId,
+  TerminalLine,
+} from "@/types/game-engine";
 
 type RandomAlertDefinition = {
   id: string;

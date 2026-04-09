@@ -1,10 +1,10 @@
 "use client";
 
+import { X } from "lucide-react";
+import type { PointerEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ResizableBox } from "react-resizable";
-import { X } from "lucide-react";
 import { useGameUIStore } from "@/store/useGameUIStore";
-import type { PointerEvent, ReactNode } from "react";
 import type { WindowPosition, WindowSize } from "@/types/game";
 
 type ResizeHandleAxis = "s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne";

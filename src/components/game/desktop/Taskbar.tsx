@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
 import {
+  ChevronUp,
+  ClipboardList,
+  Monitor,
   Palette,
   Power,
   RotateCcw,
-  ChevronUp,
-  ClipboardList,
   Volume2,
   VolumeX,
-  Monitor,
 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useGameSessionStore } from "@/store/useGameSessionStore";
 import { useGameUIStore } from "@/store/useGameUIStore";
 
@@ -20,9 +20,6 @@ export default function Taskbar() {
   const startMenuRef = useRef<HTMLDivElement>(null);
 
   const commandStats = useGameSessionStore((state) => state.commandStats);
-  const startTime = useGameSessionStore((state) => state.startTime);
-  const endTime = useGameSessionStore((state) => state.endTime);
-  const pausedAt = useGameSessionStore((state) => state.pausedAt);
   const timeLimitMs = useGameSessionStore((state) => state.timeLimitMs);
   const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
   const isPaused = useGameSessionStore((state) => state.isPaused);
@@ -89,14 +86,11 @@ export default function Taskbar() {
       year: "numeric",
     });
 
-    const referenceTime = endTime ?? pausedAt ?? now.getTime();
-
-    const elapsedSeconds = startTime
-      ? Math.max(0, Math.floor((referenceTime - startTime) / 1000))
-      : 0;
+    const elapsedMs = Math.max(0, timeLimitMs - timeRemainingMs);
+    const elapsedSeconds = Math.floor(elapsedMs / 1000);
 
     return { timeLabel, dateLabel, elapsedSeconds };
-  }, [now, startTime, endTime, pausedAt]);
+  }, [now, timeLimitMs, timeRemainingMs]);
 
   const accuracyPercent = useMemo(() => {
     if (commandStats.total === 0) return null;
@@ -166,6 +160,7 @@ export default function Taskbar() {
 
             <div className="relative">
               <button
+                type="button"
                 onClick={handleSoundButtonClick}
                 className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
               >
@@ -203,6 +198,7 @@ export default function Taskbar() {
             </div>
 
             <button
+              type="button"
               onClick={toggleCrtOverlay}
               className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
             >
@@ -216,6 +212,7 @@ export default function Taskbar() {
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setIsStartMenuOpen(false);
                 openResetModal();
@@ -227,6 +224,7 @@ export default function Taskbar() {
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setIsStartMenuOpen(false);
                 openExitModal();
