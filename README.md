@@ -4,8 +4,12 @@
 
 # CaseShell
 
-> The Ultimate Terminal Puzzle  
-> Hackea el sistema. Resuelve el caso.
+**The Ultimate Terminal Puzzle**
+
+> [!NOTE]
+> ¡Gracias por jugar! El proyecto quedó de **4to lugar**! 🏆
+
+Hackea el sistema. Resuelve el caso.
 
 CaseShell es un juego narrativo-investigativo que simula un sistema operativo corporativo minimalista dentro de una experiencia web interactiva.
 
