@@ -13,9 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    "https://wawa-cases-wickz-hi2ufv-f7affe-157-254-174-56.traefik.me/",
-  ),
+  metadataBase: new URL("https://caseshell.wickz.dev/"),
   title: {
     default: "CaseShell | The Ultimate Terminal Puzzle",
     template: "%s | CaseShell",
@@ -37,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://wawa-cases-wickz-hi2ufv-f7affe-157-254-174-56.traefik.me/",
+    url: "https://caseshell.wickz.dev/",
     title: "CaseShell | The Ultimate Terminal Puzzle",
     description:
       "Hackea el sistema. Resuelve el caso. Un simulador de sistema operativo donde tu terminal es la escena del crimen.",
