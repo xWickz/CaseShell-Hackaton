@@ -1,17 +1,19 @@
 {
   "name": "caseshell",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.11.1",
-    "@biomejs/biome": "^2.4.10",
+    "@biomejs/biome": "2.4.10",
     "@prisma/client": "6.19.2",
     "@toolwind/anchors": "1.0.10",
     "@types/react-resizable": "3.0.8",
@@ -37,6 +39,8 @@
     "babel-plugin-react-compiler": "1.0.0",
     "prisma": "6.19.2",
     "tailwindcss": "4",
-    "typescript": "5"
+    "typescript": "5",
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "2.1.8"
   }
 }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Desktop from "@/components/game/desktop/Desktop";
-import { briefingsByDifficulty } from "@/data/mock/mock-briefings";
-import { mockDesktopItemsByDifficulty } from "@/data/mock/mock-filesystem";
-import type { Difficulty } from "@/types/game";
+import { briefingsByDifficulty } from "@/features/game/data/mock/mock-briefings";
+import { mockDesktopItemsByDifficulty } from "@/features/game/data/mock/mock-filesystem";
+import type { Difficulty } from "@/features/game/types/game";
+import Desktop from "@/features/game/ui/desktop/Desktop";
 
 type GameDifficultyPageProps = {
   params: Promise<{

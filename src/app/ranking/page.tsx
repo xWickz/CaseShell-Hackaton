@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { PendingScoreSync } from "@/components/game/ranking/PendingScoreSync";
-import RankingTable from "@/components/game/ranking/RankingTable";
-import Footer from "@/components/landing/components/Footer";
-import Navbar from "@/components/landing/components/Navbar";
+import { PendingScoreSync } from "@/features/game/ui/ranking/PendingScoreSync";
+import RankingTable from "@/features/game/ui/ranking/RankingTable";
+import Footer from "@/features/landing/ui/components/Footer";
+import Navbar from "@/features/landing/ui/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Tabla de clasificación",

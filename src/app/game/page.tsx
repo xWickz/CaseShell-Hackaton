@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PendingSessionBanner from "@/components/game/ui/PendingSessionBanner";
-import Footer from "@/components/landing/components/Footer";
-import Navbar from "@/components/landing/components/Navbar";
-import { difficulties } from "@/data/mock/difficulties";
+import { difficulties } from "@/features/game/data/mock/difficulties";
+import PendingSessionBanner from "@/features/game/ui/ui/PendingSessionBanner";
+import Footer from "@/features/landing/ui/components/Footer";
+import Navbar from "@/features/landing/ui/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Elige tu caso",

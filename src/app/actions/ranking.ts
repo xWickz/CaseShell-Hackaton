@@ -1,7 +1,7 @@
 ﻿"use server";
 
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/server/db/prisma";
 
 const allowedDifficulties = new Set(["easy", "medium", "hard"]);
 

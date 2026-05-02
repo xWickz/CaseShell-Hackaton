@@ -1,11 +1,11 @@
-import About from "@/components/landing/components/About";
-import Difficulties from "@/components/landing/components/Difficulties";
-import Footer from "@/components/landing/components/Footer";
-import Hero from "@/components/landing/components/Hero";
-import Mechanics from "@/components/landing/components/Mechanics";
-import Navbar from "@/components/landing/components/Navbar";
-import Ready from "@/components/landing/components/Ready";
-import WinnerBanner from "@/components/landing/components/WinnerBanner";
+import About from "@/features/landing/ui/components/About";
+import Difficulties from "@/features/landing/ui/components/Difficulties";
+import Footer from "@/features/landing/ui/components/Footer";
+import Hero from "@/features/landing/ui/components/Hero";
+import Mechanics from "@/features/landing/ui/components/Mechanics";
+import Navbar from "@/features/landing/ui/components/Navbar";
+import Ready from "@/features/landing/ui/components/Ready";
+import WinnerBanner from "@/features/landing/ui/components/WinnerBanner";
 
 export default function HomePage() {
   return (
