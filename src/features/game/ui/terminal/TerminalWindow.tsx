@@ -7,13 +7,11 @@ import {
   getRandomAlert,
   toActiveAlert,
 } from "@/features/game/data/random-alerts";
-import { useTerminalAudio } from "@/features/game/hooks/useTerminalAudio";
 import { executeCaseCommand } from "@/features/game/engine/case-engine";
 import { getTerminalCommandsForDifficulty } from "@/features/game/engine/terminal-commands";
-import {
-  type CommandOutcome,
-  useGameSessionStore,
-} from "@/features/game/store/useGameSessionStore";
+import { useTerminalAudio } from "@/features/game/hooks/useTerminalAudio";
+import type { CommandOutcome } from "@/features/game/store/constants/game-session.types";
+import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
 
 const ALERT_PROBABILITY = 0.25;

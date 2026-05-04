@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef } from "react";
-import type { CommandOutcome } from "@/features/game/store/useGameSessionStore";
+import type { CommandOutcome } from "@/features/game/store/constants/game-session.types";
 
 function createContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
