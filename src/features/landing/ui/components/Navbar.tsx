@@ -13,7 +13,7 @@ export default function Navbar() {
   });
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex h-16 items-center border-b border-white/10 bg-void-eclipse/90 font-sans backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 flex h-12 items-center border-b border-white/10 bg-void-eclipse/90 font-sans backdrop-blur-md">
       <nav className="mx-auto grid w-full max-w-7xl grid-cols-3 items-center px-4">
         <div className="justify-self-start">
           <Logo />

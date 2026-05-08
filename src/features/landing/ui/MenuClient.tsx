@@ -43,9 +43,9 @@ export default function MenuClient({
       child as React.ReactElement<{ className?: string }>,
       {
         className: cn(
-          "text-white",
+          "text-white font-semibold tracking-tight text-sm",
           className,
-          isActive && "text-red-500 font-bold uppercase",
+          isActive && "text-red-500 font-bold",
         ),
       },
     );
