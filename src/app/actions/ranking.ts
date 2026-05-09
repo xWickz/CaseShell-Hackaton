@@ -3,13 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/server/db/prisma";
 
-const allowedDifficulties = new Set(["easy", "medium", "hard"]);
-
-const MIN_SECONDS_BY_DIFFICULTY: Record<string, number> = {
-  easy: 30, //30 segundos si, pausible
-  medium: 60, // 1 minuto? bueno, a ver
-  hard: 120, // 2 minutos si ya se sabe todo pero igual
-};
+const ALLOWED_DIFFICULTIES = ["easy", "medium", "hard"] as const;
 
 export type SubmitRankingResult = {
   status: "created" | "improved" | "slower";
@@ -21,7 +15,17 @@ export async function submitRankingAction(
   difficulty: string,
   timeSeconds: number,
 ): Promise<SubmitRankingResult> {
-  if (!allowedDifficulties.has(difficulty)) {
+  const minSecondsByDifficulty: Record<string, number> = {
+    easy: 30, //30 segundos si, pausible
+    medium: 60, // 1 minuto? bueno, a ver
+    hard: 120, // 2 minutos si ya se sabe todo pero igual
+  };
+  const session = await auth();
+  if (
+    !ALLOWED_DIFFICULTIES.includes(
+      difficulty as (typeof ALLOWED_DIFFICULTIES)[number],
+    )
+  ) {
     throw new Error("Dificultad inválida");
   }
 
@@ -29,15 +33,17 @@ export async function submitRankingAction(
     throw new Error("Tiempo inválido");
   }
 
-  const minSeconds = MIN_SECONDS_BY_DIFFICULTY[difficulty];
+  const minSeconds = minSecondsByDifficulty[difficulty];
   if (timeSeconds < minSeconds) {
     throw new Error("Tiempo no válido para ranking");
   }
 
-  const session = await auth();
+  {
+    const session = await auth();
 
-  if (!session?.user?.id) {
-    throw new Error("No estás autenticado");
+    if (!session?.user?.id) {
+      throw new Error("No estás autenticado");
+    }
   }
 
   const user = await prisma.user.findFirst({
@@ -94,6 +100,12 @@ export async function submitRankingAction(
 }
 
 export async function getRankingsAction(difficulty: string) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("No estás autenticado");
+  }
+
   const rankings = await prisma.ranking.findMany({
     where: { difficulty },
     orderBy: { timeElapsed: "asc" },

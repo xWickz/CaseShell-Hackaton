@@ -160,12 +160,12 @@ function statusIcon(status: StepStatus) {
   switch (status) {
     case "done":
       return (
-        <CheckCircle2 className="h-4 w-4 text-emerald-400" aria-hidden="true" />
+        <CheckCircle2 className="size-4 text-emerald-400" aria-hidden="true" />
       );
     case "ready":
-      return <CircleDot className="h-4 w-4 text-cyan-400" aria-hidden="true" />;
+      return <CircleDot className="size-4 text-cyan-400" aria-hidden="true" />;
     default:
-      return <Circle className="h-4 w-4 text-white/30" aria-hidden="true" />;
+      return <Circle className="size-4 text-white/30" aria-hidden="true" />;
   }
 }
 
@@ -232,7 +232,7 @@ export default function ObjectiveTracker({
 
   return (
     <aside
-      className={`pointer-events-auto relative flex w-80 flex-col gap-4 rounded-3xl border border-white/10 bg-slate-950/80 p-4 text-xs text-white shadow-2xl transition-[height] ${className}`}
+      className={`pointer-events-auto relative flex w-80 flex-col gap-4 rounded-3xl border border-white/10 bg-zinc-950/80 p-4 text-xs text-white shadow-2xl transition-[height] ${className}`}
     >
       {lastCompletedKey && !collapsed ? (
         <div
@@ -242,8 +242,8 @@ export default function ObjectiveTracker({
         >
           {Array.from({ length: 14 }).map((_, index) => (
             <span
-              key={`${confettiKey}-${index}`}
-              className="absolute top-1/2 h-2 w-2 rounded-full bg-emerald-300/80 animate-objective-confetti"
+              key={`${confettiKey}`}
+              className="absolute top-1/2 size-2 rounded-full bg-emerald-300/80 animate-objective-confetti"
               style={
                 {
                   left: `${8 + index * 6.5}%`,
@@ -290,7 +290,7 @@ export default function ObjectiveTracker({
             className="rounded-lg border border-white/15 bg-white/5 p-1 hover:bg-white/10"
           >
             <ChevronDown
-              className={`h-4 w-4 transition-transform ${
+              className={`size-4 transition-transform ${
                 collapsed ? "-rotate-90" : ""
               }`}
               aria-hidden="true"
@@ -303,7 +303,7 @@ export default function ObjectiveTracker({
             aria-label="Cerrar panel de objetivos"
             className="rounded-lg border border-white/15 bg-white/5 p-1 hover:bg-red-500/10 hover:text-red-200"
           >
-            <X className="h-4 w-4" aria-hidden="true" />
+            <X className="size-4" aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -335,7 +335,7 @@ export default function ObjectiveTracker({
                       className={`relative flex items-center gap-2 rounded-xl px-3 py-2 transition-all ${
                         isFreshlyCompleted
                           ? "scale-[1.02] border border-emerald-400/40 bg-emerald-400/15 shadow-[0_0_0_1px_rgba(52,211,153,0.15),0_0_32px_rgba(16,185,129,0.18)] animate-objective-pulse"
-                          : "bg-black/20"
+                          : "bg-zinc-950/20"
                       }`}
                     >
                       {statusIcon(status)}

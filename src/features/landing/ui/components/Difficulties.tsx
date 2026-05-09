@@ -61,11 +61,16 @@ const Metric = ({
 export default function Difficulties() {
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-24 lg:gap-32">
-      <section className="relative w-full border-t border-white/10 bg-black overflow-hidden">
+      <section className="relative w-full border-t border-white/10 bg-zinc-950 overflow-hidden">
         <div className="px-6 md:px-10 lg:px-20 py-24 md:py-32">
-          <h2 className="text-3xl md:text-5xl text-white font-bold tracking-tighter font-mono flex flex-wrap justify-center lg:justify-start items-center mb-16">
-            Dificultades
-          </h2>
+          <div className="mb-12 md:mb-20 text-center lg:text-left">
+            <h2
+              className="text-glitch select-none text-3xl md:text-5xl text-snow-white/90 font-semibold tracking-tighter flex flex-wrap justify-center lg:justify-start items-center"
+              data-text="Dificultades"
+            >
+              Dificultades
+            </h2>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
             {difficulties.map((diff) => {
@@ -84,7 +89,7 @@ export default function Difficulties() {
                     >
                       {diff.threat}
                     </span>
-                    <h3 className="text-3xl font-bold mb-4 tracking-tight text-white">
+                    <h3 className="text-3xl font-semibold mb-4 tracking-tight text-white">
                       {diff.label}
                     </h3>
                     <p className="text-zinc-400 text-sm leading-relaxed mb-8">

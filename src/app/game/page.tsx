@@ -37,10 +37,10 @@ export default function GameSelectPage() {
       <header>
         <Navbar />
       </header>
-      <main className="min-h-screen bg-black px-10 lg:px-20 font-sans pb-20">
+      <main className="min-h-screen bg-zinc-950 px-10 lg:px-20 font-sans pb-20">
         <div className="max-w-7xl mx-auto flex flex-col pt-32">
           <section className="w-full flex flex-col items-center text-center gap-6 mb-20">
-            <h1 className="text-6xl lg:text-7xl text-white font-bold tracking-tight">
+            <h1 className="text-6xl lg:text-7xl text-white font-semibold tracking-tight">
               Elige tu <span className="text-red-600">caso</span>
             </h1>
             <p className="text-lg text-zinc-400 max-w-2xl">
@@ -67,7 +67,7 @@ export default function GameSelectPage() {
                       {diff.threat}
                     </span>
                     <h3
-                      className={`text-3xl font-bold mb-4 tracking-tight text-white`}
+                      className={`text-3xl font-semibold mb-4 tracking-tight text-white`}
                     >
                       {diff.label}
                     </h3>
@@ -84,7 +84,7 @@ export default function GameSelectPage() {
 
                   <Link
                     href={`/game/${diff.id}`}
-                    className="mt-5 w-full text-center text-white text-sm border border-white/10 rounded-2xl py-4 px-6 font-bold hover:bg-white hover:text-black transition-all duration-200 uppercase "
+                    className="mt-5 w-full text-center text-white text-sm border border-white/10 rounded-2xl py-4 px-6 font-semibold hover:bg-white hover:text-black transition-all duration-200 uppercase "
                   >
                     Iniciar Investigación
                   </Link>

@@ -82,7 +82,7 @@ export default function PendingSessionBanner() {
         </div>
         <Link
           href={`/game/${pendingSession.difficulty}`}
-          className="inline-flex items-center justify-center rounded-2xl border border-gray-400/50 bg-gray-500/20 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-gray-100 transition hover:bg-gray-400/30"
+          className="inline-flex items-center justify-center rounded-2xl border border-zinc-400/50 bg-zinc-500/20 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-zinc-100 transition hover:bg-zinc-400/30"
         >
           Continuar investigación
         </Link>

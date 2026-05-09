@@ -149,7 +149,7 @@ export default function TerminalWindow() {
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [terminalHistory]);
+  }, []);
 
   useEffect(() => {
     if (!commandLog.length) return;
@@ -207,7 +207,7 @@ export default function TerminalWindow() {
     submitHintShownRef.current = true;
   }, [allObjectivesCompleted, caseState.progress.completed, addTerminalLines]);
 
-  const prompt = useMemo(() => "agent@cubepath:~$", []);
+  const prompt = "agent@cubepath:~$";
 
   const availableCommands = useMemo(() => {
     const baseCommands = getTerminalCommandsForDifficulty(currentDifficulty);
@@ -217,7 +217,7 @@ export default function TerminalWindow() {
       historyScore.set(cmd.toLowerCase(), index + 1);
     });
 
-    return [...baseCommands].sort((a, b) => {
+    return [...baseCommands].toSorted((a, b) => {
       const scoreA = historyScore.get(a.toLowerCase()) ?? 0;
       const scoreB = historyScore.get(b.toLowerCase()) ?? 0;
       return scoreB - scoreA || a.localeCompare(b);
@@ -445,9 +445,15 @@ export default function TerminalWindow() {
     failureState.isLockedOut;
 
   return (
-    <div
+    <section
+      role="region"
       className="flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden bg-black/95 p-3 font-mono text-sm text-green-400"
       onClick={() => inputRef.current?.focus()}
+      onKeyDown={(e) => {
+        if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+          inputRef.current?.focus();
+        }
+      }}
     >
       <div
         ref={scrollRef}
@@ -544,7 +550,7 @@ export default function TerminalWindow() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

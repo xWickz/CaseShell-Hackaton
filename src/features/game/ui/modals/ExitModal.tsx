@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useGameUIStore } from "@/features/game/store/useGameUIStore";
+import { useCallback, useEffect, useMemo } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
+import { useGameUIStore } from "@/features/game/store/useGameUIStore";
 import type { Difficulty } from "@/features/game/types/game";
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -30,12 +30,12 @@ export default function ExitModal() {
   const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
   const commandStats = useGameSessionStore((state) => state.commandStats);
 
-  const router = useRouter();
+  const { push } = useRouter();
 
   const handleExit = useCallback(() => {
     closeModal();
-    router.push("/game");
-  }, [closeModal, router]);
+    push("/game");
+  }, [closeModal, push]);
 
   const handleCancel = useCallback(() => {
     closeModal();
@@ -76,17 +76,17 @@ export default function ExitModal() {
 
   return (
     <div
-      className="fixed inset-0 z-1100 bg-black/70 backdrop-blur-sm px-4 py-10 flex items-center justify-center"
+      className="fixed inset-0 z-1100 bg-zinc-950/70 backdrop-blur-sm px-4 py-10 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
       aria-describedby={descriptionId}
     >
-      <div className="w-full max-w-lg rounded-3xl border border-white/15 bg-slate-950/90 p-8 shadow-[0_25px_120px_rgba(0,0,0,0.45)]">
+      <div className="w-full max-w-lg rounded-3xl border border-white/15 bg-zinc-950/90 p-8 shadow-[0_25px_120px_rgba(0,0,0,0.45)]">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/50">
           Confirmación requerida
         </p>
-        <h2 id={headingId} className="mt-2 text-3xl font-bold text-white">
+        <h2 id={headingId} className="mt-2 text-3xl font-semibold text-white">
           ¿Salir de la operación?
         </h2>
         <p id={descriptionId} className="mt-3 text-sm text-white/80">

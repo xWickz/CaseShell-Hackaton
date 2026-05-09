@@ -12,7 +12,7 @@ export default function Login() {
     <div className="flex justify-end items-center gap-4">
       <div className="flex items-center gap-3">
         {status === "loading" ? (
-          <div className="h-8 w-8 rounded-full bg-white/10 animate-pulse" />
+          <div className="size-8 rounded-full bg-white/10 animate-pulse" />
         ) : user ? (
           <div className="flex items-center gap-3">
             <div className="hidden lg:block text-right">
@@ -33,7 +33,7 @@ export default function Login() {
                 className="rounded-full border border-white/20 hover:border-red-500 transition-colors cursor-pointer"
               />
             ) : (
-              <div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs text-white bg-white/5">
+              <div className="size-8 rounded-full border border-white/20 flex items-center justify-center text-xs text-white bg-white/5">
                 {user.name?.charAt(0)?.toUpperCase() ?? "U"}
               </div>
             )}
@@ -52,7 +52,7 @@ export default function Login() {
             onClick={() => signIn("github")}
             className=" hover:bg-zinc-900 text-white text-xs md:text-sm px-4 py-2 rounded-md transition-all active:scale-95 flex justify-center items-center gap-2"
           >
-            <GitHub className="w-4 h-4" /> Entrar con GitHub
+            <GitHub className="size-4" /> Entrar con GitHub
           </button>
         )}
       </div>

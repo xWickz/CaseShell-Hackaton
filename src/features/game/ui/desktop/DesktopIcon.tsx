@@ -1,7 +1,7 @@
 "use client";
 
 import type { PanInfo } from "framer-motion";
-import { motion, useAnimation } from "framer-motion";
+import { domAnimation, LazyMotion, m, useAnimation } from "framer-motion";
 import {
   FileText,
   Folder,
@@ -12,7 +12,7 @@ import {
 import { useEffect } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
-import type { DesktopItem } from "@/features/game/types/game";
+import type { DesktopItem, Difficulty } from "@/features/game/types/game";
 
 type DesktopIconProps = {
   item: DesktopItem;
@@ -22,6 +22,132 @@ type DesktopIconProps = {
 };
 
 const GRID_SIZE = 96;
+const MAX_ROWS = 7;
+const PADDING = 16;
+const DESKTOP_OFFSET = 120;
+
+const DIFFICULTY_ORDER: Record<Difficulty, number> = {
+  easy: 0,
+  medium: 1,
+  hard: 2,
+};
+
+type KnowledgeHint = {
+  name: string;
+  knowledge:
+    | "knowsWifiFix"
+    | "knowsFirewallFix"
+    | "knowsMalwareFix"
+    | "knowsDnsFix"
+    | "knowsServiceRestart"
+    | "knowsSwitchFix"
+    | "knowsDnsDiagnostics"
+    | "knowsDnsOverride"
+    | "knowsServicesVerification"
+    | "knowsIncidentReport"
+    | "knowsSwitchAudit"
+    | "knowsPerimeterScan"
+    | "knowsWatchdog";
+  text: string;
+  minDifficulty?: Difficulty;
+  exactDifficulty?: Difficulty;
+};
+
+const KNOWLEDGE_HINTS = [
+  {
+    name: "network.txt",
+    knowledge: "knowsWifiFix",
+    text: "Nueva pista descubierta: el reporte de red contiene la solucion del Wi-Fi.",
+  },
+  {
+    name: "firewall.txt",
+    knowledge: "knowsFirewallFix",
+    text: "Nueva pista descubierta: el analisis del firewall revela una regla bloqueada.",
+  },
+  {
+    name: "suspicious-processes.txt",
+    knowledge: "knowsMalwareFix",
+    text: "Nueva pista descubierta: identificaste un proceso sospechoso en ejecucion.",
+  },
+  {
+    name: "resolver.conf",
+    minDifficulty: "medium",
+    knowledge: "knowsDnsFix",
+    text: "Reporte DNS analizado: puedes normalizar los reenviadores con 'fix dns'.",
+  },
+  {
+    name: "system.log",
+    minDifficulty: "medium",
+    knowledge: "knowsServiceRestart",
+    text: "Los logs indican que debes ejecutar 'restart services' tras estabilizar la red.",
+  },
+  {
+    name: "switch.conf",
+    exactDifficulty: "hard",
+    knowledge: "knowsSwitchFix",
+    text: "Configuracion de switch encontrada: habilita el puerto critico con 'enable port'.",
+  },
+  {
+    name: "ops-note.txt",
+    minDifficulty: "medium",
+    knowledge: "knowsDnsDiagnostics",
+    text: "Las notas operativas ordenan ejecutar 'diag dns' antes de aplicar cualquier fix.",
+  },
+  {
+    name: "dns-runes.png",
+    minDifficulty: "medium",
+    knowledge: "knowsDnsDiagnostics",
+    text: "El rompecabezas DNS confirma que la secuencia correcta es DIAG -> FIX.",
+  },
+  {
+    name: "dns-lock.png",
+    minDifficulty: "medium",
+    knowledge: "knowsDnsOverride",
+    text: "El candado DNS revela el override 8-8-4 necesario para desbloquear el fix.",
+  },
+  {
+    name: "service-manual.txt",
+    minDifficulty: "medium",
+    knowledge: "knowsServicesVerification",
+    text: "El playbook exige correr 'verify services' antes de 'restart services'.",
+  },
+  {
+    name: "incident-template.txt",
+    minDifficulty: "medium",
+    knowledge: "knowsIncidentReport",
+    text: "Necesitaras completar el informe ejecutando 'file report' tras los arreglos.",
+  },
+  {
+    name: "switch-override.txt",
+    exactDifficulty: "hard",
+    knowledge: "knowsSwitchAudit",
+    text: "Notas del switch: corre 'audit switch' antes de 'enable port'.",
+  },
+  {
+    name: "tamper-photo.png",
+    exactDifficulty: "hard",
+    knowledge: "knowsPerimeterScan",
+    text: "La foto del sello manipulado sugiere ejecutar 'scan perimeter'.",
+  },
+  {
+    name: "perimeter-note.txt",
+    exactDifficulty: "hard",
+    knowledge: "knowsPerimeterScan",
+    text: "El memo de perimetro exige documentar un 'scan perimeter' antes del cierre.",
+  },
+  {
+    name: "chain-of-custody.txt",
+    exactDifficulty: "hard",
+    knowledge: "knowsIncidentReport",
+    text: "La cadena de custodia detalla los datos requeridos por 'file report'.",
+  },
+  {
+    name: "watchdog-brief.txt",
+    exactDifficulty: "hard",
+    knowledge: "knowsWatchdog",
+    text: "El briefing del SOC exige desplegar un watchdog tras el escaneo perimetral.",
+  },
+] as const satisfies ReadonlyArray<KnowledgeHint>;
 
 export default function DesktopIcon({
   item,
@@ -47,6 +173,15 @@ export default function DesktopIcon({
   );
   const activeAlert = useGameSessionStore((state) => state.activeAlert);
 
+  const currentPos =
+    iconPositions[item.id] ?? getDefaultPositionForIndex(defaultIndex);
+
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start(currentPos);
+  }, [currentPos, controls]);
+
   const handleOpen = () => {
     if (alertEffectState.filesystemLocked) {
       addTerminalLines([
@@ -61,181 +196,12 @@ export default function DesktopIcon({
       return;
     }
 
-    if (item.name === "network.txt") {
-      discoverKnowledge("knowsWifiFix");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Nueva pista descubierta: el reporte de red contiene la solución del Wi-Fi.",
-        },
-      ]);
-    }
-
-    if (item.name === "firewall.txt") {
-      discoverKnowledge("knowsFirewallFix");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Nueva pista descubierta: el análisis del firewall revela una regla bloqueada.",
-        },
-      ]);
-    }
-
-    if (item.name === "suspicious-processes.txt") {
-      discoverKnowledge("knowsMalwareFix");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Nueva pista descubierta: identificaste un proceso sospechoso en ejecución.",
-        },
-      ]);
-    }
-
-    if (item.name === "resolver.conf" && currentDifficulty !== "easy") {
-      discoverKnowledge("knowsDnsFix");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Reporte DNS analizado: puedes normalizar los reenviadores con 'fix dns'.",
-        },
-      ]);
-    }
-
-    if (item.name === "system.log" && currentDifficulty !== "easy") {
-      discoverKnowledge("knowsServiceRestart");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Los logs indican que debes ejecutar 'restart services' tras estabilizar la red.",
-        },
-      ]);
-    }
-
-    if (item.name === "switch.conf" && currentDifficulty === "hard") {
-      discoverKnowledge("knowsSwitchFix");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Configuración de switch encontrada: habilita el puerto crítico con 'enable port'.",
-        },
-      ]);
-    }
-
-    if (item.name === "ops-note.txt" && currentDifficulty !== "easy") {
-      discoverKnowledge("knowsDnsDiagnostics");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Las notas operativas ordenan ejecutar 'diag dns' antes de aplicar cualquier fix.",
-        },
-      ]);
-    }
-
-    if (item.name === "dns-runes.png" && currentDifficulty !== "easy") {
-      discoverKnowledge("knowsDnsDiagnostics");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "El rompecabezas DNS confirma que la secuencia correcta es DIAG ➜ FIX.",
-        },
-      ]);
-    }
-
-    if (item.name === "dns-lock.png" && currentDifficulty !== "easy") {
-      discoverKnowledge("knowsDnsOverride");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "El candado DNS revela el override 8-8-4 necesario para desbloquear el fix.",
-        },
-      ]);
-    }
-
-    if (item.name === "service-manual.txt" && currentDifficulty !== "easy") {
-      discoverKnowledge("knowsServicesVerification");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "El playbook exige correr 'verify services' antes de 'restart services'.",
-        },
-      ]);
-    }
-
-    if (item.name === "incident-template.txt" && currentDifficulty !== "easy") {
-      discoverKnowledge("knowsIncidentReport");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Necesitarás completar el informe ejecutando 'file report' tras los arreglos.",
-        },
-      ]);
-    }
-
-    if (item.name === "switch-override.txt" && currentDifficulty === "hard") {
-      discoverKnowledge("knowsSwitchAudit");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "Notas del switch: corre 'audit switch' antes de 'enable port'.",
-        },
-      ]);
-    }
-
-    if (item.name === "tamper-photo.png" && currentDifficulty === "hard") {
-      discoverKnowledge("knowsPerimeterScan");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "La foto del sello manipulado sugiere ejecutar 'scan perimeter'.",
-        },
-      ]);
-    }
-
-    if (item.name === "perimeter-note.txt" && currentDifficulty === "hard") {
-      discoverKnowledge("knowsPerimeterScan");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "El memo de perímetro exige documentar un 'scan perimeter' antes del cierre.",
-        },
-      ]);
-    }
-
-    if (item.name === "chain-of-custody.txt" && currentDifficulty === "hard") {
-      discoverKnowledge("knowsIncidentReport");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "La cadena de custodia detalla los datos requeridos por 'file report'.",
-        },
-      ]);
-    }
-
-    if (item.name === "watchdog-brief.txt" && currentDifficulty === "hard") {
-      discoverKnowledge("knowsWatchdog");
-      addTerminalLines([
-        {
-          id: crypto.randomUUID(),
-          type: "hint",
-          text: "El briefing del SOC exige desplegar un watchdog tras el escaneo perimetral.",
-        },
-      ]);
-    }
+    maybeAddKnowledgeHint({
+      itemName: item.name,
+      difficulty: currentDifficulty,
+      discoverKnowledge,
+      addTerminalLines,
+    });
 
     openWindow({
       id: item.id,
@@ -247,7 +213,6 @@ export default function DesktopIcon({
     });
   };
 
-  const iconClass = insideWindow ? "w-8 h-8" : "w-10 h-10";
   const displayName = alertEffectState.labelsScrambled
     ? scrambleLabel(item.name)
     : item.name;
@@ -255,59 +220,14 @@ export default function DesktopIcon({
     ? "motion-safe:animate-bounce"
     : "";
 
-  const renderIcon = () => {
-    switch (item.type) {
-      case "text":
-        return <FileText className={`${iconClass} text-sky-300`} />;
-      case "image":
-        return <ImageIcon className={`${iconClass} text-pink-300`} />;
-      case "folder":
-        return <Folder className={`${iconClass} text-yellow-300`} />;
-      case "terminal":
-        return <TerminalSquare className={`${iconClass} text-green-300`} />;
-      case "chat":
-        return (
-          <MessageSquareText className={`${iconClass} text-emerald-200`} />
-        );
-      default:
-        return <FileText className={`${iconClass} text-white`} />;
-    }
-  };
-
-  const MAX_ROWS = 7;
-  const PADDING = 16;
-
-  const getDefaultPositionForIndex = (index: number) => {
-    const col = Math.floor(index / MAX_ROWS);
-    const row = index % MAX_ROWS;
-    return {
-      x: col * GRID_SIZE + PADDING,
-      y: row * GRID_SIZE + PADDING,
-    };
-  };
-
-  const currentPos =
-    iconPositions[item.id] ?? getDefaultPositionForIndex(defaultIndex);
-
-  const controls = useAnimation();
-
-  useEffect(() => {
-    controls.start(currentPos);
-  }, [currentPos, controls]);
-
   if (insideWindow) {
     return (
-      <button
-        onDoubleClick={handleOpen}
-        className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
-        aria-label={`Abrir ${item.name}`}
-        title={item.name}
-      >
-        {renderIcon()}
-        <span className="max-w-25 text-center text-xs font-medium">
-          {displayName}
-        </span>
-      </button>
+      <WindowIconButton
+        item={item}
+        displayName={displayName}
+        scrambleMotionClass={scrambleMotionClass}
+        onOpen={handleOpen}
+      />
     );
   }
 
@@ -323,7 +243,6 @@ export default function DesktopIcon({
     let snappedY =
       Math.round((rawY - PADDING) / GRID_SIZE) * GRID_SIZE + PADDING;
 
-    const DESKTOP_OFFSET = 120;
     const maxX =
       typeof window !== "undefined"
         ? window.innerWidth - GRID_SIZE - PADDING
@@ -363,25 +282,159 @@ export default function DesktopIcon({
   };
 
   return (
-    <motion.button
-      drag
-      dragMomentum={false}
+    <DraggableIconButton
+      item={item}
+      displayName={displayName}
+      scrambleMotionClass={scrambleMotionClass}
+      currentPos={currentPos}
+      controls={controls}
+      onOpen={handleOpen}
       onDragEnd={handleDragEnd}
-      onDoubleClick={handleOpen}
-      initial={currentPos}
-      animate={controls}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      style={{ position: "absolute" }}
-      className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
-      aria-label={`Abrir ${item.name}`}
-      title={item.name}
-    >
-      {renderIcon()}
-      <span className="max-w-25 text-center text-xs font-medium drop-shadow-md">
-        {displayName}
-      </span>
-    </motion.button>
+    />
   );
+}
+
+function WindowIconButton({
+  item,
+  displayName,
+  scrambleMotionClass,
+  onOpen,
+}: {
+  item: DesktopItem;
+  displayName: string;
+  scrambleMotionClass: string;
+  onOpen: () => void;
+}) {
+  return (
+    <LazyMotion features={domAnimation}>
+      <button
+        type="button"
+        onDoubleClick={onOpen}
+        className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
+        aria-label={`Abrir ${item.name}`}
+        title={item.name}
+      >
+        <IconGlyph type={item.type} sizeClass="w-8 h-8" />
+        <span className="max-w-25 text-center text-xs font-medium">
+          {displayName}
+        </span>
+      </button>
+    </LazyMotion>
+  );
+}
+
+function DraggableIconButton({
+  item,
+  displayName,
+  scrambleMotionClass,
+  currentPos,
+  controls,
+  onOpen,
+  onDragEnd,
+}: {
+  item: DesktopItem;
+  displayName: string;
+  scrambleMotionClass: string;
+  currentPos: { x: number; y: number };
+  controls: ReturnType<typeof useAnimation>;
+  onOpen: () => void;
+  onDragEnd: (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => void;
+}) {
+  return (
+    <LazyMotion features={domAnimation}>
+      <m.button
+        drag
+        dragMomentum={false}
+        onDragEnd={onDragEnd}
+        onDoubleClick={onOpen}
+        initial={currentPos}
+        animate={controls}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        style={{ position: "absolute" }}
+        className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
+        aria-label={`Abrir ${item.name}`}
+        title={item.name}
+      >
+        <IconGlyph type={item.type} sizeClass="w-10 h-10" />
+        <span className="max-w-25 text-center text-xs font-medium drop-shadow-md">
+          {displayName}
+        </span>
+      </m.button>
+    </LazyMotion>
+  );
+}
+
+function IconGlyph({
+  type,
+  sizeClass,
+}: {
+  type: DesktopItem["type"];
+  sizeClass: string;
+}) {
+  switch (type) {
+    case "text":
+      return <FileText className={`${sizeClass} text-sky-300`} />;
+    case "image":
+      return <ImageIcon className={`${sizeClass} text-pink-300`} />;
+    case "folder":
+      return <Folder className={`${sizeClass} text-yellow-300`} />;
+    case "terminal":
+      return <TerminalSquare className={`${sizeClass} text-green-300`} />;
+    case "chat":
+      return <MessageSquareText className={`${sizeClass} text-emerald-200`} />;
+    default:
+      return <FileText className={`${sizeClass} text-white`} />;
+  }
+}
+
+function getDefaultPositionForIndex(index: number) {
+  const col = Math.floor(index / MAX_ROWS);
+  const row = index % MAX_ROWS;
+  return {
+    x: col * GRID_SIZE + PADDING,
+    y: row * GRID_SIZE + PADDING,
+  };
+}
+
+function matchesDifficulty(hint: KnowledgeHint, difficulty: Difficulty) {
+  if (hint.exactDifficulty && hint.exactDifficulty !== difficulty) return false;
+  if (
+    hint.minDifficulty &&
+    DIFFICULTY_ORDER[difficulty] < DIFFICULTY_ORDER[hint.minDifficulty]
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function maybeAddKnowledgeHint({
+  itemName,
+  difficulty,
+  discoverKnowledge,
+  addTerminalLines,
+}: {
+  itemName: string;
+  difficulty: Difficulty;
+  discoverKnowledge: (key: KnowledgeHint["knowledge"]) => void;
+  addTerminalLines: (
+    lines: { id: string; type: "hint"; text: string }[],
+  ) => void;
+}) {
+  const hint = KNOWLEDGE_HINTS.find((entry) => entry.name === itemName);
+  if (!hint) return;
+  if (!matchesDifficulty(hint, difficulty)) return;
+
+  discoverKnowledge(hint.knowledge);
+  addTerminalLines([
+    {
+      id: crypto.randomUUID(),
+      type: "hint",
+      text: hint.text,
+    },
+  ]);
 }
 
 function scrambleLabel(label: string) {

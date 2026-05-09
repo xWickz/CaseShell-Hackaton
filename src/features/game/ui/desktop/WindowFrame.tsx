@@ -127,15 +127,16 @@ export default function WindowFrame({
         handleAxis === "se" ? (
           <span
             ref={ref}
-            className="pointer-events-auto absolute -bottom-1 -right-1 flex h-6 w-6 cursor-se-resize items-center justify-center rounded-br-2xl border border-white/30 bg-white/30 shadow-lg"
+            className="pointer-events-auto absolute -bottom-1 -right-1 flex size-6 cursor-se-resize items-center justify-center rounded-br-2xl border border-white/30 bg-white/30 shadow-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="12"
               height="12"
               viewBox="0 0 12 12"
-              className="text-slate-900"
+              className="text-zinc-900"
             >
+              <title>s</title>
               <path
                 d="M2 10L10 2"
                 stroke="currentColor"
@@ -174,10 +175,11 @@ export default function WindowFrame({
         position: "absolute",
       }}
     >
-      <div
+      <section
+        role="region"
         ref={frameRef}
         onMouseDown={() => focusWindow(id)}
-        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-slate-900/60 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-200 ease-out"
+        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-zinc-900/60 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-200 ease-out"
         style={{
           transitionProperty: isDragging ? "none" : "box-shadow, border-color",
         }}
@@ -197,18 +199,19 @@ export default function WindowFrame({
           <span className="text-sm font-semibold text-white">{title}</span>
 
           <button
+            type="button"
             onClick={() => closeWindow(id)}
             className="rounded-md p-1 text-white/70 transition hover:bg-red-500/20 hover:text-red-300"
             data-window-control
           >
-            <X className="h-4 w-4" />
+            <X className="size-4" />
           </button>
         </div>
 
         <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden p-4">
           {children}
         </div>
-      </div>
+      </section>
     </ResizableBox>
   );
 }

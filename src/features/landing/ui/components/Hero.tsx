@@ -12,7 +12,7 @@ const MatrixRain = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="absolute inset-0 -z-10 bg-linear-to-b from-black/40 to-black" />
+      <div className="absolute inset-0 -z-10 bg-linear-to-b from-zinc-950/40 to-zinc-950" />
     ),
   },
 );
@@ -25,7 +25,7 @@ const TerminalMockup = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full max-w-137.5 aspect-5/4 rounded-2xl border border-white/10 bg-black/40" />
+      <div className="w-full max-w-137.5 aspect-5/4 rounded-2xl border border-white/10 bg-zinc-950/40" />
     ),
   },
 );
@@ -38,7 +38,7 @@ export default function Hero() {
         id="intro"
       >
         <MatrixRain />
-        <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-zinc-950 pointer-events-none" />
         <section
           className="w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:max-w-xl z-11"
           aria-label="Introducción al juego"
@@ -56,20 +56,20 @@ export default function Hero() {
           </div>
 
           <span className="flex items-center tracking-tighter">
-            <h1 className="text-7xl font-bold md:text-4xl lg:text-6xl text-snow-white">
+            <h1 className="text-7xl font-semibold md:text-4xl lg:text-6xl text-snow-white">
               Case
             </h1>
             <CanvasTxt
               text="Shell"
-              className="text-7xl font-bold md:text-4xl lg:text-6xl"
+              className="text-7xl font-semibold md:text-4xl lg:text-6xl"
             />
           </span>
 
-          <p className="text-base md:text-lg text-slate-400 max-w-75 lg:max-w-md text-center lg:text-justify">
-            <strong className="text-slate-300">Investiga</strong> incidentes
+          <p className="text-base md:text-lg text-zinc-400 max-w-75 lg:max-w-md text-center lg:text-justify">
+            <strong className="text-zinc-300">Investiga</strong> incidentes
             técnicos dentro de un entorno virtual, explora archivos, usa la{" "}
-            <strong className="text-slate-300">terminal</strong> y resuelve el{" "}
-            <strong className="text-slate-300">caso</strong> como si estuvieras
+            <strong className="text-zinc-300">terminal</strong> y resuelve el{" "}
+            <strong className="text-zinc-300">caso</strong> como si estuvieras
             dentro del sistema.
           </p>
           <Link

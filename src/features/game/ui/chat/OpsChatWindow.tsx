@@ -44,10 +44,10 @@ export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages.length]);
+  }, []);
 
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-slate-950/80 text-sm text-white">
+    <div className="flex h-full w-full flex-col rounded-2xl bg-zinc-950/80 text-sm text-white">
       <header className="flex items-center justify-between border-b border-white/5 px-4 py-3">
         <div>
           <h3 className="text-base font-semibold">Canal en tiempo real</h3>
@@ -61,7 +61,7 @@ export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
         ref={scrollRef}
         className="
           chat-scroll
-          flex-1 space-y-4 overflow-y-auto px-4 py-4 pr-2
+          flex-1 space-y-4 overflow-y-auto p-4 pr-2
         "
       >
         {messages.map((message) => {
@@ -74,7 +74,7 @@ export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
               className={`rounded-2xl border px-4 py-3 shadow-inner ${meta.bubble}`}
             >
               <header className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-white/70">
-                <Icon className="h-4 w-4" aria-hidden="true" />
+                <Icon className="size-4" aria-hidden="true" />
                 {meta.label}
               </header>
 
@@ -102,7 +102,7 @@ export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
         )}
       </div>
 
-      <footer className="border-t border-white/5 px-4 py-3 text-[0.7rem] text-white/50">
+      <footer className="border-t border-white/5 p-4 text-[0.7rem] text-white/50">
         Este chat simula al equipo CubePath OPS. Usa las sugerencias para copiar
         comandos en la terminal.
       </footer>

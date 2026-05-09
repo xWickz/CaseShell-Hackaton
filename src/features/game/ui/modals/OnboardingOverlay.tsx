@@ -40,14 +40,14 @@ export default function OnboardingOverlay({
 
   return (
     <div
-      className="absolute inset-0 z-1200 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur font-sans"
+      className="absolute inset-0 z-1200 flex items-center justify-center bg-zinc-950/70 px-4 py-6 backdrop-blur font-sans"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
     >
-      <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-slate-950/95 p-8 shadow-2xl">
+      <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-zinc-950/95 p-8 shadow-2xl">
         <div className="mb-6 flex items-center gap-3 text-sky-300">
-          <Sparkles className="h-6 w-6" aria-hidden="true" />
+          <Sparkles className="size-6" aria-hidden="true" />
           <div>
             <p className="text-xs uppercase tracking-tight text-white/60 ">
               Primer vistazo
@@ -66,7 +66,7 @@ export default function OnboardingOverlay({
               className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80"
             >
               <tip.icon
-                className="mb-3 h-5 w-5 text-emerald-300"
+                className="mb-3 size-5 text-emerald-300"
                 aria-hidden="true"
               />
               <p className="text-base font-semibold text-white">{tip.title}</p>
@@ -76,8 +76,9 @@ export default function OnboardingOverlay({
         </div>
 
         <button
+          type="button"
           onClick={onDismiss}
-          className="mt-6 w-full rounded-2xl bg-emerald-500 px-6 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+          className="mt-6 w-full rounded-2xl bg-emerald-500 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-emerald-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
         >
           Listo, entrar al escritorio
         </button>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
 import type {
@@ -34,7 +34,10 @@ type DesktopProps = {
 
 export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
+  const [showCompletionBanner, dispatchBanner] = useReducer(
+    (state: boolean, action: "show" | "hide") => action === "show",
+    false,
+  );
 
   const previousCompletedRef = useRef(false);
 
@@ -92,18 +95,15 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
 
   useEffect(() => {
     if (!hasHydrated) return;
-
     setDifficulty(difficulty);
+  }, [hasHydrated, difficulty, setDifficulty]);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
     if (currentDifficulty !== difficulty) {
       initializeSession(difficulty);
     }
-  }, [
-    hasHydrated,
-    difficulty,
-    currentDifficulty,
-    setDifficulty,
-    initializeSession,
-  ]);
+  }, [hasHydrated, currentDifficulty, difficulty, initializeSession]);
 
   useEffect(() => {
     openWindow({
@@ -111,7 +111,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
       title: "Terminal",
       type: "terminal",
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -132,10 +131,10 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
 
   useEffect(() => {
     if (isCaseCompleted && !previousCompletedRef.current) {
-      setShowCompletionBanner(true);
+      dispatchBanner("show");
 
       const timeoutId = window.setTimeout(() => {
-        setShowCompletionBanner(false);
+        dispatchBanner("hide");
       }, 2600);
 
       previousCompletedRef.current = true;
@@ -145,7 +144,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
 
     if (!isCaseCompleted) {
       previousCompletedRef.current = false;
-      setShowCompletionBanner(false);
+      dispatchBanner("hide");
     }
   }, [isCaseCompleted]);
 
@@ -292,7 +291,9 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
             <line x1="12" x2="12" y1="17" y2="21" />
           </svg>
         </div>
-        <h2 className="mb-2 text-2xl font-bold text-white">Acceso Denegado</h2>
+        <h2 className="mb-2 text-2xl font-semibold text-white">
+          Acceso Denegado
+        </h2>
         <p className="mb-6 max-w-sm text-zinc-400">
           Este entorno de investigación requiere teclado físico y una pantalla
           amplia. Por favor, <strong>accede desde un ordenador</strong>.

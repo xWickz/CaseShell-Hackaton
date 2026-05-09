@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 
 const TYPING_SPEED = 20;
 
@@ -14,10 +14,53 @@ const terminalText = [
   "agent@cubepath:~$ _",
 ];
 
+type TypingState = {
+  displayedLines: string[];
+  currentLineIndex: number;
+  currentTextIndex: number;
+};
+
+type TypingAction = { type: "typeChar"; line: string } | { type: "nextLine" };
+
+const INITIAL_TYPING_STATE: TypingState = {
+  displayedLines: [],
+  currentLineIndex: 0,
+  currentTextIndex: 0,
+};
+
+function typingReducer(state: TypingState, action: TypingAction): TypingState {
+  switch (action.type) {
+    case "typeChar": {
+      const nextLines = [...state.displayedLines];
+      if (state.currentTextIndex === 0) {
+        nextLines[state.currentLineIndex] = "";
+      }
+      nextLines[state.currentLineIndex] = action.line.slice(
+        0,
+        state.currentTextIndex + 1,
+      );
+      return {
+        ...state,
+        displayedLines: nextLines,
+        currentTextIndex: state.currentTextIndex + 1,
+      };
+    }
+    case "nextLine":
+      return {
+        ...state,
+        currentLineIndex: state.currentLineIndex + 1,
+        currentTextIndex: 0,
+      };
+    default:
+      return state;
+  }
+}
+
 export const TerminalMockup = () => {
-  const [displayedLines, setDisplayedLines] = useState<string[]>([]);
-  const [currentLineIndex, setCurrentLineIndex] = useState(0);
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [typingState, dispatchTyping] = useReducer(
+    typingReducer,
+    INITIAL_TYPING_STATE,
+  );
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -40,20 +83,15 @@ export const TerminalMockup = () => {
   useEffect(() => {
     if (prefersReducedMotion) return;
 
+    const { currentLineIndex, currentTextIndex } = typingState;
+
     if (currentLineIndex >= terminalText.length) return;
 
     const currentLine = terminalText[currentLineIndex];
 
     if (currentTextIndex < currentLine.length) {
       const timeout = setTimeout(() => {
-        setDisplayedLines((prev) => {
-          const next = [...prev];
-          if (currentTextIndex === 0) next[currentLineIndex] = "";
-          next[currentLineIndex] = currentLine.slice(0, currentTextIndex + 1);
-          return next;
-        });
-
-        setCurrentTextIndex((prev) => prev + 1);
+        dispatchTyping({ type: "typeChar", line: currentLine });
       }, TYPING_SPEED);
 
       return () => clearTimeout(timeout);
@@ -61,26 +99,27 @@ export const TerminalMockup = () => {
 
     if (currentLineIndex < terminalText.length - 1) {
       const timeout = setTimeout(() => {
-        setCurrentLineIndex((prev) => prev + 1);
-        setCurrentTextIndex(0);
+        dispatchTyping({ type: "nextLine" });
       }, 350);
 
       return () => clearTimeout(timeout);
     }
-  }, [currentLineIndex, currentTextIndex, prefersReducedMotion]);
+  }, [prefersReducedMotion, typingState]);
 
-  const linesToRender = prefersReducedMotion ? staticLines : displayedLines;
+  const linesToRender = prefersReducedMotion
+    ? staticLines
+    : typingState.displayedLines;
 
   return (
-    <div className="hover:shadow-emerald-500/10 relative w-full max-w-[550px] aspect-[5/4] overflow-hidden rounded-2xl border border-emerald-500/10 bg-black/75 shadow-2xl">
+    <div className="hover:shadow-emerald-500/10 relative w-full max-w-[550px] aspect-[5/4] overflow-hidden rounded-2xl border border-emerald-500/10 bg-zinc-950/75 shadow-2xl">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.06),transparent_45%)] pointer-events-none" />
       <div className="absolute inset-0 pointer-events-none opacity-[0.06] [background-image:linear-gradient(to_bottom,transparent,transparent_3px,rgba(255,255,255,0.3)_4px)] [background-size:100%_6px]" />
 
-      <div className="absolute top-0 left-0 z-10 flex h-10 w-full items-center gap-2 border-b border-white/10 bg-black/50 px-4 backdrop-blur-sm">
-        <div className="h-3 w-3 rounded-full bg-red-500/80" />
-        <div className="h-3 w-3 rounded-full bg-orange-400/80" />
-        <div className="h-3 w-3 rounded-full bg-green-500/80" />
-        <span className="flex-1 pr-10 text-center text-xs text-slate-500">
+      <div className="absolute top-0 left-0 z-10 flex h-10 w-full items-center gap-2 border-b border-white/10 bg-zinc-950/50 px-4 backdrop-blur-sm">
+        <div className="size-3 rounded-full bg-red-500/80" />
+        <div className="size-3 rounded-full bg-orange-400/80" />
+        <div className="size-3 rounded-full bg-green-500/80" />
+        <span className="flex-1 pr-10 text-center text-xs text-zinc-500">
           Terminal
         </span>
       </div>
@@ -97,7 +136,7 @@ export const TerminalMockup = () => {
 
             return (
               <p
-                key={index}
+                key={line}
                 className={`flex items-start gap-1 leading-relaxed ${
                   isCritical
                     ? "text-red-400"
@@ -112,7 +151,7 @@ export const TerminalMockup = () => {
 
                 {!prefersReducedMotion &&
                   isLastLine &&
-                  currentLineIndex === terminalText.length - 1 && (
+                  typingState.currentLineIndex === terminalText.length - 1 && (
                     <span className="mt-0.5 inline-block h-4 w-2 bg-emerald-400 animate-pulse" />
                   )}
               </p>
@@ -120,7 +159,7 @@ export const TerminalMockup = () => {
           })}
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black via-black/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
       </div>
     </div>
   );

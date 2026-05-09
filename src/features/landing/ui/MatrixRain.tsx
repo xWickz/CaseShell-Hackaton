@@ -3,7 +3,7 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
 interface MatrixBackgroundProps {
-  color?: string; // Por defecto usa el verde esmeralda que tenías
+  color?: string;
   fontSize?: number;
   className?: string;
   speed?: number;
@@ -20,7 +20,6 @@ export const MatrixBackground: React.FC<MatrixBackgroundProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isActive, setIsActive] = useState(false);
 
-  // Lógica de optimización del primer código
   useEffect(() => {
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -60,14 +59,13 @@ export const MatrixBackground: React.FC<MatrixBackgroundProps> = ({
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Mantenemos la esencia: Solo 0 y 1
     const chars = "01";
     const columns = Math.floor(canvas.width / fontSize);
     const drops: number[] = new Array(columns).fill(1);
 
     let animationFrameId: number;
     let lastTime = 0;
-    const interval = 50; // Ajustado para un balance entre suavidad y estética retro
+    const interval = 50;
 
     const draw = (currentTime: number) => {
       animationFrameId = requestAnimationFrame(draw);
@@ -75,7 +73,6 @@ export const MatrixBackground: React.FC<MatrixBackgroundProps> = ({
       if (currentTime - lastTime < interval) return;
       lastTime = currentTime;
 
-      // Fondo semi-transparente para el rastro (mantenemos el 0.08 del original)
       ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -112,7 +109,6 @@ export const MatrixBackground: React.FC<MatrixBackgroundProps> = ({
         className="w-full h-full"
         style={{ opacity: opacity }}
       />
-      {/* Mantenemos el degradado inferior del primer código */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
     </div>
   );

@@ -89,18 +89,18 @@ export default function FailureModal() {
 
   return (
     <div
-      className="fixed inset-0 z-1100 flex items-center justify-center bg-black/70 px-4 py-10 backdrop-blur-sm"
+      className="fixed inset-0 z-1100 flex items-center justify-center bg-zinc-950/70 px-4 py-10 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
       aria-describedby={descriptionId}
     >
-      <div className="w-full max-w-lg rounded-3xl border border-red-500/20 bg-slate-950/90 p-8 shadow-[0_25px_120px_rgba(0,0,0,0.45)]">
+      <div className="w-full max-w-lg rounded-3xl border border-red-500/20 bg-zinc-950/90 p-8 shadow-[0_25px_120px_rgba(0,0,0,0.45)]">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-red-400/80">
           Caso fallido
         </p>
 
-        <h2 id={headingId} className="mt-2 text-3xl font-bold text-white">
+        <h2 id={headingId} className="mt-2 text-3xl font-semibold text-white">
           {title}
         </h2>
 

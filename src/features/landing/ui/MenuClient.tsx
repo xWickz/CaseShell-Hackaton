@@ -53,7 +53,7 @@ export default function MenuClient({
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: dynamicCSS }} />
+      <style>{dynamicCSS}</style>
       <nav id="main-nav" className="relative flex gap-3">
         {newChildren}
         <div

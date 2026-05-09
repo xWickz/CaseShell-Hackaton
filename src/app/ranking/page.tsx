@@ -17,10 +17,10 @@ export default function RankingPage() {
         <Navbar />
       </header>
       <PendingScoreSync>
-        <main className="min-h-screen bg-black pt-24 px-6 pb-20 font-sans text-white">
+        <main className="min-h-screen bg-zinc-950 pt-24 px-6 pb-20 font-sans text-white">
           <div className="max-w-4xl mx-auto flex flex-col gap-10">
             <section className="w-full flex flex-col items-center text-center gap-6">
-              <h1 className="text-5xl lg:text-6xl text-white font-bold tracking-tight">
+              <h1 className="text-5xl lg:text-6xl text-white font-semibold tracking-tight">
                 Tabla de <span className="text-red-600">clasificación</span>
               </h1>
               <p className="text-lg text-zinc-400 max-w-2xl">

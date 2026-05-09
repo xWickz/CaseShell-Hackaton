@@ -87,7 +87,7 @@ export type ActiveTerminalAlert = {
   effect?: AlertEffectId;
 };
 
-export type FailureType = "timeout" | "command";
+type FailureType = "timeout" | "command";
 
 export type FailureState = {
   strikes: number;

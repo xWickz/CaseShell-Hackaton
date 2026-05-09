@@ -133,7 +133,7 @@ export default function Taskbar() {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-black/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
+    <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-zinc-950/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
       <div className="relative flex items-center gap-2" ref={startMenuRef}>
         <button
           type="button"
@@ -144,7 +144,7 @@ export default function Taskbar() {
           }`}
         >
           <ChevronUp
-            className={`h-5 w-5 transition-transform ${
+            className={`size-5 transition-transform ${
               isStartMenuVisible ? "rotate-180" : ""
             }`}
           />
@@ -162,12 +162,12 @@ export default function Taskbar() {
               <button
                 type="button"
                 onClick={handleSoundButtonClick}
-                className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                className="mb-1 flex w-full items-center gap-3 rounded-xl p-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
               >
                 {alertSoundsEnabled ? (
-                  <Volume2 className="h-4 w-4" />
+                  <Volume2 className="size-4" />
                 ) : (
-                  <VolumeX className="h-4 w-4" />
+                  <VolumeX className="size-4" />
                 )}
                 <div className="flex flex-col items-start text-left">
                   <span className="font-medium">Sonidos de virus</span>
@@ -178,7 +178,7 @@ export default function Taskbar() {
               </button>
 
               {virusAlertTooltipOpen && (
-                <div className="absolute left-[calc(100%+0.75rem)] top-0 z-20 w-64 rounded-2xl border border-cyan-400/20 bg-slate-950/95 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)]">
+                <div className="absolute left-[calc(100%+0.75rem)] top-0 z-20 w-64 rounded-2xl border border-cyan-400/20 bg-zinc-950/95 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)]">
                   <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-cyan-300/80">
                     Consejo
                   </p>
@@ -200,9 +200,9 @@ export default function Taskbar() {
             <button
               type="button"
               onClick={toggleCrtOverlay}
-              className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              className="mb-1 flex w-full items-center gap-3 rounded-xl p-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
             >
-              <Monitor className="h-4 w-4" />
+              <Monitor className="size-4" />
               <div className="flex flex-col items-start text-left">
                 <span className="font-medium">Filtro CRT</span>
                 <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
@@ -217,9 +217,9 @@ export default function Taskbar() {
                 setIsStartMenuOpen(false);
                 openResetModal();
               }}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              className="flex w-full items-center gap-3 rounded-xl p-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="size-4" />
               Reiniciar Sistema
             </button>
 
@@ -229,9 +229,9 @@ export default function Taskbar() {
                 setIsStartMenuOpen(false);
                 openExitModal();
               }}
-              className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+              className="mt-1 flex w-full items-center gap-3 rounded-xl p-3 text-sm text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
             >
-              <Power className="h-4 w-4" />
+              <Power className="size-4" />
               Apagar y Salir
             </button>
           </div>
@@ -243,7 +243,7 @@ export default function Taskbar() {
           aria-label="Cambiar fondo del escritorio"
           className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
-          <Palette className="h-5 w-5" />
+          <Palette className="size-5" />
         </button>
 
         <button
@@ -256,7 +256,7 @@ export default function Taskbar() {
               : "bg-white/10 text-white/80 hover:bg-white/20"
           }`}
         >
-          <ClipboardList className="h-5 w-5" />
+          <ClipboardList className="size-5" />
         </button>
       </div>
 

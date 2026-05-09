@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface CanvasTextProps {
@@ -41,18 +41,18 @@ export function CanvasText({
   const bgRef = useRef<HTMLSpanElement>(null);
   const animationRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
-  const [bgColor, setBgColor] = useState("#0a0a0a");
-  const [resolvedColors, setResolvedColors] = useState<string[]>([]);
+  const bgColorRef = useRef("#0a0a0a");
+  const resolvedColorsRef = useRef<string[]>([]);
+  const fontRef = useRef("");
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [font, setFont] = useState("");
 
   const updateColors = useCallback(() => {
     if (bgRef.current) {
       const computed = window.getComputedStyle(bgRef.current);
-      setBgColor(computed.backgroundColor);
+      bgColorRef.current = computed.backgroundColor;
     }
     const resolved = colors.map(resolveColor);
-    setResolvedColors(resolved);
+    resolvedColorsRef.current = resolved;
   }, [colors]);
 
   useEffect(() => {
@@ -78,9 +78,7 @@ export function CanvasText({
         width: Math.ceil(rect.width) || 400,
         height: Math.ceil(rect.height) || 200,
       });
-      setFont(
-        `${computed.fontWeight} ${computed.fontSize} ${computed.fontFamily}`,
-      );
+      fontRef.current = `${computed.fontWeight} ${computed.fontSize} ${computed.fontFamily}`;
     };
 
     updateDimensions();
@@ -89,17 +87,20 @@ export function CanvasText({
     resizeObserver.observe(textEl);
 
     return () => resizeObserver.disconnect();
-  }, [text, className]);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const resolvedColors = resolvedColorsRef.current;
+    const font = fontRef.current;
     if (
       !canvas ||
       resolvedColors.length === 0 ||
       dimensions.width === 0 ||
       !font
-    )
+    ) {
       return;
+    }
 
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
@@ -134,7 +135,7 @@ export function CanvasText({
       ctx.fillText(text, 0, baselineY);
 
       ctx.globalCompositeOperation = "source-in";
-      ctx.fillStyle = bgColor;
+      ctx.fillStyle = bgColorRef.current;
       ctx.fillRect(0, 0, width, height);
 
       ctx.globalCompositeOperation = "source-atop";
@@ -169,17 +170,7 @@ export function CanvasText({
     return () => {
       cancelAnimationFrame(animationRef.current);
     };
-  }, [
-    text,
-    font,
-    bgColor,
-    resolvedColors,
-    animationDuration,
-    lineWidth,
-    lineGap,
-    curveIntensity,
-    dimensions,
-  ]);
+  }, [text, animationDuration, lineWidth, lineGap, curveIntensity, dimensions]);
 
   return (
     <span
