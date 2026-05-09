@@ -20,7 +20,6 @@ export async function submitRankingAction(
     medium: 60, // 1 minuto? bueno, a ver
     hard: 120, // 2 minutos si ya se sabe todo pero igual
   };
-  const session = await auth();
   if (
     !ALLOWED_DIFFICULTIES.includes(
       difficulty as (typeof ALLOWED_DIFFICULTIES)[number],
@@ -38,17 +37,18 @@ export async function submitRankingAction(
     throw new Error("Tiempo no válido para ranking");
   }
 
-  {
-    const session = await auth();
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      throw new Error("No estás autenticado");
-    }
+  if (!session?.user?.id && !session?.user?.email) {
+    throw new Error("No estás autenticado");
   }
 
   const user = await prisma.user.findFirst({
     where: {
-      OR: [{ id: session.user.id }, { email: session.user.email ?? "" }],
+      OR: [
+        ...(session.user.id ? [{ id: session.user.id }] : []),
+        ...(session.user.email ? [{ email: session.user.email }] : []),
+      ],
     },
   });
 
