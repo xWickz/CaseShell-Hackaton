@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const difficulties = [
   {
     id: "easy",
@@ -79,9 +81,11 @@ export default function Difficulties() {
                 difficultyStyles.easy;
 
               return (
-                <div
+                <Link
                   key={diff.id}
-                  className={`group bg-zinc-900/10 rounded-3xl border border-white/10 p-8 flex flex-col justify-between transition-all duration-300 shadow-2xl ${styles.border} ${styles.bg}`}
+                  href={`/game/${diff.id}`}
+                  aria-label={`Jugar en dificultad ${diff.label}`}
+                  className={`group bg-zinc-900/10 rounded-3xl border border-white/10 p-8 flex flex-col justify-between transition-all duration-300 shadow-2xl pointer-events-none md:pointer-events-auto focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${styles.border} ${styles.bg}`}
                 >
                   <div>
                     <span
@@ -102,7 +106,13 @@ export default function Difficulties() {
                       <Metric label="Enfoque" value={diff.meta.focus} full />
                     </div>
                   </div>
-                </div>
+
+                  <span
+                    className={`mt-8 hidden md:block text-sm font-semibold ${styles.text}`}
+                  >
+                    Jugar &rarr;
+                  </span>
+                </Link>
               );
             })}
           </div>

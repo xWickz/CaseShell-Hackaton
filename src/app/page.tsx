@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-zinc-950 font-sans pb-20 overflow-hidden">
+      <main className="min-h-screen bg-zinc-950 font-sans overflow-hidden">
         <ShaderPage />
         <SecondHero />
         <Mechanics />

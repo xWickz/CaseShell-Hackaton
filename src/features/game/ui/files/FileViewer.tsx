@@ -25,28 +25,40 @@ export default function FileViewer({
 
   if (type === "text") {
     viewerContent = (
-      <div className="h-full w-full overflow-auto rounded-lg bg-neutral-950 p-4 text-sm text-green-300">
-        <pre className="whitespace-pre-wrap font-mono">{content}</pre>
+      <div className="flex h-full w-full flex-col bg-[#ece9d8] text-black">
+        <div className="flex gap-4 px-2 py-0.5 text-[11px]">
+          <span>Archivo</span>
+          <span>Edición</span>
+          <span>Formato</span>
+          <span>Ver</span>
+          <span>Ayuda</span>
+        </div>
+        <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap border border-[#7f9db9] bg-white p-1 font-['Lucida_Console',_'Courier_New',_monospace] text-[13px]">
+          {content}
+        </pre>
       </div>
     );
   } else if (type === "image") {
     viewerContent = (
-      <div className="flex h-full w-full items-center justify-center rounded-lg bg-neutral-950 p-4">
-        <div className="relative h-full w-full">
+      <div className="flex h-full w-full flex-col bg-white">
+        <div className="relative min-h-0 flex-1 p-3">
           {imageUrl && (
             <Image
               src={imageUrl}
               alt="Archivo visual"
               fill
-              className="max-h-full max-w-full rounded-lg border border-white/10"
+              className="object-contain p-3"
             />
           )}
+        </div>
+        <div className="border-t border-[#d5d2c1] bg-[#ece9d8] px-2 py-1 text-center text-[11px] text-[#444]">
+          Visor de imágenes
         </div>
       </div>
     );
   } else {
     viewerContent = (
-      <div className="rounded-lg bg-neutral-950 p-4 text-sm text-white">
+      <div className="h-full w-full bg-white p-4 text-[11px] text-black">
         Archivo no soportado todavía.
       </div>
     );

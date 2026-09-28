@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
 import type {
@@ -14,6 +20,7 @@ import DesktopIcon from "@/features/game/ui/desktop/DesktopIcon";
 import ObjectiveTracker from "@/features/game/ui/desktop/ObjectiveTracker";
 import Taskbar from "@/features/game/ui/desktop/Taskbar";
 import WindowFrame from "@/features/game/ui/desktop/WindowFrame";
+import XpBootScreen from "@/features/game/ui/desktop/XpBootScreen";
 import FileViewer from "@/features/game/ui/files/FileViewer";
 import FolderViewer from "@/features/game/ui/files/FolderViewer";
 import BriefingModal from "@/features/game/ui/modals/BriefingModal";
@@ -34,6 +41,8 @@ type DesktopProps = {
 
 export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [isBooting, setIsBooting] = useState(true);
+  const endBoot = useCallback(() => setIsBooting(false), []);
   const [showCompletionBanner, dispatchBanner] = useReducer(
     (state: boolean, action: "show" | "hide") => action === "show",
     false,
@@ -44,7 +53,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   const openWindows = useGameUIStore((state) => state.openWindows);
   const openWindow = useGameUIStore((state) => state.openWindow);
   const setDifficulty = useGameUIStore((state) => state.setDifficulty);
-  const wallpaperTheme = useGameUIStore((state) => state.wallpaperTheme);
   const hasSeenOnboarding = useGameUIStore((state) => state.hasSeenOnboarding);
   const completeOnboarding = useGameUIStore(
     (state) => state.completeOnboarding,
@@ -78,16 +86,6 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     (state) => state.caseState.progress.completed,
   );
 
-  const wallpaperClasses = useMemo(() => {
-    switch (wallpaperTheme) {
-      case "ocean":
-        return "from-slate-900 via-cyan-900 to-blue-900";
-      case "matrix":
-        return "from-black via-emerald-950 to-slate-900";
-      default:
-        return "from-slate-900 via-slate-800 to-slate-950";
-    }
-  }, [wallpaperTheme]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -151,19 +149,21 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   if (!isMounted) {
     return (
       <main
-        className={`relative h-screen w-full overflow-hidden bg-linear-to-br ${wallpaperClasses}`}
+        className="xp-bliss relative h-screen w-full overflow-hidden"
       />
     );
   }
 
   return (
     <main
-      className={`relative h-screen w-full overflow-hidden bg-linear-to-br ${wallpaperClasses}`}
+      data-os="xp"
+      className="xp-bliss relative h-screen w-full overflow-hidden"
     >
       <GameSessionHydrator />
       <GameTimerController />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.15),transparent_30%)]" />
+      {isBooting && <XpBootScreen onDone={endBoot} />}
+
 
       {showCompletionBanner && (
         <div className="pointer-events-none absolute left-1/2 top-6 z-1400 -translate-x-1/2 animate-in fade-in zoom-in-95 duration-300">
@@ -197,11 +197,12 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
           zIndex={window.zIndex}
           position={window.position}
           size={window.size}
+          minimized={window.minimized}
         >
           {window.type === "terminal" ? (
             <TerminalWindow />
           ) : window.type === "folder" ? (
-            <FolderViewer items={window.children ?? []} />
+            <FolderViewer title={window.title} items={window.children ?? []} />
           ) : window.type === "chat" ? (
             <OpsChatWindow difficulty={difficulty} />
           ) : (

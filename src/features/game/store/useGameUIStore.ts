@@ -15,7 +15,6 @@ type GameUIState = {
   selectedDifficulty: Difficulty | null;
   openWindows: WindowInstance[];
   zCounter: number;
-  wallpaperTheme: WallpaperTheme;
   iconPositions: Record<string, { x: number; y: number }>;
   objectivePanelVisible: boolean;
   objectivePanelCollapsed: boolean;
@@ -29,8 +28,6 @@ type GameUIState = {
   closeBriefing: () => void;
   completeOnboarding: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
-  setWallpaperTheme: (theme: WallpaperTheme) => void;
-  cycleWallpaperTheme: () => void;
   setIconPosition: (id: string, position: { x: number; y: number }) => void;
   openObjectivePanel: () => void;
   closeObjectivePanel: () => void;
@@ -56,11 +53,10 @@ type GameUIState = {
   ) => void;
   closeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
+  minimizeWindow: (id: string) => void;
   setWindowPosition: (id: string, position: WindowPosition) => void;
   setWindowSize: (id: string, size: WindowSize) => void;
 };
-
-export type WallpaperTheme = "aurora" | "ocean" | "matrix";
 
 const BASE_WINDOW_POSITION: WindowPosition = { x: 120, y: 120 };
 const WINDOW_OFFSET = 28;
@@ -78,7 +74,6 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   selectedDifficulty: null,
   openWindows: [],
   zCounter: 10,
-  wallpaperTheme: "aurora",
   iconPositions: {},
   objectivePanelVisible: true,
   objectivePanelCollapsed: false,
@@ -98,15 +93,6 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
       iconPositions: {},
       hasAcknowledgedVirusAlert: false,
       virusAlertTooltipOpen: false,
-    }),
-
-  setWallpaperTheme: (theme) => set({ wallpaperTheme: theme }),
-  cycleWallpaperTheme: () =>
-    set((state) => {
-      const nextOrder: WallpaperTheme[] = ["aurora", "ocean", "matrix"];
-      const currentIndex = nextOrder.indexOf(state.wallpaperTheme);
-      const nextTheme = nextOrder[(currentIndex + 1) % nextOrder.length];
-      return { wallpaperTheme: nextTheme };
     }),
 
   setIconPosition: (id, position) =>
@@ -166,7 +152,9 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
     if (existing) {
       set({
         openWindows: openWindows.map((w) =>
-          w.id === window.id ? { ...w, zIndex: zCounter + 1 } : w,
+          w.id === window.id
+            ? { ...w, zIndex: zCounter + 1, minimized: false }
+            : w,
         ),
         zCounter: zCounter + 1,
       });
@@ -207,11 +195,18 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
 
     set({
       openWindows: openWindows.map((w) =>
-        w.id === id ? { ...w, zIndex: zCounter + 1 } : w,
+        w.id === id ? { ...w, zIndex: zCounter + 1, minimized: false } : w,
       ),
       zCounter: zCounter + 1,
     });
   },
+
+  minimizeWindow: (id) =>
+    set((state) => ({
+      openWindows: state.openWindows.map((w) =>
+        w.id === id ? { ...w, minimized: true } : w,
+      ),
+    })),
 
   setWindowPosition: (id, position) =>
     set((state) => ({

@@ -2,17 +2,11 @@
 
 import type { PanInfo } from "framer-motion";
 import { domAnimation, LazyMotion, m, useAnimation } from "framer-motion";
-import {
-  FileText,
-  Folder,
-  ImageIcon,
-  MessageSquareText,
-  TerminalSquare,
-} from "lucide-react";
 import { useEffect } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
 import type { DesktopItem, Difficulty } from "@/features/game/types/game";
+import XpIcon from "@/features/game/ui/desktop/XpIcon";
 
 type DesktopIconProps = {
   item: DesktopItem;
@@ -310,12 +304,12 @@ function WindowIconButton({
       <button
         type="button"
         onDoubleClick={onOpen}
-        className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
+        className={`group flex w-24 flex-col items-center gap-1 p-1 text-black outline-none ${scrambleMotionClass}`}
         aria-label={`Abrir ${item.name}`}
         title={item.name}
       >
-        <IconGlyph type={item.type} sizeClass="w-8 h-8" />
-        <span className="max-w-25 text-center text-xs font-medium">
+        <XpIcon type={item.type} className="size-10 group-focus:opacity-75" />
+        <span className="max-w-24 px-0.5 text-center text-[11px] group-focus:bg-[#316ac5] group-focus:text-white">
           {displayName}
         </span>
       </button>
@@ -354,40 +348,17 @@ function DraggableIconButton({
         animate={controls}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
         style={{ position: "absolute" }}
-        className={`flex w-24 flex-col items-center gap-2 rounded-xl p-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${scrambleMotionClass}`}
+        className={`group flex w-24 flex-col items-center gap-1 p-1 text-white outline-none ${scrambleMotionClass}`}
         aria-label={`Abrir ${item.name}`}
         title={item.name}
       >
-        <IconGlyph type={item.type} sizeClass="w-10 h-10" />
-        <span className="max-w-25 text-center text-xs font-medium drop-shadow-md">
+        <XpIcon type={item.type} className="size-12 group-focus:opacity-75" />
+        <span className="max-w-24 px-0.5 text-center text-[11px] [text-shadow:1px_1px_1px_#000] group-focus:bg-[#316ac5] group-focus:[text-shadow:none]">
           {displayName}
         </span>
       </m.button>
     </LazyMotion>
   );
-}
-
-function IconGlyph({
-  type,
-  sizeClass,
-}: {
-  type: DesktopItem["type"];
-  sizeClass: string;
-}) {
-  switch (type) {
-    case "text":
-      return <FileText className={`${sizeClass} text-sky-300`} />;
-    case "image":
-      return <ImageIcon className={`${sizeClass} text-pink-300`} />;
-    case "folder":
-      return <Folder className={`${sizeClass} text-yellow-300`} />;
-    case "terminal":
-      return <TerminalSquare className={`${sizeClass} text-green-300`} />;
-    case "chat":
-      return <MessageSquareText className={`${sizeClass} text-emerald-200`} />;
-    default:
-      return <FileText className={`${sizeClass} text-white`} />;
-  }
 }
 
 function getDefaultPositionForIndex(index: number) {

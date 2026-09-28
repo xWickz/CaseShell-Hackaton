@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Minus, X } from "lucide-react";
 import type { PointerEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ResizableBox } from "react-resizable";
@@ -15,6 +15,7 @@ type WindowFrameProps = {
   zIndex?: number;
   position: WindowPosition;
   size: WindowSize;
+  minimized?: boolean;
   children: ReactNode;
 };
 
@@ -24,16 +25,17 @@ export default function WindowFrame({
   zIndex = 20,
   position,
   size,
+  minimized = false,
   children,
 }: WindowFrameProps) {
   const closeWindow = useGameUIStore((state) => state.closeWindow);
   const focusWindow = useGameUIStore((state) => state.focusWindow);
+  const minimizeWindow = useGameUIStore((state) => state.minimizeWindow);
   const setWindowPosition = useGameUIStore((state) => state.setWindowPosition);
   const setWindowSize = useGameUIStore((state) => state.setWindowSize);
 
   const frameRef = useRef<HTMLDivElement | null>(null);
   const dragOffsetRef = useRef<{ x: number; y: number } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [tempSize, setTempSize] = useState<WindowSize | null>(null);
   const [viewportSize, setViewportSize] = useState({
     width: 1920,
@@ -73,7 +75,6 @@ export default function WindowFrame({
       x: event.clientX - rect.left,
       y: event.clientY - rect.top,
     };
-    setIsDragging(true);
 
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -104,7 +105,6 @@ export default function WindowFrame({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     dragOffsetRef.current = null;
-    setIsDragging(false);
   };
 
   const minConstraints: [number, number] = [420, 320];
@@ -127,14 +127,14 @@ export default function WindowFrame({
         handleAxis === "se" ? (
           <span
             ref={ref}
-            className="pointer-events-auto absolute -bottom-1 -right-1 flex size-6 cursor-se-resize items-center justify-center rounded-br-2xl border border-white/30 bg-white/30 shadow-lg"
+            className="pointer-events-auto absolute bottom-0 right-0 flex size-4 cursor-se-resize items-center justify-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="12"
               height="12"
               viewBox="0 0 12 12"
-              className="text-zinc-900"
+              className="text-[#808080]"
             >
               <title>s</title>
               <path
@@ -173,19 +173,17 @@ export default function WindowFrame({
         top: position.y,
         zIndex,
         position: "absolute",
+        display: minimized ? "none" : undefined,
       }}
     >
       <section
         role="region"
         ref={frameRef}
         onMouseDown={() => focusWindow(id)}
-        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-zinc-900/60 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-200 ease-out"
-        style={{
-          transitionProperty: isDragging ? "none" : "box-shadow, border-color",
-        }}
+        className="os-window flex h-full w-full flex-col overflow-hidden"
       >
         <div
-          className="flex shrink-0 items-center justify-between border-b border-white/10 bg-white/10 px-4 py-3 cursor-move select-none backdrop-blur-md"
+          className="os-titlebar flex shrink-0 items-center justify-between select-none"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={endDrag}
@@ -196,19 +194,31 @@ export default function WindowFrame({
           }}
           onPointerCancel={endDrag}
         >
-          <span className="text-sm font-semibold text-white">{title}</span>
+          <span className="truncate text-white">{title}</span>
 
-          <button
-            type="button"
-            onClick={() => closeWindow(id)}
-            className="rounded-md p-1 text-white/70 transition hover:bg-red-500/20 hover:text-red-300"
-            data-window-control
-          >
-            <X className="size-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => minimizeWindow(id)}
+              aria-label={`Minimizar ${title}`}
+              className="os-titlebtn"
+              data-window-control
+            >
+              <Minus className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => closeWindow(id)}
+              aria-label={`Cerrar ${title}`}
+              className="os-titlebtn os-close"
+              data-window-control
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden p-4">
+        <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden p-[3px]">
           {children}
         </div>
       </section>

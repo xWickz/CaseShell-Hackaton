@@ -1,18 +1,19 @@
 "use client";
 
 import {
-  ChevronUp,
   ClipboardList,
   Monitor,
-  Palette,
   Power,
   RotateCcw,
+  TerminalSquare,
+  User,
   Volume2,
   VolumeX,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
+import XpIcon from "@/features/game/ui/desktop/XpIcon";
 
 export default function Taskbar() {
   const [now, setNow] = useState(() => new Date());
@@ -24,9 +25,6 @@ export default function Taskbar() {
   const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
   const isPaused = useGameSessionStore((state) => state.isPaused);
 
-  const cycleWallpaperTheme = useGameUIStore(
-    (state) => state.cycleWallpaperTheme,
-  );
   const openObjectivePanel = useGameUIStore(
     (state) => state.openObjectivePanel,
   );
@@ -47,6 +45,14 @@ export default function Taskbar() {
   const openResetModal = useGameUIStore((state) => state.openResetModal);
   const crtOverlayEnabled = useGameUIStore((state) => state.crtOverlayEnabled);
   const toggleCrtOverlay = useGameUIStore((state) => state.toggleCrtOverlay);
+  const openWindows = useGameUIStore((state) => state.openWindows);
+  const focusWindow = useGameUIStore((state) => state.focusWindow);
+  const minimizeWindow = useGameUIStore((state) => state.minimizeWindow);
+
+  const topZIndex = Math.max(
+    0,
+    ...openWindows.filter((w) => !w.minimized).map((w) => w.zIndex),
+  );
 
   const isStartMenuVisible = isStartMenuOpen || virusAlertTooltipOpen;
 
@@ -133,168 +139,171 @@ export default function Taskbar() {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-999 flex items-center justify-between gap-6 border-t border-white/10 bg-zinc-950/40 px-6 py-3 text-white shadow-[0_-8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
-      <div className="relative flex items-center gap-2" ref={startMenuRef}>
+    <div className="os-taskbar absolute bottom-0 left-0 right-0 z-999 flex items-center text-white">
+      <div
+        className="relative flex h-full items-center gap-2"
+        ref={startMenuRef}
+      >
         <button
           type="button"
           onClick={() => setIsStartMenuOpen((prev) => !prev)}
           aria-label="Abrir menú de inicio"
-          className={`flex items-center gap-1 rounded-xl p-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
-            isStartMenuVisible ? "bg-white/30" : "bg-white/10 hover:bg-white/20"
+          aria-expanded={isStartMenuVisible}
+          className={`os-start flex items-center gap-1.5 ${
+            isStartMenuVisible ? "brightness-90" : ""
           }`}
         >
-          <ChevronUp
-            className={`size-5 transition-transform ${
-              isStartMenuVisible ? "rotate-180" : ""
-            }`}
-          />
+          <TerminalSquare className="size-5" />
+          <span>inicio</span>
         </button>
 
         {isStartMenuVisible && (
-          <div className="absolute bottom-[calc(100%+1rem)] left-0 w-64 animate-scale-in rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-2xl backdrop-blur-xl">
-            <div className="mb-2 border-b border-white/5 px-3 py-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-white/50">
-                Sistema
+          <div className="absolute bottom-full left-0 w-72 rounded-t-lg border-2 border-[#0a246a] bg-white text-[12px] text-black shadow-[2px_2px_8px_rgba(0,0,0,0.5)]">
+            <div className="xp-menu-band flex items-center gap-2 rounded-t-md px-2 py-2">
+              <span className="grid size-10 place-items-center rounded-[3px] border-2 border-white bg-[#e8a53a]">
+                <User className="size-6 text-white" />
+              </span>
+              <span className="text-[14px] font-bold text-white [text-shadow:1px_1px_#0a246a]">
+                Agente
               </span>
             </div>
 
-            <div className="relative">
+            <div className="relative py-1">
               <button
                 type="button"
                 onClick={handleSoundButtonClick}
-                className="mb-1 flex w-full items-center gap-3 rounded-xl p-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-[#316ac5] hover:text-white"
               >
                 {alertSoundsEnabled ? (
-                  <Volume2 className="size-4" />
+                  <Volume2 className="size-6 text-[#0a4fd6]" />
                 ) : (
-                  <VolumeX className="size-4" />
+                  <VolumeX className="size-6 text-[#808080]" />
                 )}
-                <div className="flex flex-col items-start text-left">
-                  <span className="font-medium">Sonidos de virus</span>
-                  <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
-                    {alertSoundsEnabled ? "Activados" : "Silenciados"}
-                  </span>
-                </div>
+                <span>
+                  <b className="block">Sonidos de virus</b>
+                  {alertSoundsEnabled ? "Activados" : "Silenciados"}
+                </span>
               </button>
 
               {virusAlertTooltipOpen && (
-                <div className="absolute left-[calc(100%+0.75rem)] top-0 z-20 w-64 rounded-2xl border border-cyan-400/20 bg-zinc-950/95 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)]">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-cyan-300/80">
-                    Consejo
-                  </p>
-                  <p className="mt-2 text-sm text-white/85">
+                <div className="absolute left-[calc(100%+0.5rem)] top-0 z-20 w-60 rounded-lg border border-black bg-[#ffffe1] p-3 text-[11px] text-black shadow-[2px_2px_4px_rgba(0,0,0,0.4)]">
+                  <p className="font-bold">Consejo</p>
+                  <p className="mt-1">
                     Si te molestan los sonidos de alerta, puedes silenciarlos
                     aquí.
                   </p>
                   <button
                     type="button"
                     onClick={handleAcknowledgeTooltip}
-                    className="mt-3 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-200 transition hover:bg-cyan-400/20"
+                    className="xp-button mt-2"
                   >
                     Entendido
                   </button>
                 </div>
               )}
-            </div>
 
-            <button
-              type="button"
-              onClick={toggleCrtOverlay}
-              className="mb-1 flex w-full items-center gap-3 rounded-xl p-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <Monitor className="size-4" />
-              <div className="flex flex-col items-start text-left">
-                <span className="font-medium">Filtro CRT</span>
-                <span className="text-[0.65rem] uppercase tracking-wide text-white/50">
+              <button
+                type="button"
+                onClick={toggleCrtOverlay}
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-[#316ac5] hover:text-white"
+              >
+                <Monitor className="size-6 text-[#0a4fd6]" />
+                <span>
+                  <b className="block">Filtro CRT</b>
                   {crtOverlayEnabled ? "Activo" : "Desactivado"}
                 </span>
-              </div>
-            </button>
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setIsStartMenuOpen(false);
-                openResetModal();
-              }}
-              className="flex w-full items-center gap-3 rounded-xl p-3 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <RotateCcw className="size-4" />
-              Reiniciar Sistema
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setIsStartMenuOpen(false);
-                openExitModal();
-              }}
-              className="mt-1 flex w-full items-center gap-3 rounded-xl p-3 text-sm text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
-            >
-              <Power className="size-4" />
-              Apagar y Salir
-            </button>
+            <div className="xp-menu-band flex justify-end gap-3 px-3 py-2 text-white">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsStartMenuOpen(false);
+                  openResetModal();
+                }}
+                className="flex items-center gap-1.5 hover:brightness-125"
+              >
+                <span className="grid size-6 place-items-center rounded-[3px] border border-white bg-[#3c9c38]">
+                  <RotateCcw className="size-4" />
+                </span>
+                Reiniciar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsStartMenuOpen(false);
+                  openExitModal();
+                }}
+                className="flex items-center gap-1.5 hover:brightness-125"
+              >
+                <span className="grid size-6 place-items-center rounded-[3px] border border-white bg-[#dc5a2a]">
+                  <Power className="size-4" />
+                </span>
+                Apagar equipo
+              </button>
+            </div>
           </div>
         )}
 
         <button
           type="button"
-          onClick={cycleWallpaperTheme}
-          aria-label="Cambiar fondo del escritorio"
-          className="rounded-xl bg-white/10 p-2 transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-        >
-          <Palette className="size-5" />
-        </button>
-
-        <button
-          type="button"
           onClick={openObjectivePanel}
           aria-label="Mostrar panel de objetivos"
-          className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
-            objectivePanelVisible
-              ? "bg-emerald-500/15 text-emerald-100"
-              : "bg-white/10 text-white/80 hover:bg-white/20"
-          }`}
+          aria-pressed={objectivePanelVisible}
+          className="rounded-[3px] p-1 hover:bg-white/20 aria-pressed:bg-black/20"
         >
           <ClipboardList className="size-5" />
         </button>
       </div>
 
-      <div className="flex flex-1 items-center justify-center gap-3 text-xs text-white/80">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <Badge label="Tiempo" value={formatElapsed()} />
-          <Badge
-            label="Límite"
-            value={countdownLabel}
-            tone={timeLimitTone}
-            title="Tiempo restante del caso según la dificultad actual."
-          />
-          {isPaused && (
-            <Badge
-              label="Estado"
-              value="Pausado"
-              tone="warning"
-              title="La sesión quedó congelada al salir del juego. Se reanuda al volver."
-            />
-          )}
-          <Badge
-            label="Precisión"
-            value={accuracyPercent === null ? "—" : `${accuracyPercent}%`}
-            tone={
-              accuracyPercent !== null && accuracyPercent < 50
-                ? "warning"
-                : "default"
-            }
-            title="Porcentaje de comandos exitosos sobre el total ejecutado."
-          />
-        </div>
+      <div className="flex min-w-0 flex-1 items-center gap-1 px-2">
+        {openWindows.map((w) => {
+          const isActive = !w.minimized && w.zIndex === topZIndex;
+          return (
+            <button
+              key={w.id}
+              type="button"
+              onClick={() =>
+                isActive ? minimizeWindow(w.id) : focusWindow(w.id)
+              }
+              aria-pressed={isActive}
+              className="os-taskbtn flex max-w-40 min-w-0 items-center gap-1.5 px-2 text-left"
+            >
+              <XpIcon type={w.type} className="size-4 shrink-0" />
+              <span className="truncate">{w.title}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="flex flex-col text-right text-xs">
-        <span className="font-semibold">{timeLabel}</span>
-        <span className="text-[0.65rem] uppercase tracking-wide text-white/70">
-          {dateLabel}
-        </span>
+      <div className="os-tray flex items-center gap-3 text-[11px]">
+        <Badge label="Tiempo" value={formatElapsed()} />
+        <Badge
+          label="Límite"
+          value={countdownLabel}
+          tone={timeLimitTone}
+          title="Tiempo restante del caso según la dificultad actual."
+        />
+        {isPaused && (
+          <Badge
+            label="Estado"
+            value="Pausado"
+            tone="warning"
+            title="La sesión quedó congelada al salir del juego. Se reanuda al volver."
+          />
+        )}
+        <Badge
+          label="Precisión"
+          value={accuracyPercent === null ? "—" : `${accuracyPercent}%`}
+          tone={
+            accuracyPercent !== null && accuracyPercent < 50
+              ? "warning"
+              : "default"
+          }
+          title="Porcentaje de comandos exitosos sobre el total ejecutado."
+        />
+        <span title={dateLabel}>{timeLabel}</span>
       </div>
     </div>
   );
@@ -308,20 +317,16 @@ type BadgeProps = {
 };
 
 function Badge({ label, value, tone = "default", title }: BadgeProps) {
-  const toneClasses =
+  const toneClass =
     tone === "danger"
-      ? "border-red-400/30 bg-red-400/10 text-red-200"
+      ? "text-[#ffd0d0]"
       : tone === "warning"
-        ? "border-amber-400/30 bg-amber-400/10 text-amber-200"
-        : "border-white/15 bg-white/5 text-white";
+        ? "text-[#fff3a0]"
+        : "text-white";
 
   return (
-    <div
-      className={`rounded-xl border px-3 py-1 text-[0.65rem] ${toneClasses}`}
-      title={title}
-    >
-      <span className="uppercase tracking-wider text-white/60">{label}</span>
-      <span className="ml-2 font-semibold text-white">{value}</span>
-    </div>
+    <span className={toneClass} title={title}>
+      {label}: <b>{value}</b>
+    </span>
   );
 }
