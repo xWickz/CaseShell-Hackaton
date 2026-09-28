@@ -31,6 +31,7 @@ export type WindowInstance = {
   zIndex: number;
   position: WindowPosition;
   size: WindowSize;
+  minimized?: boolean;
 };
 
 export type Briefing = {

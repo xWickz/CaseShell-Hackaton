@@ -1,7 +1,7 @@
 "use client";
 
-import { CheckCircle2, ChevronDown, Circle, CircleDot, X } from "lucide-react";
-import { type CSSProperties, useEffect, useId, useMemo } from "react";
+import { CheckCircle2, Circle, CircleDot, Minus, Plus, X } from "lucide-react";
+import { useEffect, useId, useMemo } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import type { Difficulty } from "@/features/game/types/game";
 import type { CaseProgress } from "@/features/game/types/game-engine";
@@ -160,12 +160,12 @@ function statusIcon(status: StepStatus) {
   switch (status) {
     case "done":
       return (
-        <CheckCircle2 className="size-4 text-emerald-400" aria-hidden="true" />
+        <CheckCircle2 className="size-4 text-[#2e9b2e]" aria-hidden="true" />
       );
     case "ready":
-      return <CircleDot className="size-4 text-cyan-400" aria-hidden="true" />;
+      return <CircleDot className="size-4 text-[#0a4fd6]" aria-hidden="true" />;
     default:
-      return <Circle className="size-4 text-white/30" aria-hidden="true" />;
+      return <Circle className="size-4 text-[#a0a0a0]" aria-hidden="true" />;
   }
 }
 
@@ -226,57 +226,13 @@ export default function ObjectiveTracker({
     return () => window.clearTimeout(timeoutId);
   }, [lastCompletedKey, clearLastCompletedKey]);
 
-  const confettiKey = lastCompletedKey
-    ? `${String(lastCompletedKey)}-${completionStreak}`
-    : "idle";
-
   return (
     <aside
-      className={`pointer-events-auto relative flex w-80 flex-col gap-4 rounded-3xl border border-white/10 bg-zinc-950/80 p-4 text-xs text-white shadow-2xl transition-[height] ${className}`}
+      className={`os-window pointer-events-auto flex w-72 flex-col text-[11px] text-black ${className}`}
     >
-      {lastCompletedKey && !collapsed ? (
-        <div
-          key={confettiKey}
-          className="pointer-events-none absolute inset-x-6 top-16 z-20 h-14 overflow-hidden rounded-2xl"
-          aria-hidden="true"
-        >
-          {Array.from({ length: 14 }).map((_, index) => (
-            <span
-              key={`${confettiKey}`}
-              className="absolute top-1/2 size-2 rounded-full bg-emerald-300/80 animate-objective-confetti"
-              style={
-                {
-                  left: `${8 + index * 6.5}%`,
-                  animationDelay: `${index * 40}ms`,
-                } as CSSProperties
-              }
-            />
-          ))}
-        </div>
-      ) : null}
-
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-[0.65rem] uppercase text-white/40">
-            Objetivos del caso
-          </p>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-white">
-              {completion.percent}%
-            </span>
-            <span className="text-white/60">
-              {completion.done}/{completion.total} tareas
-            </span>
-          </div>
-
-          {completionStreak > 0 && !collapsed ? (
-            <p className="mt-1 text-[0.65rem] uppercase tracking-[0.25em] text-emerald-300/80">
-              Racha: {completionStreak}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex items-center gap-2 text-white/70">
+      <header className="os-titlebar flex items-center justify-between text-white">
+        <span>Objetivos del caso</span>
+        <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={onToggleCollapse}
@@ -287,75 +243,83 @@ export default function ObjectiveTracker({
             }
             aria-expanded={!collapsed}
             aria-controls={contentId}
-            className="rounded-lg border border-white/15 bg-white/5 p-1 hover:bg-white/10"
+            className="os-titlebtn"
           >
-            <ChevronDown
-              className={`size-4 transition-transform ${
-                collapsed ? "-rotate-90" : ""
-              }`}
-              aria-hidden="true"
-            />
+            {collapsed ? (
+              <Plus className="size-3.5" aria-hidden="true" />
+            ) : (
+              <Minus className="size-3.5" aria-hidden="true" />
+            )}
           </button>
-
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar panel de objetivos"
-            className="rounded-lg border border-white/15 bg-white/5 p-1 hover:bg-red-500/10 hover:text-red-200"
+            className="os-titlebtn os-close"
           >
-            <X className="size-4" aria-hidden="true" />
+            <X className="size-3.5" aria-hidden="true" />
           </button>
         </div>
       </header>
 
-      {collapsed ? (
-        <p className="text-[0.7rem] text-white/60" id={contentId}>
-          Panel minimizado. Usa la flecha o el acceso en la barra para volver a
-          abrir la lista.
-        </p>
-      ) : (
-        <div className="space-y-4" id={contentId}>
-          {sections.map((section) => (
-            <section
-              key={section.title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-3"
-            >
-              <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-wide text-white/60">
-                {section.title}
-              </p>
-
-              <ul className="space-y-2">
-                {section.steps.map((step) => {
-                  const status = resolveStatus(step, progress);
-                  const isFreshlyCompleted = lastCompletedKey === step.key;
-
-                  return (
-                    <li
-                      key={step.key}
-                      className={`relative flex items-center gap-2 rounded-xl px-3 py-2 transition-all ${
-                        isFreshlyCompleted
-                          ? "scale-[1.02] border border-emerald-400/40 bg-emerald-400/15 shadow-[0_0_0_1px_rgba(52,211,153,0.15),0_0_32px_rgba(16,185,129,0.18)] animate-objective-pulse"
-                          : "bg-zinc-950/20"
-                      }`}
-                    >
-                      {statusIcon(status)}
-
-                      <div>
-                        <p className="text-sm text-white">{step.label}</p>
-                        {step.hint ? (
-                          <p className="text-[0.65rem] text-white/50">
-                            {step.hint}
-                          </p>
-                        ) : null}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))}
+      <div className="space-y-2 p-2" id={contentId}>
+        <div className="flex items-center gap-2">
+          <div
+            className="xp-progress flex-1"
+            role="progressbar"
+            aria-valuenow={completion.percent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progreso del caso"
+          >
+            <span style={{ width: `${completion.percent}%` }} />
+          </div>
+          <span>
+            {completion.done}/{completion.total}
+          </span>
         </div>
-      )}
+
+        {completionStreak > 0 && !collapsed ? (
+          <p className="text-[#2e9b2e]">Racha: {completionStreak}</p>
+        ) : null}
+
+        {collapsed
+          ? null
+          : sections.map((section) => (
+              <fieldset
+                key={section.title}
+                className="rounded-[3px] border border-[#d0d0bf] px-2 pb-2"
+              >
+                <legend className="px-1 text-[#0046d5]">{section.title}</legend>
+
+                <ul className="space-y-0.5">
+                  {section.steps.map((step) => {
+                    const status = resolveStatus(step, progress);
+                    const isFreshlyCompleted = lastCompletedKey === step.key;
+
+                    return (
+                      <li
+                        key={step.key}
+                        className={`flex items-center gap-2 px-1 py-0.5 ${
+                          isFreshlyCompleted
+                            ? "animate-objective-pulse bg-[#316ac5] text-white"
+                            : status === "locked"
+                              ? "text-[#808080]"
+                              : ""
+                        }`}
+                      >
+                        {statusIcon(status)}
+                        <span>{step.label}</span>
+                        {step.hint ? (
+                          <span className="text-[#808080]">{step.hint}</span>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </fieldset>
+            ))}
+      </div>
     </aside>
   );
 }

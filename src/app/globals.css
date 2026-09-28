@@ -38,6 +38,17 @@ body {
   font-family: "Segoe UI", "Segoe UI Variable", system-ui, sans-serif;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .crt-overlay {
   position: absolute;
   top: 0;
@@ -221,4 +232,190 @@ body {
 .text-glitch:hover::after {
   opacity: 0.75;
   animation: glitch-effect 0.3s infinite linear 0.1s alternate;
+}
+/* ---------- Tema Windows XP ---------- */
+/* Reglas sin @layer: ganan a las utilidades de Tailwind sin !important. */
+
+.xp-bliss {
+  background:
+    radial-gradient(ellipse 30% 9% at 22% 20%, rgb(255 255 255 / 0.8), transparent 70%),
+    radial-gradient(ellipse 22% 6% at 68% 12%, rgb(255 255 255 / 0.65), transparent 70%),
+    radial-gradient(ellipse 130% 55% at 25% 105%, #2f7d14 0, #5fb52c 50%, #7ccb3f 59.5%, transparent 60%),
+    radial-gradient(ellipse 110% 48% at 90% 110%, #2a7012 0, #4f9f22 50%, #6cbb33 59.5%, transparent 60%),
+    linear-gradient(#1f5fcf 0%, #4f8fe6 40%, #9cc6f2 72%);
+}
+
+[data-os="xp"] {
+  cursor: url("/xp/cursor.svg") 2 2, default;
+  font-family: Tahoma, Verdana, "Segoe UI", sans-serif;
+}
+
+/* Ventanas */
+.os-window {
+  border: 3px solid #0831d9;
+  border-top: 0;
+  border-radius: 8px 8px 0 0;
+  background: #ece9d8;
+  box-shadow: 2px 2px 10px rgb(0 0 0 / 0.45);
+}
+
+.os-titlebar {
+  gap: 8px;
+  padding: 3px 5px 3px 8px;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(#0997ff 0%, #0053ee 8%, #0050ee 40%, #06f 88%, #005bff 95%, #003dd7 100%);
+}
+
+.os-titlebar > span {
+  font-size: 13px;
+  font-weight: 700;
+  text-shadow: 1px 1px #0f1089;
+}
+
+.os-titlebtn {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  color: #fff;
+  background: radial-gradient(circle at 80% 80%, #0054e9, #2263d5 55%, #4f86e8);
+}
+
+.os-titlebtn:hover {
+  filter: brightness(1.15);
+}
+
+.os-close {
+  background: radial-gradient(circle at 90% 90%, #cc4600, #dc6527 55%, #e7835a);
+}
+
+/* Botón clásico */
+.xp-button {
+  min-width: 75px;
+  padding: 3px 10px;
+  border: 1px solid #003c74;
+  border-radius: 3px;
+  background: linear-gradient(#fff, #ecebe6 86%, #d6d0c5);
+  color: #000;
+  font-size: 11px;
+}
+
+.xp-button:hover {
+  box-shadow: inset 0 0 0 2px #f8b636;
+}
+
+/* Barra de progreso de bloques verdes */
+.xp-progress {
+  height: 14px;
+  padding: 1px;
+  border: 1px solid #686868;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.xp-progress > span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #37b737 0 8px, transparent 8px 10px);
+  transition: width 0.4s;
+}
+
+/* Barra de tareas */
+.os-taskbar {
+  height: 34px;
+  border-top: 1px solid #0c59b9;
+  background: linear-gradient(#1f2f86 0%, #3165c4 3%, #3682e5 6%, #4490e6 10%, #3883e5 12%, #2b71e0 15%, #2663da 18%, #235bd6 20%, #2258d5 23%, #2157d6 38%, #245ddb 54%, #2562df 86%, #245fdc 89%, #2158d4 92%, #1d4ec0 95%, #1941a5 98%);
+}
+
+.os-start {
+  height: 100%;
+  padding: 0 22px 0 10px;
+  border-radius: 0 12px 12px 0;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgb(0 0 0 / 0.6);
+  background: radial-gradient(circle at 60% -40%, #79c973, #3c9c38 45%, #2f8a2a 70%, #1f6e1c);
+  box-shadow: inset -2px 0 3px rgb(0 0 0 / 0.3);
+}
+
+.os-start:hover {
+  filter: brightness(1.1);
+}
+
+.os-taskbtn {
+  height: 26px;
+  border: 1px solid rgb(0 0 0 / 0.25);
+  border-radius: 3px;
+  font-size: 11px;
+  background: #3c81f3;
+  box-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.3);
+}
+
+.os-taskbtn:hover {
+  background: #5395f7;
+}
+
+.os-taskbtn[aria-pressed="true"] {
+  background: #1e52b7;
+  box-shadow: inset 1px 1px 2px rgb(0 0 0 / 0.5);
+}
+
+.os-tray {
+  align-self: stretch;
+  padding: 0 12px;
+  border-left: 1px solid #092e8c;
+  background: linear-gradient(#0c59b9 1%, #139ee9 6%, #18b5f2 10%, #139beb 14%, #1290e8 19%, #0d8dea 63%, #0d9ff1 81%, #0f9eed 88%, #119be9 91%, #1392e2 94%, #137ed7 97%, #095bc9);
+  box-shadow: inset 1px 0 1px #18bbff;
+}
+
+/* Cabecera y pie del menú Inicio */
+.xp-menu-band {
+  background: linear-gradient(#1868ce, #0e60cb 12%, #0e60cb 88%, #0a52b0);
+}
+
+/* Pantalla de arranque */
+.xp-boot {
+  font-family: Tahoma, Verdana, "Segoe UI", sans-serif;
+  cursor: none;
+}
+
+.xp-boot-bar {
+  position: relative;
+  width: 160px;
+  height: 18px;
+  overflow: hidden;
+  border: 2px solid #b2b2b2;
+  border-radius: 4px;
+}
+
+.xp-boot-bar span {
+  position: absolute;
+  top: 2px;
+  left: -30px;
+  width: 9px;
+  height: 10px;
+  border-radius: 1px;
+  background: linear-gradient(#2838c7, #7d98f4 50%, #2838c7);
+  animation: xp-boot 1.8s linear infinite;
+}
+
+.xp-boot-bar span:nth-child(2) {
+  animation-delay: 0.13s;
+}
+
+.xp-boot-bar span:nth-child(3) {
+  animation-delay: 0.26s;
+}
+
+@keyframes xp-boot {
+  from {
+    left: -30px;
+  }
+  to {
+    left: 170px;
+  }
 }
