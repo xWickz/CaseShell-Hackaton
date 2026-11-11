@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tailwind-animations";
 @import "@toolwind/anchors";
-@source inline("anchor/[--anchor-nav-inicio] anchor/[--anchor-nav-jugar] anchor/[--anchor-nav-clasificacion] anchored/[--anchor-nav-inicio] anchored/[--anchor-nav-jugar] anchored/[--anchor-nav-clasificacion]");
+@source inline("anchor/[--anchor-nav-inicio] anchor/[--anchor-nav-jugar] anchor/[--anchor-nav-clasificacion] anchor/[--anchor-nav-novedades] anchored/[--anchor-nav-inicio] anchored/[--anchor-nav-jugar] anchored/[--anchor-nav-clasificacion] anchored/[--anchor-nav-novedades]");
 
 :root {
   --background: #ffffff;
@@ -243,6 +243,52 @@ body {
     radial-gradient(ellipse 130% 55% at 25% 105%, #2f7d14 0, #5fb52c 50%, #7ccb3f 59.5%, transparent 60%),
     radial-gradient(ellipse 110% 48% at 90% 110%, #2a7012 0, #4f9f22 50%, #6cbb33 59.5%, transparent 60%),
     linear-gradient(#1f5fcf 0%, #4f8fe6 40%, #9cc6f2 72%);
+}
+
+/* Fondos de temporada (data-season en Desktop) */
+.xp-bliss[data-season="halloween"] {
+  background:
+    radial-gradient(circle at 78% 18%, #fff3c4 0, #ffd36b 5%, rgb(255 170 60 / 0.35) 9%, transparent 16%),
+    radial-gradient(ellipse 130% 55% at 25% 105%, #120a1c 0, #22122e 50%, #2d1838 59.5%, transparent 60%),
+    radial-gradient(ellipse 110% 48% at 90% 110%, #0d0714 0, #1c0f26 50%, #26142f 59.5%, transparent 60%),
+    linear-gradient(#12051f 0%, #3b1450 45%, #8a3b1f 85%);
+}
+
+.xp-bliss[data-season="christmas"] {
+  background:
+    radial-gradient(ellipse 130% 55% at 25% 105%, #dfe9f3 0, #f4f8fc 50%, #ffffff 59.5%, transparent 60%),
+    radial-gradient(ellipse 110% 48% at 90% 110%, #c9d8e8 0, #e3edf6 50%, #f2f7fb 59.5%, transparent 60%),
+    linear-gradient(#081633 0%, #173a73 50%, #4f7fb8 80%);
+}
+
+.xp-bliss[data-season="christmas"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+    radial-gradient(3px 3px at 90px 120px, #fff, transparent),
+    radial-gradient(2px 2px at 160px 60px, rgb(255 255 255 / 0.8), transparent),
+    radial-gradient(3px 3px at 230px 170px, #fff, transparent),
+    radial-gradient(2px 2px at 300px 90px, rgb(255 255 255 / 0.7), transparent);
+  background-size: 320px 220px;
+  animation: snowfall 12s linear infinite;
+}
+
+@keyframes snowfall {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-bliss[data-season="christmas"]::before {
+    animation: none;
+  }
 }
 
 [data-os="xp"] {

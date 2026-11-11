@@ -2,7 +2,6 @@
 
 import { create } from "zustand";
 import type {
-  Difficulty,
   FileType,
   WindowInstance,
   WindowPosition,
@@ -12,7 +11,7 @@ import type {
 type GameUIState = {
   briefingOpen: boolean;
   hasSeenOnboarding: boolean;
-  selectedDifficulty: Difficulty | null;
+  selectedCaseId: string | null;
   openWindows: WindowInstance[];
   zCounter: number;
   iconPositions: Record<string, { x: number; y: number }>;
@@ -27,7 +26,7 @@ type GameUIState = {
 
   closeBriefing: () => void;
   completeOnboarding: () => void;
-  setDifficulty: (difficulty: Difficulty) => void;
+  selectCase: (caseId: string) => void;
   setIconPosition: (id: string, position: { x: number; y: number }) => void;
   openObjectivePanel: () => void;
   closeObjectivePanel: () => void;
@@ -71,7 +70,7 @@ const DEFAULT_WINDOW_SIZES: Record<FileType, WindowSize> = {
 export const useGameUIStore = create<GameUIState>((set, get) => ({
   briefingOpen: true,
   hasSeenOnboarding: false,
-  selectedDifficulty: null,
+  selectedCaseId: null,
   openWindows: [],
   zCounter: 10,
   iconPositions: {},
@@ -87,9 +86,9 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   closeBriefing: () => set({ briefingOpen: false }),
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
 
-  setDifficulty: (difficulty) =>
+  selectCase: (caseId) =>
     set({
-      selectedDifficulty: difficulty,
+      selectedCaseId: caseId,
       iconPositions: {},
       hasAcknowledgedVirusAlert: false,
       virusAlertTooltipOpen: false,

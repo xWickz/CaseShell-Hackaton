@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { executeMediumCommand } from "@/features/game/engine/medium-case-engine";
+import { medium002 } from "@/features/game/data/cases/medium-002";
+import { runCaseCommand } from "@/features/game/engine/case-runner";
 import type { CaseState } from "@/features/game/types/game-engine";
 
 const baseState: CaseState = {
   knowledge: {},
   progress: {},
 };
+
+const executeMediumCommand = (input: string, state: CaseState) =>
+  runCaseCommand(medium002, input, state);
 
 describe("executeMediumCommand", () => {
   it("fails on wrong override code", () => {

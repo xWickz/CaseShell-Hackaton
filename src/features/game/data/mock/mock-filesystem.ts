@@ -289,7 +289,7 @@ El candado en dns-lock.png muestra el override numérico que debes ingresar.
 
 Procedimiento:
 1. Ejecuta 'diag dns' para obtener la lectura actual.
-2. Ingresa el código del candado usando 'enter override 884'.
+2. Ingresa el código del candado usando 'enter override {{override}}'.
 3. Solo después aplica 'fix dns'.
 4. Documenta los hallazgos en incident-template.txt.
 
@@ -305,7 +305,7 @@ Recordatorio: no reinicies servicios sin verificar la capa de aplicación.`,
     id: "dns-lock",
     name: "dns-lock.png",
     type: "image",
-    imageUrl: "/game/dns-lock.webp",
+    imageUrl: "/game/dns-lock-{{override}}.webp",
   },
   {
     id: "service-manual",

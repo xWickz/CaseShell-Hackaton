@@ -3,13 +3,10 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
-import type { Difficulty } from "@/features/game/types/game";
-
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: "Fácil",
-  medium: "Medio",
-  hard: "Difícil",
-};
+import {
+  getGameCaseOrDefault,
+  TIER_LABELS,
+} from "@/features/game/data/cases";
 
 const formatElapsed = (elapsedSeconds: number) => {
   const minutes = Math.floor(elapsedSeconds / 60);
@@ -23,9 +20,7 @@ export default function ResetModal() {
   const closeModal = useGameUIStore((state) => state.closeResetModal);
   const resetSession = useGameSessionStore((state) => state.resetSession);
 
-  const currentDifficulty = useGameSessionStore(
-    (state) => state.currentDifficulty,
-  );
+  const currentCaseId = useGameSessionStore((state) => state.currentCaseId);
   const timeLimitMs = useGameSessionStore((state) => state.timeLimitMs);
   const timeRemainingMs = useGameSessionStore((state) => state.timeRemainingMs);
   const commandStats = useGameSessionStore((state) => state.commandStats);
@@ -99,7 +94,7 @@ export default function ResetModal() {
               Dificultad
             </p>
             <p className="mt-1 text-lg font-semibold text-white">
-              {DIFFICULTY_LABELS[currentDifficulty]}
+              {TIER_LABELS[getGameCaseOrDefault(currentCaseId).tier]}
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">

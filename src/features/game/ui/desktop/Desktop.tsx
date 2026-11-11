@@ -10,11 +10,8 @@ import {
 } from "react";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
 import { useGameUIStore } from "@/features/game/store/useGameUIStore";
-import type {
-  Briefing,
-  DesktopItem,
-  Difficulty,
-} from "@/features/game/types/game";
+import type { Season } from "@/features/game/data/cases";
+import { getSessionCase } from "@/features/game/data/cases";
 import OpsChatWindow from "@/features/game/ui/chat/OpsChatWindow";
 import DesktopIcon from "@/features/game/ui/desktop/DesktopIcon";
 import ObjectiveTracker from "@/features/game/ui/desktop/ObjectiveTracker";
@@ -34,12 +31,11 @@ import GameTimerController from "@/features/game/ui/system/GameTimerController";
 import TerminalWindow from "@/features/game/ui/terminal/TerminalWindow";
 
 type DesktopProps = {
-  items: DesktopItem[];
-  briefing: Briefing;
-  difficulty: Difficulty;
+  caseId: string;
+  season?: Season;
 };
 
-export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
+export default function Desktop({ caseId, season }: DesktopProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [isBooting, setIsBooting] = useState(true);
   const endBoot = useCallback(() => setIsBooting(false), []);
@@ -52,7 +48,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
 
   const openWindows = useGameUIStore((state) => state.openWindows);
   const openWindow = useGameUIStore((state) => state.openWindow);
-  const setDifficulty = useGameUIStore((state) => state.setDifficulty);
+  const selectCase = useGameUIStore((state) => state.selectCase);
   const hasSeenOnboarding = useGameUIStore((state) => state.hasSeenOnboarding);
   const completeOnboarding = useGameUIStore(
     (state) => state.completeOnboarding,
@@ -75,8 +71,12 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
     (state) => state.initializeSession,
   );
   const hasHydrated = useGameSessionStore((state) => state.hasHydrated);
-  const currentDifficulty = useGameSessionStore(
-    (state) => state.currentDifficulty,
+  const currentCaseId = useGameSessionStore((state) => state.currentCaseId);
+  const caseSeed = useGameSessionStore((state) => state.caseSeed);
+  // Hasta que el store cambie a este caso, la semilla guardada es de otro.
+  const { desktop: items, briefing } = getSessionCase(
+    caseId,
+    currentCaseId === caseId ? caseSeed : 0,
   );
   const alertEffectState = useGameSessionStore(
     (state) => state.alertEffectState,
@@ -93,15 +93,15 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
 
   useEffect(() => {
     if (!hasHydrated) return;
-    setDifficulty(difficulty);
-  }, [hasHydrated, difficulty, setDifficulty]);
+    selectCase(caseId);
+  }, [hasHydrated, caseId, selectCase]);
 
   useEffect(() => {
     if (!hasHydrated) return;
-    if (currentDifficulty !== difficulty) {
-      initializeSession(difficulty);
+    if (currentCaseId !== caseId) {
+      initializeSession(caseId);
     }
-  }, [hasHydrated, currentDifficulty, difficulty, initializeSession]);
+  }, [hasHydrated, currentCaseId, caseId, initializeSession]);
 
   useEffect(() => {
     openWindow({
@@ -149,6 +149,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   if (!isMounted) {
     return (
       <main
+        data-season={season}
         className="xp-bliss relative h-screen w-full overflow-hidden"
       />
     );
@@ -157,6 +158,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
   return (
     <main
       data-os="xp"
+      data-season={season}
       className="xp-bliss relative h-screen w-full overflow-hidden"
     >
       <GameSessionHydrator />
@@ -204,7 +206,7 @@ export default function Desktop({ items, briefing, difficulty }: DesktopProps) {
           ) : window.type === "folder" ? (
             <FolderViewer title={window.title} items={window.children ?? []} />
           ) : window.type === "chat" ? (
-            <OpsChatWindow difficulty={difficulty} />
+            <OpsChatWindow caseId={caseId} />
           ) : (
             <FileViewer
               type={window.type}

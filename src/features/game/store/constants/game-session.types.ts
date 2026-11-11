@@ -1,4 +1,3 @@
-import type { Difficulty } from "@/features/game/types/game";
 import type {
   ActiveTerminalAlert,
   AlertEffectState,
@@ -24,7 +23,10 @@ export type GameSessionState = {
   };
 
   caseState: CaseState;
-  currentDifficulty: Difficulty;
+  /** Id del caso en GAME_CASES (también la ruta /game/<id>). */
+  currentCaseId: string;
+  /** Elige los valores variables del caso (códigos, PIDs...). 0 = clásicos. */
+  caseSeed: number;
 
   startTime: number | null;
   endTime: number | null;
@@ -52,7 +54,7 @@ export type GameSessionState = {
   addTerminalLines: (lines: TerminalLine[]) => void;
   clearTerminalHistory: () => void;
 
-  initializeSession: (difficulty: Difficulty) => void;
+  initializeSession: (caseId: string) => void;
   setCaseState: (updater: Partial<CaseState>) => void;
   discoverKnowledge: (key: keyof CaseKnowledge) => void;
 
