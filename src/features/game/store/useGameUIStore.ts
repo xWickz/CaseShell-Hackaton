@@ -27,6 +27,7 @@ type GameUIState = {
   closeBriefing: () => void;
   completeOnboarding: () => void;
   selectCase: (caseId: string) => void;
+  closeCaseWindows: () => void;
   setIconPosition: (id: string, position: { x: number; y: number }) => void;
   openObjectivePanel: () => void;
   closeObjectivePanel: () => void;
@@ -87,12 +88,24 @@ export const useGameUIStore = create<GameUIState>((set, get) => ({
   completeOnboarding: () => set({ hasSeenOnboarding: true }),
 
   selectCase: (caseId) =>
-    set({
-      selectedCaseId: caseId,
-      iconPositions: {},
-      hasAcknowledgedVirusAlert: false,
-      virusAlertTooltipOpen: false,
-    }),
+    set((state) =>
+      state.selectedCaseId === caseId
+        ? {}
+        : {
+            selectedCaseId: caseId,
+            briefingOpen: true,
+            iconPositions: {},
+            hasAcknowledgedVirusAlert: false,
+            virusAlertTooltipOpen: false,
+          },
+    ),
+
+  // Las ventanas guardan una copia del contenido al abrirse: al cambiar de
+  // partida (otro caso u otra semilla) quedarían con datos viejos.
+  closeCaseWindows: () =>
+    set((state) => ({
+      openWindows: state.openWindows.filter((w) => w.type === "terminal"),
+    })),
 
   setIconPosition: (id, position) =>
     set((state) => ({

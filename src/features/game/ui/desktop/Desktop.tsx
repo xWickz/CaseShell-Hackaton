@@ -49,6 +49,7 @@ export default function Desktop({ caseId, season }: DesktopProps) {
   const openWindows = useGameUIStore((state) => state.openWindows);
   const openWindow = useGameUIStore((state) => state.openWindow);
   const selectCase = useGameUIStore((state) => state.selectCase);
+  const closeCaseWindows = useGameUIStore((state) => state.closeCaseWindows);
   const hasSeenOnboarding = useGameUIStore((state) => state.hasSeenOnboarding);
   const completeOnboarding = useGameUIStore(
     (state) => state.completeOnboarding,
@@ -102,6 +103,12 @@ export default function Desktop({ caseId, season }: DesktopProps) {
       initializeSession(caseId);
     }
   }, [hasHydrated, currentCaseId, caseId, initializeSession]);
+
+  // Partida nueva (otro caso o reinicio) → nada de ventanas de la anterior.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: debe correr al cambiar la semilla
+  useEffect(() => {
+    closeCaseWindows();
+  }, [caseSeed, closeCaseWindows]);
 
   useEffect(() => {
     openWindow({

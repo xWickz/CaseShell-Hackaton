@@ -32,16 +32,22 @@ export default function ShaderPage() {
     <section
       id="intro"
       className="relative w-full h-screen overflow-hidden bg-zinc-950">
-      <div
-        ref={containerRef}
-        className="absolute inset-0 z-0 pointer-events-none hidden md:block"
-      >
-        {isVisible && <MyShader text="caseshell" />}
-      </div>
-      <div className="absolute inset-0 z-1 pointer-events-none flex items-center justify-center md:hidden">
-        <h1 className="font-semibold text-7xl text-red-600 tracking-tighter">
+      {/* Debajo del shader: es lo que se ve en móvil y mientras el shader
+          carga en escritorio. El shader es opaco y lo tapa al dibujar. */}
+      <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
+        <h1 className="font-semibold text-7xl md:text-9xl text-red-600 tracking-tighter md:animate-pulse">
           CASESHELL
         </h1>
+      </div>
+      <div
+        ref={containerRef}
+        className="absolute inset-0 z-1 pointer-events-none hidden md:block"
+      >
+        {isVisible && (
+          <div className="h-full w-full animate-in fade-in duration-1000">
+            <MyShader text="caseshell" />
+          </div>
+        )}
       </div>
       <div className="relative z-10 flex flex-col items-center justify-end h-full text-center px-4 pb-10 font-sans">
         <a
