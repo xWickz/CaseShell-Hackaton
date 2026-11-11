@@ -7,10 +7,12 @@ export const MENU_ITEMS: MenuItem[] = [
   { label: "Inicio", href: "/" },
   { label: "Jugar", href: "/game" },
   { label: "Clasificación", href: "/ranking" },
+  { label: "Novedades", href: "/changelog" },
 ];
 
 export const MENU_ANCHORS: Record<string, string> = {
   "/": "--anchor-nav-inicio",
   "/game": "--anchor-nav-jugar",
   "/ranking": "--anchor-nav-clasificacion",
+  "/changelog": "--anchor-nav-novedades",
 };

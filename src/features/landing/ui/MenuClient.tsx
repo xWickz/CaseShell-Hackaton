@@ -8,6 +8,7 @@ const ANCHOR_CLASSES: Record<string, string> = {
   "/": "anchored/[--anchor-nav-inicio]",
   "/game": "anchored/[--anchor-nav-jugar]",
   "/ranking": "anchored/[--anchor-nav-clasificacion]",
+  "/changelog": "anchored/[--anchor-nav-novedades]",
 };
 
 export default function MenuClient({
