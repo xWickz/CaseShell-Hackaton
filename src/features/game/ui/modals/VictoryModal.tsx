@@ -8,27 +8,13 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { SubmitRankingResult } from "@/app/actions/ranking";
 import { submitRankingAction } from "@/app/actions/ranking";
+import {
+  getGameCase,
+  getGameCaseOrDefault,
+  TIER_LABELS,
+} from "@/features/game/data/cases";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
-import type { Difficulty } from "@/features/game/types/game";
 import { GitHub } from "@/features/game/ui/ui/github";
-
-const CASE_IDS: Record<Difficulty, string> = {
-  easy: "ACCESS-NOT-GRANTED",
-  medium: "DATA-LEAK",
-  hard: "CRITICAL-COLLAPSE",
-};
-
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: "Fácil",
-  medium: "Medio",
-  hard: "Difícil",
-};
-
-const NEXT_DIFFICULTY_MAP: Record<Difficulty, Difficulty | null> = {
-  easy: "medium",
-  medium: "hard",
-  hard: null,
-};
 
 const AUTO_RESET_DELAY_MS = 5000;
 const AUTO_RESET_DELAY_SECONDS = Math.floor(AUTO_RESET_DELAY_MS / 1000);
@@ -87,9 +73,7 @@ export default function VictoryModal() {
     (state) => state.initializeSession,
   );
 
-  const currentDifficulty = useGameSessionStore(
-    (state) => state.currentDifficulty,
-  );
+  const currentCaseId = useGameSessionStore((state) => state.currentCaseId);
 
   const [user, setUser] = useState<Session["user"] | null>(null);
   const [submissionState, setSubmissionState] = useState<SubmissionState>(
@@ -150,12 +134,11 @@ export default function VictoryModal() {
     return Math.floor(elapsedMs / 1000);
   }, [timeLimitMs, timeRemainingMs]);
 
-  const caseId = CASE_IDS[currentDifficulty];
-  const difficultyLabel = DIFFICULTY_LABELS[currentDifficulty];
-  const nextDifficulty = NEXT_DIFFICULTY_MAP[currentDifficulty];
-  const nextDifficultyLabel = nextDifficulty
-    ? DIFFICULTY_LABELS[nextDifficulty]
-    : null;
+  const gameCase = getGameCaseOrDefault(currentCaseId);
+  const caseId = gameCase.code;
+  const difficultyLabel = TIER_LABELS[gameCase.tier];
+  const nextCase = gameCase.next ? getGameCase(gameCase.next) : undefined;
+  const nextDifficultyLabel = nextCase ? TIER_LABELS[nextCase.tier] : null;
 
   const headingId = "victory-heading";
 
@@ -192,10 +175,7 @@ export default function VictoryModal() {
     }));
 
     try {
-      const result = await submitRankingAction(
-        currentDifficulty,
-        elapsedSeconds,
-      );
+      const result = await submitRankingAction(currentCaseId, elapsedSeconds);
 
       setSubmissionState((prev) => ({
         ...prev,
@@ -241,7 +221,7 @@ export default function VictoryModal() {
   };
 
   const handleNextLevel = () => {
-    if (!nextDifficulty) return;
+    if (!nextCase) return;
 
     if (autoResetTimeoutRef.current !== null) {
       window.clearTimeout(autoResetTimeoutRef.current);
@@ -252,8 +232,8 @@ export default function VictoryModal() {
       ...prev,
       resetCountdown: null,
     }));
-    initializeSession(nextDifficulty);
-    push(`/game/${nextDifficulty}`);
+    initializeSession(nextCase.id);
+    push(`/game/${nextCase.id}`);
   };
 
   const handleExploreRanking = () => {

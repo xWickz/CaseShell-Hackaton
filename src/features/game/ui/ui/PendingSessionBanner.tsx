@@ -2,19 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Difficulty } from "@/features/game/types/game";
-
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: "Fácil",
-  medium: "Medio",
-  hard: "Difícil",
-};
+import { getGameCase } from "@/features/game/data/cases";
 
 const STORAGE_KEY = "caseshell-session-storage";
 
 export default function PendingSessionBanner() {
   const [pendingSession, setPendingSession] = useState<{
-    difficulty: Difficulty;
+    caseId: string;
+    label: string;
   } | null>(null);
 
   useEffect(() => {
@@ -24,12 +19,12 @@ export default function PendingSessionBanner() {
 
       const parsed = JSON.parse(serialized);
       const state = parsed?.state;
-      const currentDifficulty = state?.currentDifficulty as
-        | Difficulty
-        | undefined;
+      // currentDifficulty: formato v0, antes de la migración del store.
+      const gameCase = getGameCase(
+        String(state?.currentCaseId ?? state?.currentDifficulty ?? ""),
+      );
 
-      if (!currentDifficulty || !(currentDifficulty in DIFFICULTY_LABELS))
-        return;
+      if (!gameCase) return;
 
       const knowledge = state.caseState?.knowledge ?? {};
       const progress = state.caseState?.progress ?? {};
@@ -59,7 +54,10 @@ export default function PendingSessionBanner() {
         !isLockedOut
       ) {
         window.requestAnimationFrame(() => {
-          setPendingSession({ difficulty: currentDifficulty });
+          setPendingSession({
+            caseId: gameCase.id,
+            label: gameCase.card.label,
+          });
         });
       }
     } catch (e) {
@@ -74,14 +72,14 @@ export default function PendingSessionBanner() {
       <div className="rounded-3xl border border-zinc-500/30 bg-zinc-500/10 p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xl font-semibold text-white">
-            Quedaste en el caso {DIFFICULTY_LABELS[pendingSession.difficulty]}
+            Quedaste en el caso {pendingSession.label}
           </p>
           <p className="text-sm text-white/70">
             Retoma tu investigación justo donde la pausaste.
           </p>
         </div>
         <Link
-          href={`/game/${pendingSession.difficulty}`}
+          href={`/game/${pendingSession.caseId}`}
           className="inline-flex items-center justify-center rounded-2xl border border-zinc-400/50 bg-zinc-500/20 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-zinc-100 transition hover:bg-zinc-400/30"
         >
           Continuar investigación

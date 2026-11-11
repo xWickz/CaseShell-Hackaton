@@ -1,10 +1,8 @@
+import { getGameCaseOrDefault } from "@/features/game/data/cases";
 import {
   ALERT_EFFECT_MAP,
-  CASE_CODES,
-  DIFFICULTY_MAX_STRIKES,
   INITIAL_ALERT_EFFECT_STATE,
 } from "@/features/game/store/constants/game-session.constants";
-import type { Difficulty } from "@/features/game/types/game";
 import type {
   AlertEffectId,
   CaseState,
@@ -22,18 +20,16 @@ export const createInitialCaseState = (): CaseState => ({
   progress: { completed: false },
 });
 
-export const createInitialFailureState = (
-  difficulty: Difficulty,
-): FailureState => ({
+export const createInitialFailureState = (caseId: string): FailureState => ({
   strikes: 0,
-  maxStrikes: DIFFICULTY_MAX_STRIKES[difficulty],
+  maxStrikes: getGameCaseOrDefault(caseId).maxStrikes,
   reason: null,
   isLockedOut: false,
   failureType: null,
 });
 
 export const createInitialTerminalHistory = (
-  difficulty: Difficulty,
+  caseId: string,
 ): TerminalLine[] => [
   {
     id: crypto.randomUUID(),
@@ -43,7 +39,7 @@ export const createInitialTerminalHistory = (
   {
     id: crypto.randomUUID(),
     type: "system",
-    text: `Caso asignado: ${CASE_CODES[difficulty]}`,
+    text: `Caso asignado: ${getGameCaseOrDefault(caseId).code}`,
   },
   {
     id: crypto.randomUUID(),

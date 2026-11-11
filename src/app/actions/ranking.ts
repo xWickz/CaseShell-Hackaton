@@ -1,9 +1,8 @@
 ﻿"use server";
 
 import { auth } from "@/auth";
+import { getGameCase } from "@/features/game/data/cases";
 import { prisma } from "@/server/db/prisma";
-
-const ALLOWED_DIFFICULTIES = ["easy", "medium", "hard"] as const;
 
 export type SubmitRankingResult = {
   status: "created" | "improved" | "slower";
@@ -12,6 +11,8 @@ export type SubmitRankingResult = {
 };
 
 export async function submitRankingAction(
+  // Id del caso. Se guarda en la columna `difficulty`: los 3 casos originales
+  // usan "easy" | "medium" | "hard" como id, así que el ranking viejo sigue igual.
   difficulty: string,
   timeSeconds: number,
 ): Promise<SubmitRankingResult> {
@@ -20,19 +21,16 @@ export async function submitRankingAction(
     medium: 60, // 1 minuto? bueno, a ver
     hard: 120, // 2 minutos si ya se sabe todo pero igual
   };
-  if (
-    !ALLOWED_DIFFICULTIES.includes(
-      difficulty as (typeof ALLOWED_DIFFICULTIES)[number],
-    )
-  ) {
-    throw new Error("Dificultad inválida");
+  const gameCase = getGameCase(difficulty);
+  if (!gameCase) {
+    throw new Error("Caso inválido");
   }
 
   if (!Number.isFinite(timeSeconds) || timeSeconds <= 0) {
     throw new Error("Tiempo inválido");
   }
 
-  const minSeconds = minSecondsByDifficulty[difficulty];
+  const minSeconds = minSecondsByDifficulty[gameCase.tier];
   if (timeSeconds < minSeconds) {
     throw new Error("Tiempo no válido para ranking");
   }

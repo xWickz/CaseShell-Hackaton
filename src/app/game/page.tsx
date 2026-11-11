@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { difficulties } from "@/features/game/data/mock/difficulties";
+import { GAME_CASES, isPlayable } from "@/features/game/data/cases";
 import PendingSessionBanner from "@/features/game/ui/ui/PendingSessionBanner";
 import Footer from "@/features/landing/ui/components/Footer";
 import Navbar from "@/features/landing/ui/components/Navbar";
+
+// Los casos de temporada aparecen y desaparecen por fecha.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Elige tu caso",
@@ -30,7 +33,19 @@ export default function GameSelectPage() {
       border: "hover:border-red-500/50",
       bg: "group-hover:bg-red-500/5",
     },
+    halloween: {
+      text: "text-orange-400",
+      border: "border-orange-500/40 hover:border-orange-500/70",
+      bg: "bg-orange-500/5 group-hover:bg-orange-500/10",
+    },
+    christmas: {
+      text: "text-sky-300",
+      border: "border-sky-400/40 hover:border-sky-300/70",
+      bg: "bg-sky-400/5 group-hover:bg-sky-400/10",
+    },
   };
+
+  const cases = GAME_CASES.filter((gameCase) => isPlayable(gameCase));
 
   return (
     <>
@@ -52,12 +67,14 @@ export default function GameSelectPage() {
             <PendingSessionBanner />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-            {difficulties.map((diff) => {
-              const styles = difficultyStyles[diff.id] || difficultyStyles.easy;
+            {cases.map(({ id, tier, season, card: diff }) => {
+              const styles =
+                difficultyStyles[season?.theme ?? tier] ||
+                difficultyStyles.easy;
 
               return (
                 <div
-                  key={diff.id}
+                  key={id}
                   className={`group bg-zinc-900/40 rounded-3xl border border-white/10 p-10 flex flex-col justify-between transition-all duration-300 shadow-2xl ${styles.border} ${styles.bg}`}
                 >
                   <div>
@@ -83,7 +100,7 @@ export default function GameSelectPage() {
                   </div>
 
                   <Link
-                    href={`/game/${diff.id}`}
+                    href={`/game/${id}`}
                     className="mt-5 w-full text-center text-white text-sm border border-white/10 rounded-2xl py-4 px-6 font-semibold hover:bg-white hover:text-black transition-all duration-200 uppercase "
                   >
                     Iniciar Investigación

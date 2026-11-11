@@ -2,9 +2,9 @@
 
 import { Bot, MessageSquareMore, Radio } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
-import { chatScripts, isConditionMet } from "@/features/game/data/chat-script";
+import { getSessionCase } from "@/features/game/data/cases";
+import { isConditionMet } from "@/features/game/data/chat-script";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
-import type { Difficulty } from "@/features/game/types/game";
 
 const speakerStyles = {
   ops: {
@@ -25,21 +25,22 @@ const speakerStyles = {
 };
 
 type OpsChatWindowProps = {
-  difficulty: Difficulty;
+  caseId: string;
 };
 
-export default function OpsChatWindow({ difficulty }: OpsChatWindowProps) {
+export default function OpsChatWindow({ caseId }: OpsChatWindowProps) {
   const caseProgress = useGameSessionStore((state) => state.caseState.progress);
+  const caseSeed = useGameSessionStore((state) => state.caseSeed);
   const setCurrentInput = useGameSessionStore((state) => state.setCurrentInput);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const messages = useMemo(() => {
-    const script = chatScripts[difficulty];
+    const script = getSessionCase(caseId, caseSeed).chat;
     return script.filter((entry) =>
       isConditionMet(entry.condition, caseProgress),
     );
-  }, [difficulty, caseProgress]);
+  }, [caseId, caseSeed, caseProgress]);
 
   useEffect(() => {
     if (!scrollRef.current) return;

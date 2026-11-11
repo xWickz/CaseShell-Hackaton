@@ -1,21 +1,30 @@
-import type { CaseState, CommandExecutionResult } from "@/features/game/types/game-engine";
-import type { Difficulty } from "@/features/game/types/game";
-import { executeEasyCommand } from "./easy-case-engine";
-import { executeMediumCommand } from "./medium-case-engine";
-import { executeHardCommand } from "./hard-case-engine";
+import {
+  getGameCaseOrDefault,
+  getSessionCase,
+} from "@/features/game/data/cases";
+import type {
+  CaseState,
+  CommandExecutionResult,
+} from "@/features/game/types/game-engine";
+import {
+  COMMON_COMMANDS,
+  getCaseCommands,
+  runCaseCommand,
+} from "./case-runner";
 
 export function executeCaseCommand(
-  difficulty: Difficulty,
+  caseId: string,
   rawInput: string,
   state: CaseState,
+  seed = 0,
 ): CommandExecutionResult {
-  switch (difficulty) {
-    case "medium":
-      return executeMediumCommand(rawInput, state);
-    case "hard":
-      return executeHardCommand(rawInput, state);
-    case "easy":
-    default:
-      return executeEasyCommand(rawInput, state);
-  }
+  return runCaseCommand(getSessionCase(caseId, seed).engine, rawInput, state);
+}
+
+/** Comandos para autocompletar en la terminal. */
+export function getTerminalCommands(caseId: string): string[] {
+  return [
+    ...COMMON_COMMANDS,
+    ...getCaseCommands(getGameCaseOrDefault(caseId).engine),
+  ];
 }

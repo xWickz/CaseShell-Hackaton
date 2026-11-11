@@ -7,8 +7,11 @@ import {
   getRandomAlert,
   toActiveAlert,
 } from "@/features/game/data/random-alerts";
-import { executeCaseCommand } from "@/features/game/engine/case-engine";
-import { getTerminalCommandsForDifficulty } from "@/features/game/engine/terminal-commands";
+import { getGameCaseOrDefault } from "@/features/game/data/cases";
+import {
+  executeCaseCommand,
+  getTerminalCommands,
+} from "@/features/game/engine/case-engine";
 import { useTerminalAudio } from "@/features/game/hooks/useTerminalAudio";
 import type { CommandOutcome } from "@/features/game/store/constants/game-session.types";
 import { useGameSessionStore } from "@/features/game/store/useGameSessionStore";
@@ -22,43 +25,12 @@ const ALERT_SFX_FILES = [
   "/game/audio/audio3_fix.mp3",
 ] as const;
 
-const REQUIRED_PROGRESS_KEYS = {
-  easy: ["wifiFixed", "firewallFixed", "malwareKilled"],
-  medium: [
-    "wifiFixed",
-    "firewallFixed",
-    "malwareKilled",
-    "dnsDiagnosticsComplete",
-    "overrideValidated",
-    "dnsFixed",
-    "servicesVerified",
-    "servicesRestarted",
-    "incidentReportFiled",
-  ],
-  hard: [
-    "wifiFixed",
-    "firewallFixed",
-    "malwareKilled",
-    "dnsDiagnosticsComplete",
-    "overrideValidated",
-    "dnsFixed",
-    "servicesVerified",
-    "servicesRestarted",
-    "perimeterScanComplete",
-    "watchdogDeployed",
-    "switchAuditComplete",
-    "switchPortEnabled",
-    "incidentReportFiled",
-  ],
-} as const;
-
 export default function TerminalWindow() {
   const terminalHistory = useGameSessionStore((state) => state.terminalHistory);
   const currentInput = useGameSessionStore((state) => state.currentInput);
   const caseState = useGameSessionStore((state) => state.caseState);
-  const currentDifficulty = useGameSessionStore(
-    (state) => state.currentDifficulty,
-  );
+  const currentCaseId = useGameSessionStore((state) => state.currentCaseId);
+  const caseSeed = useGameSessionStore((state) => state.caseSeed);
   const hasTimedOut = useGameSessionStore((state) => state.hasTimedOut);
   const isPaused = useGameSessionStore((state) => state.isPaused);
   const failureState = useGameSessionStore((state) => state.failureState);
@@ -179,9 +151,10 @@ export default function TerminalWindow() {
   }, [caseState.progress.completed, playCompletion]);
 
   const allObjectivesCompleted = useMemo(() => {
-    const requiredKeys = REQUIRED_PROGRESS_KEYS[currentDifficulty];
-    return requiredKeys.every((key) => Boolean(caseState.progress[key]));
-  }, [currentDifficulty, caseState.progress]);
+    return getGameCaseOrDefault(currentCaseId).engine.actions.every((action) =>
+      Boolean(caseState.progress[action.objective]),
+    );
+  }, [currentCaseId, caseState.progress]);
 
   useEffect(() => {
     if (!allObjectivesCompleted) {
@@ -210,7 +183,7 @@ export default function TerminalWindow() {
   const prompt = "agent@cubepath:~$";
 
   const availableCommands = useMemo(() => {
-    const baseCommands = getTerminalCommandsForDifficulty(currentDifficulty);
+    const baseCommands = getTerminalCommands(currentCaseId);
 
     const historyScore = new Map<string, number>();
     commandHistory.forEach((cmd, index) => {
@@ -222,7 +195,7 @@ export default function TerminalWindow() {
       const scoreB = historyScore.get(b.toLowerCase()) ?? 0;
       return scoreB - scoreA || a.localeCompare(b);
     });
-  }, [currentDifficulty, commandHistory]);
+  }, [currentCaseId, commandHistory]);
 
   const normalizedInput = currentInput.trim().toLowerCase();
 
@@ -374,7 +347,12 @@ export default function TerminalWindow() {
       return;
     }
 
-    const result = executeCaseCommand(currentDifficulty, rawInput, caseState);
+    const result = executeCaseCommand(
+      currentCaseId,
+      rawInput,
+      caseState,
+      caseSeed,
+    );
 
     const outcome: CommandOutcome = result.lines.some(
       (line) => line.type === "error",

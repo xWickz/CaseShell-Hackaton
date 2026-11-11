@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { executeEasyCommand } from "@/features/game/engine/easy-case-engine";
+import { easy001 } from "@/features/game/data/cases/easy-001";
+import { runCaseCommand } from "@/features/game/engine/case-runner";
 import type { CaseState } from "@/features/game/types/game-engine";
 
 const baseState: CaseState = {
@@ -7,7 +8,25 @@ const baseState: CaseState = {
   progress: {},
 };
 
-describe("executeEasyCommand", () => {
+const executeEasyCommand = (input: string, state: CaseState) =>
+  runCaseCommand(easy001, input, state);
+
+describe("easy-001 via case-runner", () => {
+  it("reading a file teaches its command", () => {
+    const result = executeEasyCommand("cat network.txt", baseState);
+
+    expect(result.nextState).toEqual({ knowledge: { knowsWifiFix: true } });
+  });
+
+  it("does not submit with pending objectives", () => {
+    const result = executeEasyCommand("submit", {
+      knowledge: {},
+      progress: { wifiFixed: true, firewallFixed: true },
+    });
+
+    expect(result.completed).toBeUndefined();
+  });
+
   it("blocks destructive commands", () => {
     const result = executeEasyCommand("rm -rf /", baseState);
 

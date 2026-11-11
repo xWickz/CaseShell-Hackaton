@@ -4,6 +4,11 @@ import { Clock, Target } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useReducer, useState } from "react";
 import { getRankingsAction } from "@/app/actions/ranking";
+import {
+  DEFAULT_CASE_ID,
+  GAME_CASES,
+  TIER_LABELS,
+} from "@/features/game/data/cases";
 
 type Ranking = {
   id: string;
@@ -45,7 +50,7 @@ function rankingReducer(
 
 export default function RankingTable() {
   const [state, dispatch] = useReducer(rankingReducer, INITIAL_STATE);
-  const [filter, setFilter] = useState<"easy" | "medium" | "hard">("easy");
+  const [filter, setFilter] = useState(DEFAULT_CASE_ID);
 
   const { rankings, loading } = state;
 
@@ -75,23 +80,21 @@ export default function RankingTable() {
 
   return (
     <>
-      <div className="flex justify-center gap-4">
-        {(["easy", "medium", "hard"] as const).map((diff) => (
+      <div className="flex flex-wrap justify-center gap-4">
+        {GAME_CASES.map((gameCase) => (
           <button
             type="button"
-            key={diff}
-            onClick={() => setFilter(diff)}
+            key={gameCase.id}
+            onClick={() => setFilter(gameCase.id)}
             className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-              filter === diff
+              filter === gameCase.id
                 ? "bg-white text-black"
                 : "bg-white/10 text-white hover:bg-white/20"
             }`}
           >
-            {diff === "easy"
-              ? "Fácil"
-              : diff === "medium"
-                ? "Medio"
-                : "Díficil"}
+            {gameCase.season
+              ? gameCase.card.label
+              : TIER_LABELS[gameCase.tier]}
           </button>
         ))}
       </div>

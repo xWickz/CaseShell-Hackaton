@@ -3,8 +3,11 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import {
-  DEFAULT_DIFFICULTY,
-  DIFFICULTY_TIME_LIMITS,
+  DEFAULT_CASE_ID,
+  getGameCaseOrDefault,
+  newCaseSeed,
+} from "@/features/game/data/cases";
+import {
   INITIAL_ALERT_EFFECT_STATE,
   MAX_COMMAND_HISTORY,
 } from "@/features/game/store/constants/game-session.constants";
@@ -53,19 +56,20 @@ export const useGameSessionStore = create<GameSessionState>()(
           };
         }),
 
-      terminalHistory: createInitialTerminalHistory(DEFAULT_DIFFICULTY),
+      terminalHistory: createInitialTerminalHistory(DEFAULT_CASE_ID),
       currentInput: "",
       commandLog: [],
       commandHistory: [],
       commandStats: { total: 0, success: 0, error: 0 },
       caseState: createInitialCaseState(),
-      currentDifficulty: DEFAULT_DIFFICULTY,
+      currentCaseId: DEFAULT_CASE_ID,
+      caseSeed: 0,
 
       startTime: null,
       endTime: null,
 
-      timeLimitMs: DIFFICULTY_TIME_LIMITS[DEFAULT_DIFFICULTY],
-      timeRemainingMs: DIFFICULTY_TIME_LIMITS[DEFAULT_DIFFICULTY],
+      timeLimitMs: getGameCaseOrDefault(DEFAULT_CASE_ID).timeLimitMs,
+      timeRemainingMs: getGameCaseOrDefault(DEFAULT_CASE_ID).timeLimitMs,
       timerEndsAt: null,
       hasTimedOut: false,
       isFailedOpen: false,
@@ -81,17 +85,18 @@ export const useGameSessionStore = create<GameSessionState>()(
       activeAlert: null,
       alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
 
-      failureState: createInitialFailureState(DEFAULT_DIFFICULTY),
+      failureState: createInitialFailureState(DEFAULT_CASE_ID),
 
-      initializeSession: (difficulty) =>
+      initializeSession: (caseId) =>
         set(() => {
           useGameUIStore.getState().resetVirusAlertHint();
 
-          const nextTimeLimit = DIFFICULTY_TIME_LIMITS[difficulty];
+          const nextTimeLimit = getGameCaseOrDefault(caseId).timeLimitMs;
 
           return {
-            currentDifficulty: difficulty,
-            terminalHistory: createInitialTerminalHistory(difficulty),
+            currentCaseId: caseId,
+            caseSeed: newCaseSeed(),
+            terminalHistory: createInitialTerminalHistory(caseId),
             currentInput: "",
             caseState: createInitialCaseState(),
             startTime: null,
@@ -115,7 +120,7 @@ export const useGameSessionStore = create<GameSessionState>()(
             commandStats: { total: 0, success: 0, error: 0 },
             activeAlert: null,
             alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
-            failureState: createInitialFailureState(difficulty),
+            failureState: createInitialFailureState(caseId),
           };
         }),
 
@@ -341,7 +346,7 @@ export const useGameSessionStore = create<GameSessionState>()(
 
       clearFailureState: () =>
         set((state) => ({
-          failureState: createInitialFailureState(state.currentDifficulty),
+          failureState: createInitialFailureState(state.currentCaseId),
         })),
 
       failSession: () =>
@@ -403,12 +408,14 @@ export const useGameSessionStore = create<GameSessionState>()(
         set((state) => {
           useGameUIStore.getState().resetVirusAlertHint();
 
-          const nextTimeLimit = DIFFICULTY_TIME_LIMITS[state.currentDifficulty];
+          const nextTimeLimit = getGameCaseOrDefault(
+            state.currentCaseId,
+          ).timeLimitMs;
 
           return {
-            terminalHistory: createInitialTerminalHistory(
-              state.currentDifficulty,
-            ),
+            // Reiniciar = partida nueva: otros códigos.
+            caseSeed: newCaseSeed(),
+            terminalHistory: createInitialTerminalHistory(state.currentCaseId),
             currentInput: "",
             caseState: createInitialCaseState(),
             startTime: null,
@@ -432,7 +439,7 @@ export const useGameSessionStore = create<GameSessionState>()(
             commandStats: { total: 0, success: 0, error: 0 },
             activeAlert: null,
             alertEffectState: { ...INITIAL_ALERT_EFFECT_STATE },
-            failureState: createInitialFailureState(state.currentDifficulty),
+            failureState: createInitialFailureState(state.currentCaseId),
           };
         }),
 
@@ -475,6 +482,17 @@ export const useGameSessionStore = create<GameSessionState>()(
     {
       name: "caseshell-session-storage",
       storage: createJSONStorage(() => localStorage),
+      // v0 guardaba la partida por dificultad; los 3 casos originales
+      // conservan esos ids, así que basta con renombrar el campo.
+      version: 1,
+      migrate: (persisted, version) => {
+        const state = persisted as Record<string, unknown>;
+        if (version === 0 && state && "currentDifficulty" in state) {
+          const { currentDifficulty, ...rest } = state;
+          return { ...rest, currentCaseId: currentDifficulty };
+        }
+        return state;
+      },
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
@@ -493,7 +511,9 @@ export const useGameSessionStore = create<GameSessionState>()(
           },
         },
 
-        currentDifficulty: state.currentDifficulty,
+        currentCaseId: state.currentCaseId,
+        // Partidas guardadas antes de existir la semilla quedan en 0 (clásicos).
+        caseSeed: state.caseSeed,
 
         timeLimitMs: state.timeLimitMs,
         timeRemainingMs: state.timeRemainingMs,

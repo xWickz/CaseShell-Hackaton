@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { executeHardCommand } from "@/features/game/engine/hard-case-engine";
+import { hard003 } from "@/features/game/data/cases/hard-003";
+import { runCaseCommand } from "@/features/game/engine/case-runner";
 import type { CaseState } from "@/features/game/types/game-engine";
 
 const baseState: CaseState = {
   knowledge: {},
   progress: {},
 };
+
+const executeHardCommand = (input: string, state: CaseState) =>
+  runCaseCommand(hard003, input, state);
 
 describe("executeHardCommand", () => {
   it("fails when enabling port without audit", () => {
